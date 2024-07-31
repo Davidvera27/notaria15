@@ -5,6 +5,7 @@ import os
 import fitz  # PyMuPDF
 import re
 
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -42,10 +43,9 @@ class Protocolist(db.Model):
             'correo_electronico': self.correo_electronico
         }
 
-@app.route('/cases', methods=['GET'])
+@app.route('/api/cases', methods=['GET'])
 def get_cases():
-    cases = Case.query.all()
-    return jsonify([case.to_dict() for case in cases])
+    return jsonify({'cases': 'This is a test case'})
 
 @app.route('/cases', methods=['POST'])
 def add_case():
@@ -151,6 +151,4 @@ def extract_data():
     return jsonify(extracted_data)
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
