@@ -18,8 +18,8 @@
       "dest": "/api/index.py"
     },
     {
-      "src": "/frontend/(.*)",
-      "dest": "/frontend/build/$1"
+      "src": "/api/(.*)",
+      "dest": "/api/build/$1"
     }
   ]
 }
