@@ -1,4 +1,6 @@
-flask
+Flask
 flask_sqlalchemy
 flask_cors
-imaplib2
+requests
+watchdog
+PyMuPDF
