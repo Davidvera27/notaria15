@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "notaria15/frontend/package.json",
+      "src": "./frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "frontend/build"
