@@ -5,7 +5,7 @@ import './Home.css';
 const Home = () => {
   return (
     <div className="home-container">
-      <h1 className="home-title">Bienvenido a la Gestión Notarial</h1>
+      <h1 className="home-title">Bienvenida doña Martha</h1>
       <div className="home-buttons">
         <Link to="/cases" className="home-button">Gestión de Casos</Link>
         <Link to="/protocolists" className="home-button">Gestión de Protocolistas</Link>
