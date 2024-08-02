@@ -20,7 +20,7 @@ const CaseForm = () => {
 
   const fetchCases = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/cases');
+      const response = await axios.get('https://notaria15-backend.vercel.app/cases');
       setCases(response.data);
     } catch (error) {
       console.error('Error fetching cases:', error);
@@ -29,7 +29,7 @@ const CaseForm = () => {
 
   const fetchProtocolists = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/protocolists');
+      const response = await axios.get('https://notaria15-backend.vercel.app/protocolists');
       setProtocolists(response.data);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
