@@ -6,7 +6,7 @@ import fitz  # PyMuPDF
 import re
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)  # Asegúrate de que CORS esté habilitado para todas las rutas
 
 # Configurar la base de datos
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -151,4 +151,5 @@ def extract_data():
     return jsonify(extracted_data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Configurar el host y puerto para desplegar en plataformas de producción
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
