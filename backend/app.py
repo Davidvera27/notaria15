@@ -6,9 +6,10 @@ import fitz  # PyMuPDF
 import re
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow CORS for all routes
+# Asegúrate de permitir el origen de tu frontend
+CORS(app, resources={r"/*": {"origins": "https://notaria15.vercel.app"}})
 
-# Configure the database
+# Configurar la base de datos
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database', 'notaria15.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -53,7 +54,7 @@ def add_case():
     new_case = Case(fecha=data['fecha'], escritura=data['escritura'], radicado=data['radicado'], protocolista=data['protocolista'])
     db.session.add(new_case)
     db.session.commit()
-    return jsonify(new_case.to_dict()), 201
+    return jsonify(new_case.to_dict())
 
 @app.route('/api/cases/<int:id>', methods=['PUT'])
 def update_case(id):
@@ -90,7 +91,7 @@ def add_protocolist():
     new_protocolist = Protocolist(nombre=data['nombre'], correo_electronico=data['correo_electronico'])
     db.session.add(new_protocolist)
     db.session.commit()
-    return jsonify(new_protocolist.to_dict()), 201
+    return jsonify(new_protocolist.to_dict())
 
 @app.route('/api/protocolists/<int:id>', methods=['PUT'])
 def update_protocolist(id):
@@ -108,14 +109,14 @@ def delete_protocolist(id):
     db.session.commit()
     return jsonify({'message': 'Protocolist deleted successfully'})
 
-# PDF data extraction functionality
+# Nueva funcionalidad para extraer datos de PDFs
 def extract_pdf_data(pdf_path):
     doc = fitz.open(pdf_path)
     text = ""
     for page in doc:
         text += page.get_text()
 
-    # Extract specific data
+    # Extraer los datos específicos
     clase = extract_field(text, "CLASE")
     radicado = extract_field(text, "RADICADO N°")
     doc_number = extract_field(text, "N° DOC")
@@ -151,5 +152,6 @@ def extract_data():
     return jsonify(extracted_data)
 
 if __name__ == '__main__':
-    # Configure host and port for deployment on production platforms
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True, host='0.0.0.0', port=5000) # Agregar host para Vercel
