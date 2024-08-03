@@ -7,7 +7,7 @@ import re
 
 app = Flask(__name__)
 # Asegúrate de permitir el origen de tu frontend
-CORS(app, resources={r"/*": {"origins": "https://notaria15.vercel.app"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Configurar la base de datos
 basedir = os.path.abspath(os.path.dirname(__file__))
