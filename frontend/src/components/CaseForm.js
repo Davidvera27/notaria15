@@ -18,7 +18,7 @@ const CaseForm = () => {
     protocolista: ''
   });
 
-  const API_URL = process.env.REACT_APP_API_URL; // Asegúrate de que REACT_APP_API_URL esté configurada en tu archivo .env
+  const API_URL = process.env.REACT_APP_API_URL || 'https://notaria15-backend.vercel.app'; // Ensure REACT_APP_API_URL is set
 
   const fetchCases = useCallback(async () => {
     try {
@@ -55,8 +55,8 @@ const CaseForm = () => {
     const intervalId = setInterval(() => {
       fetchCases();
       fetchPdfData();
-    }, 10000); // Refrescar cada 10 segundos
-    return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar el componente
+    }, 10000); // Refresh every 10 seconds
+    return () => clearInterval(intervalId); // Clear interval on component unmount
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
 
   useEffect(() => {
