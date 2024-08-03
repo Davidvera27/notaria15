@@ -27,8 +27,8 @@ const CaseForm = () => {
     } catch (error) {
       console.error('Error fetching cases:', error);
     }
-  }, []); // No incluir API_URL
-  
+  }, [API_URL]); // Incluir API_URL en las dependencias
+
   const fetchProtocolists = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/protocolists`);
@@ -36,16 +36,17 @@ const CaseForm = () => {
     } catch (error) {
       console.error('Error fetching protocolists:', error);
     }
-  }, []); // No incluir API_URL
-  
+  }, [API_URL]); // Incluir API_URL en las dependencias
+
   const fetchPdfData = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/extract-data`);
       setPdfData(response.data);
+      console.log('PDF Data:', response.data);
     } catch (error) {
       console.error('Error fetching PDF data:', error);
     }
-  }, []); // No incluir API_URL
+  }, [API_URL]); // Incluir API_URL en las dependencias
 
   useEffect(() => {
     fetchCases();
