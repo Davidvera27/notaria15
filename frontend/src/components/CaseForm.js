@@ -18,34 +18,35 @@ const CaseForm = () => {
     protocolista: ''
   });
 
+  const API_URL = process.env.REACT_APP_API_URL; // Definición de la variable de entorno
+
   const fetchCases = useCallback(async () => {
     try {
-      const response = await axios.get('https://notaria15-backend.vercel.app/cases');
+      const response = await axios.get(`${API_URL}/api/cases`); // Uso de la variable de entorno
       setCases(response.data);
     } catch (error) {
       console.error('Error fetching cases:', error);
     }
-  }, []);
+  }, [API_URL]);
 
   const fetchProtocolists = useCallback(async () => {
     try {
-      const response = await axios.get('https://notaria15-backend.vercel.app/protocolists');
+      const response = await axios.get(`${API_URL}/api/protocolists`); // Uso de la variable de entorno
       setProtocolists(response.data);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
     }
-  }, []);
+  }, [API_URL]);
 
   const fetchPdfData = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/extract-data');
+      const response = await axios.get(`${API_URL}/extract-data`); // Uso de la variable de entorno
       setPdfData(response.data);
       console.log('PDF Data:', response.data);
     } catch (error) {
       console.error('Error fetching PDF data:', error);
     }
-  }, []);
-  
+  }, [API_URL]);
 
   useEffect(() => {
     fetchCases();
@@ -57,7 +58,6 @@ const CaseForm = () => {
     }, 10000); // Refrescar cada 10 segundos
     return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar el componente
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
-  
 
   useEffect(() => {
     if (currentCase) {
@@ -87,13 +87,13 @@ const CaseForm = () => {
     e.preventDefault();
     try {
       if (currentCase) {
-        await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, {
+        await axios.put(`${API_URL}/api/cases/${currentCase.id}`, { // Uso de la variable de entorno
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
         setCurrentCase(null);
       } else {
-        await axios.post('http://127.0.0.1:5000/cases', {
+        await axios.post(`${API_URL}/api/cases`, { // Uso de la variable de entorno
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
@@ -126,7 +126,7 @@ const CaseForm = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://127.0.0.1:5000/cases/${id}`);
+        await axios.delete(`${API_URL}/api/cases/${id}`); // Uso de la variable de entorno
         fetchCases();
         Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
       } catch (error) {
@@ -134,7 +134,7 @@ const CaseForm = () => {
         Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
       }
     }
-  }, [fetchCases]);
+  }, [fetchCases, API_URL]);
 
   const isRadicadoInPdf = (radicado) => {
     return pdfData.some((pdf) => {
@@ -143,7 +143,6 @@ const CaseForm = () => {
       return pdfRadicado === caseRadicado;
     });
   };
-  
 
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(
