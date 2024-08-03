@@ -9,9 +9,9 @@ import './App.css';
 function App() {
   const handleCheckEmails = async () => {
     try {
-      const response = await fetch('http://localhost:5000/check-emails', {
-        method: 'POST',
-      });
+        const response = await fetch('https://notaria15-backend.vercel.app/check-emails', {
+            method: 'POST',
+        });
       const data = await response.json();
       if (response.ok) {
         alert(data.message);
@@ -20,8 +20,8 @@ function App() {
       }
     } catch (error) {
       alert(`Error: ${error.message}`);
-    }
-  };
+  }
+};
 
   return (
     <Router>
