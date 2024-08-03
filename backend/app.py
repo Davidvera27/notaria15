@@ -6,9 +6,9 @@ import fitz  # PyMuPDF
 import re
 
 app = Flask(__name__)
-CORS(app)  # Asegúrate de que CORS esté habilitado para todas las rutas
+CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow CORS for all routes
 
-# Configurar la base de datos
+# Configure the database
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database', 'notaria15.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -108,14 +108,14 @@ def delete_protocolist(id):
     db.session.commit()
     return jsonify({'message': 'Protocolist deleted successfully'})
 
-# Nueva funcionalidad para extraer datos de PDFs
+# PDF data extraction functionality
 def extract_pdf_data(pdf_path):
     doc = fitz.open(pdf_path)
     text = ""
     for page in doc:
         text += page.get_text()
 
-    # Extraer los datos específicos
+    # Extract specific data
     clase = extract_field(text, "CLASE")
     radicado = extract_field(text, "RADICADO N°")
     doc_number = extract_field(text, "N° DOC")
@@ -151,5 +151,5 @@ def extract_data():
     return jsonify(extracted_data)
 
 if __name__ == '__main__':
-    # Configurar el host y puerto para desplegar en plataformas de producción
+    # Configure host and port for deployment on production platforms
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
