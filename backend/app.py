@@ -5,7 +5,6 @@ import os
 import fitz  # PyMuPDF
 import re
 
-
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -45,17 +44,18 @@ class Protocolist(db.Model):
 
 @app.route('/api/cases', methods=['GET'])
 def get_cases():
-    return jsonify({'cases': 'This is a test case'})
+    cases = Case.query.all()
+    return jsonify([case.to_dict() for case in cases])
 
-@app.route('/cases', methods=['POST'])
+@app.route('/api/cases', methods=['POST'])
 def add_case():
     data = request.json
     new_case = Case(fecha=data['fecha'], escritura=data['escritura'], radicado=data['radicado'], protocolista=data['protocolista'])
     db.session.add(new_case)
     db.session.commit()
-    return jsonify(new_case.to_dict())
+    return jsonify(new_case.to_dict()), 201
 
-@app.route('/cases/<int:id>', methods=['PUT'])
+@app.route('/api/cases/<int:id>', methods=['PUT'])
 def update_case(id):
     data = request.json
     case = Case.query.get(id)
@@ -69,7 +69,7 @@ def update_case(id):
     db.session.commit()
     return jsonify(case.to_dict())
 
-@app.route('/cases/<int:id>', methods=['DELETE'])
+@app.route('/api/cases/<int:id>', methods=['DELETE'])
 def delete_case(id):
     case = Case.query.get(id)
     if not case:
@@ -79,20 +79,20 @@ def delete_case(id):
     db.session.commit()
     return '', 204
 
-@app.route('/protocolists', methods=['GET'])
+@app.route('/api/protocolists', methods=['GET'])
 def get_protocolists():
     protocolists = Protocolist.query.all()
     return jsonify([protocolist.to_dict() for protocolist in protocolists])
 
-@app.route('/protocolists', methods=['POST'])
+@app.route('/api/protocolists', methods=['POST'])
 def add_protocolist():
     data = request.json
     new_protocolist = Protocolist(nombre=data['nombre'], correo_electronico=data['correo_electronico'])
     db.session.add(new_protocolist)
     db.session.commit()
-    return jsonify(new_protocolist.to_dict())
+    return jsonify(new_protocolist.to_dict()), 201
 
-@app.route('/protocolists/<int:id>', methods=['PUT'])
+@app.route('/api/protocolists/<int:id>', methods=['PUT'])
 def update_protocolist(id):
     protocolist = Protocolist.query.get_or_404(id)
     data = request.json
@@ -101,7 +101,7 @@ def update_protocolist(id):
     db.session.commit()
     return jsonify(protocolist.to_dict())
 
-@app.route('/protocolists/<int:id>', methods=['DELETE'])
+@app.route('/api/protocolists/<int:id>', methods=['DELETE'])
 def delete_protocolist(id):
     protocolist = Protocolist.query.get_or_404(id)
     db.session.delete(protocolist)
@@ -135,7 +135,7 @@ def extract_field(text, field_name):
         return match.group(1).strip()
     return "No encontrado"
 
-@app.route('/extract-data', methods=['GET'])
+@app.route('/api/extract-data', methods=['GET'])
 def extract_data():
     UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
     pdf_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
