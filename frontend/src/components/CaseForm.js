@@ -6,6 +6,8 @@ import './CaseForm.css';
 import { useTable, useFilters, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Valor por defecto para desarrollo local
+
 const CaseForm = () => {
   const [cases, setCases] = useState([]);
   const [protocolists, setProtocolists] = useState([]);
@@ -18,8 +20,6 @@ const CaseForm = () => {
     protocolista: ''
   });
 
-  const API_URL = process.env.REACT_APP_API_URL || 'https://notaria15-backend.vercel.app'; // Ensure REACT_APP_API_URL is set
-
   const fetchCases = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/cases`);
@@ -27,8 +27,8 @@ const CaseForm = () => {
     } catch (error) {
       console.error('Error fetching cases:', error);
     }
-  }, [API_URL]);
-
+  }, []); // No incluir API_URL
+  
   const fetchProtocolists = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/protocolists`);
@@ -36,17 +36,16 @@ const CaseForm = () => {
     } catch (error) {
       console.error('Error fetching protocolists:', error);
     }
-  }, [API_URL]);
-
+  }, []); // No incluir API_URL
+  
   const fetchPdfData = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/extract-data`);
       setPdfData(response.data);
-      console.log('PDF Data:', response.data);
     } catch (error) {
       console.error('Error fetching PDF data:', error);
     }
-  }, [API_URL]);
+  }, []); // No incluir API_URL
 
   useEffect(() => {
     fetchCases();
@@ -55,8 +54,8 @@ const CaseForm = () => {
     const intervalId = setInterval(() => {
       fetchCases();
       fetchPdfData();
-    }, 10000); // Refresh every 10 seconds
-    return () => clearInterval(intervalId); // Clear interval on component unmount
+    }, 10000); // Refrescar cada 10 segundos
+    return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar el componente
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
 
   useEffect(() => {
@@ -134,7 +133,7 @@ const CaseForm = () => {
         Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
       }
     }
-  }, [fetchCases, API_URL]);
+  }, [fetchCases]);
 
   const isRadicadoInPdf = (radicado) => {
     return pdfData.some((pdf) => {
