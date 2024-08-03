@@ -18,11 +18,11 @@ const CaseForm = () => {
     protocolista: ''
   });
 
-  const API_URL = process.env.REACT_APP_API_URL; // Definición de la variable de entorno
+  const API_URL = process.env.REACT_APP_API_URL; // Asegúrate de que REACT_APP_API_URL esté configurada en tu archivo .env
 
   const fetchCases = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/cases`); // Uso de la variable de entorno
+      const response = await axios.get(`${API_URL}/api/cases`);
       setCases(response.data);
     } catch (error) {
       console.error('Error fetching cases:', error);
@@ -31,7 +31,7 @@ const CaseForm = () => {
 
   const fetchProtocolists = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/protocolists`); // Uso de la variable de entorno
+      const response = await axios.get(`${API_URL}/api/protocolists`);
       setProtocolists(response.data);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
@@ -40,7 +40,7 @@ const CaseForm = () => {
 
   const fetchPdfData = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/extract-data`); // Uso de la variable de entorno
+      const response = await axios.get(`${API_URL}/api/extract-data`);
       setPdfData(response.data);
       console.log('PDF Data:', response.data);
     } catch (error) {
@@ -87,13 +87,13 @@ const CaseForm = () => {
     e.preventDefault();
     try {
       if (currentCase) {
-        await axios.put(`${API_URL}/api/cases/${currentCase.id}`, { // Uso de la variable de entorno
+        await axios.put(`${API_URL}/api/cases/${currentCase.id}`, {
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
         setCurrentCase(null);
       } else {
-        await axios.post(`${API_URL}/api/cases`, { // Uso de la variable de entorno
+        await axios.post(`${API_URL}/api/cases`, {
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
@@ -126,7 +126,7 @@ const CaseForm = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`${API_URL}/api/cases/${id}`); // Uso de la variable de entorno
+        await axios.delete(`${API_URL}/api/cases/${id}`);
         fetchCases();
         Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
       } catch (error) {
