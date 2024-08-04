@@ -1,3 +1,4 @@
+/* ProtocolistTable.css */
 .table-container {
   max-height: 400px;
   overflow-y: auto;
@@ -12,6 +13,7 @@ table {
 th, td {
   border: 1px solid #ddd;
   padding: 8px;
+  font-size: 14px;
 }
 
 th {
@@ -24,6 +26,10 @@ th {
 
 tbody tr:nth-child(even) {
   background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
 }
 
 .protocolist-form {
@@ -43,6 +49,13 @@ tbody tr:nth-child(even) {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.protocolist-form input:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
 .protocolist-form button {
@@ -52,9 +65,10 @@ tbody tr:nth-child(even) {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .protocolist-form button:hover {
   background-color: #0056b3;
+  transform: translateY(-2px);
 }
