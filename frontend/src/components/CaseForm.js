@@ -248,8 +248,8 @@ const CaseForm = () => {
       try {
         // Actualiza el radicado en el backend
         await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
-        // Refrescar la lista de casos
-        fetchCases();
+        // Refrescar la lista de casos para que se refleje el cambio y resalte si es necesario
+        await fetchCases();
       } catch (error) {
         console.error('Error updating radicado:', error);
       }
