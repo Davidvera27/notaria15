@@ -15,7 +15,8 @@ const CaseForm = () => {
     fecha: new Date(),
     escritura: '',
     radicado: '',
-    protocolista: ''
+    protocolista: '',
+    observaciones: '' // Añadir observaciones al estado del formulario
   });
 
   const fetchCases = useCallback(async () => {
@@ -68,7 +69,8 @@ const CaseForm = () => {
         fecha: new Date(),
         escritura: '',
         radicado: '',
-        protocolista: ''
+        protocolista: '',
+        observaciones: '' // Reiniciar observaciones
       });
     }
   }, [currentCase]);
@@ -84,24 +86,23 @@ const CaseForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const caseData = {
+        ...form,
+        fecha: form.fecha.toISOString().split('T')[0]
+      };
       if (currentCase) {
-        await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, {
-          ...form,
-          fecha: form.fecha.toISOString().split('T')[0]
-        });
+        await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
         setCurrentCase(null);
       } else {
-        await axios.post('http://127.0.0.1:5000/cases', {
-          ...form,
-          fecha: form.fecha.toISOString().split('T')[0]
-        });
+        await axios.post('http://127.0.0.1:5000/cases', caseData);
       }
       fetchCases();
       setForm({
         fecha: new Date(),
         escritura: '',
         radicado: '',
-        protocolista: ''
+        protocolista: '',
+        observaciones: '' // Reiniciar observaciones
       });
     } catch (error) {
       console.error('Error adding/updating case:', error);
@@ -163,6 +164,11 @@ const CaseForm = () => {
       {
         Header: 'Protocolista',
         accessor: 'protocolista',
+        Filter: DefaultColumnFilter,
+      },
+      {
+        Header: 'Observaciones',
+        accessor: 'observaciones', // Nueva columna para observaciones
         Filter: DefaultColumnFilter,
       },
       {
@@ -242,6 +248,7 @@ const CaseForm = () => {
             <option key={protocolista.id} value={protocolista.nombre}>{protocolista.nombre}</option>
           ))}
         </select>
+        <textarea name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones"></textarea>
         <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
       </form>
     </div>
