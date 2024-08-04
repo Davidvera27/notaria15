@@ -14,7 +14,7 @@ const ProtocolistTable = () => {
 
   const fetchProtocolists = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/protocolists');
+      const response = await axios.get('https://notaria15-backend.vercel.app/api/protocolists');
       setProtocolists(response.data);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
@@ -45,7 +45,7 @@ const ProtocolistTable = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://127.0.0.1:5000/protocolists/${id}`);
+        await axios.delete(`https://notaria15-backend.vercel.app/api/protocolists/${id}`);
         fetchProtocolists();
         Swal.fire('¡Eliminado!', 'El protocolista ha sido eliminado.', 'success');
       } catch (error) {
@@ -63,10 +63,10 @@ const ProtocolistTable = () => {
     e.preventDefault();
     try {
       if (currentProtocolist) {
-        await axios.put(`http://127.0.0.1:5000/protocolists/${currentProtocolist.id}`, form);
+        await axios.put(`https://notaria15-backend.vercel.app/api/protocolists/${currentProtocolist.id}`, form);
         setCurrentProtocolist(null);
       } else {
-        await axios.post('http://127.0.0.1:5000/protocolists', form);
+        await axios.post('https://notaria15-backend.vercel.app/api/protocolists', form);
       }
       setForm({ nombre: '', correo_electronico: '' });
       fetchProtocolists();
