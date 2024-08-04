@@ -31,3 +31,17 @@ class Protocolist(db.Model):
             'nombre': self.nombre,
             'correo_electronico': self.correo_electronico
         }
+
+class Radicado(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('case.id'), nullable=False)
+    radicado = db.Column(db.String(50), nullable=False)
+    fecha = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'case_id': self.case_id,
+            'radicado': self.radicado,
+            'fecha': self.fecha
+        }
