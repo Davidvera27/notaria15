@@ -243,18 +243,26 @@ const CaseForm = () => {
       loadRadicados();
     }, [caseId]);
 
-    if (radicados.length > 1) {
-      return (
-        <select defaultValue={initialRadicado}>
-          <option value={initialRadicado}>{initialRadicado}</option>
-          {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
-            <option key={r.id} value={r.radicado}>{r.radicado}</option>
-          ))}
-        </select>
-      );
-    } else {
-      return <span>{initialRadicado || 'No Radicados'}</span>;
-    }
+    const handleRadicadoChange = async (e) => {
+      const selectedRadicado = e.target.value;
+      try {
+        // Actualiza el radicado en el backend
+        await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
+        // Refrescar la lista de casos
+        fetchCases();
+      } catch (error) {
+        console.error('Error updating radicado:', error);
+      }
+    };
+
+    return (
+      <select defaultValue={initialRadicado} onChange={handleRadicadoChange}>
+        <option value={initialRadicado}>{initialRadicado}</option>
+        {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
+          <option key={r.id} value={r.radicado}>{r.radicado}</option>
+        ))}
+      </select>
+    );
   };
 
   return (
