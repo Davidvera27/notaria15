@@ -195,7 +195,7 @@ const CaseForm = () => {
       Header: 'Radicado',
       accessor: 'radicado',
       Cell: ({ row }) => (
-        <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} row={row} />
+        <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
       ),
       Filter: DefaultColumnFilter,
     },
@@ -232,7 +232,7 @@ const CaseForm = () => {
     prepareRow,
   } = useTable({ columns, data }, useFilters, useSortBy);
 
-  const RadicadoDropdown = ({ caseId, initialRadicado, row }) => {
+  const RadicadoDropdown = ({ caseId, initialRadicado }) => {
     const [radicados, setRadicados] = useState([]);
 
     useEffect(() => {
@@ -243,36 +243,18 @@ const CaseForm = () => {
       loadRadicados();
     }, [caseId]);
 
-    const handleRadicadoChange = async (e) => {
-      const selectedRadicado = e.target.value;
-      try {
-        // Prepara los datos para enviar al servidor
-        const updatedCase = {
-          fecha: row.original.fecha, // Asegúrate de incluir todos los campos necesarios
-          escritura: row.original.escritura,
-          radicado: selectedRadicado,
-          protocolista: row.original.protocolista,
-          observaciones: row.original.observaciones,
-        };
-    
-        // Actualiza el radicado en el backend
-        await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, updatedCase);
-    
-        // Refrescar la lista de casos para que se refleje el cambio y resalte si es necesario
-        await fetchCases();
-      } catch (error) {
-        console.error('Error updating radicado:', error);
-      }
-    };
-
-    return (
-      <select value={initialRadicado} onChange={handleRadicadoChange}>
-        <option value={initialRadicado}>{initialRadicado}</option>
-        {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
-          <option key={r.id} value={r.radicado}>{r.radicado}</option>
-        ))}
-      </select>
-    );
+    if (radicados.length > 1) {
+      return (
+        <select defaultValue={initialRadicado}>
+          <option value={initialRadicado}>{initialRadicado}</option>
+          {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
+            <option key={r.id} value={r.radicado}>{r.radicado}</option>
+          ))}
+        </select>
+      );
+    } else {
+      return <span>{initialRadicado || 'No Radicados'}</span>;
+    }
   };
 
   return (
