@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
+import { useTable, useFilters, useSortBy } from 'react-table';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import './CaseForm.css';
-import { useTable, useFilters, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
 
 const CaseForm = () => {
   const [cases, setCases] = useState([]);
   const [protocolists, setProtocolists] = useState([]);
   const [pdfData, setPdfData] = useState([]);
-  const [currentCase, setCurrentCase] = useState(null);
   const [form, setForm] = useState({
     fecha: new Date(),
     escritura: '',
@@ -18,6 +16,8 @@ const CaseForm = () => {
     protocolista: '',
     observaciones: ''
   });
+  const [currentCase, setCurrentCase] = useState(null);
+  const [radicados, setRadicados] = useState({});
 
   const fetchCases = useCallback(async () => {
     try {
@@ -41,12 +41,20 @@ const CaseForm = () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/extract-data');
       setPdfData(response.data);
-      console.log('PDF Data:', response.data);
     } catch (error) {
       console.error('Error fetching PDF data:', error);
     }
   }, []);
-  
+
+  const fetchRadicados = useCallback(async (caseId) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/cases/${caseId}/radicados`);
+      setRadicados((prev) => ({ ...prev, [caseId]: response.data }));
+    } catch (error) {
+      console.error('Error fetching radicados:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCases();
     fetchProtocolists();
@@ -57,7 +65,7 @@ const CaseForm = () => {
     }, 10000); // Refrescar cada 10 segundos
     return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar el componente
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
-  
+
   useEffect(() => {
     if (currentCase) {
       setForm({
@@ -152,13 +160,14 @@ const CaseForm = () => {
       try {
         await axios.post(`http://127.0.0.1:5000/cases/${caseItem.id}/radicados`, { radicado });
         fetchCases(); // Actualizar la lista de casos para reflejar el nuevo radicado
+        fetchRadicados(caseItem.id); // Actualizar la lista de radicados
         Swal.fire('Éxito', 'Nuevo radicado añadido.', 'success');
       } catch (error) {
         console.error('Error adding new radicado:', error);
         Swal.fire('Error', 'Hubo un problema al añadir el nuevo radicado.', 'error');
       }
     }
-  }, [fetchCases]);
+  }, [fetchCases, fetchRadicados]);
 
   const isRadicadoInPdf = (radicado) => {
     return pdfData.some((pdf) => {
@@ -167,50 +176,63 @@ const CaseForm = () => {
       return pdfRadicado === caseRadicado;
     });
   };
-  
+
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
-      {
-        Header: 'Fecha',
-        accessor: 'fecha',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Escritura',
-        accessor: 'escritura',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Radicado',
-        accessor: 'radicado',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Protocolista',
-        accessor: 'protocolista',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Observaciones',
-        accessor: 'observaciones',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Acciones',
-        accessor: 'acciones',
-        disableSortBy: true,
-        disableFilters: true,
-        Cell: ({ row }) => (
-          <>
-            <button onClick={() => handleEdit(row.original)}>Editar</button>
-            <button onClick={() => handleDelete(row.original.id)}>Eliminar</button>
-            <button onClick={() => handleAddRadicado(row.original)}>Añadir Radicado</button>
-          </>
-        ),
-      },
-    ],
-    [handleEdit, handleDelete, handleAddRadicado] // Ensure handleAddRadicado is included
-  );
+    {
+      Header: 'Fecha',
+      accessor: 'fecha',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Escritura',
+      accessor: 'escritura',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Radicado',
+      accessor: 'radicado',
+      Filter: DefaultColumnFilter,
+      Cell: ({ row }) => {
+        const radicadosList = radicados[row.original.id] || [];
+        return radicadosList.length > 1 ? (
+          <select
+            value={row.original.radicado}
+            onChange={(e) => console.log(`Radicado seleccionado: ${e.target.value}`)}
+          >
+            {radicadosList.map((r) => (
+              <option key={r.id} value={r.radicado}>{r.radicado}</option>
+            ))}
+          </select>
+        ) : (
+          <span>{row.original.radicado}</span>
+        );
+      }
+    },
+    {
+      Header: 'Protocolista',
+      accessor: 'protocolista',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Observaciones',
+      accessor: 'observaciones',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Acciones',
+      accessor: 'acciones',
+      disableSortBy: true,
+      disableFilters: true,
+      Cell: ({ row }) => (
+        <>
+          <button onClick={() => handleEdit(row.original)}>Editar</button>
+          <button onClick={() => handleDelete(row.original.id)}>Eliminar</button>
+          <button onClick={() => handleAddRadicado(row.original)}>Añadir Radicado</button>
+        </>
+      ),
+    },
+  ], [handleEdit, handleDelete, handleAddRadicado, radicados]); // Ensure handleAddRadicado and radicados are included
 
   const {
     getTableProps,
@@ -229,17 +251,7 @@ const CaseForm = () => {
             {headerGroups.map(headerGroup => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
-                  <th key={column.id} {...column.getHeaderProps()} onClick={() => !column.disableSortBy && column.toggleSortBy(!column.isSortedDesc)}>
-                    {column.render('Header')}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? ' 🔽'
-                          : ' 🔼'
-                        : ''}
-                    </span>
-                    <div onClick={(e) => e.stopPropagation()}>{column.canFilter ? column.render('Filter') : null}</div>
-                  </th>
+                  <th {...column.getHeaderProps()}>{column.render('Header')}</th>
                 ))}
               </tr>
             ))}
@@ -248,53 +260,71 @@ const CaseForm = () => {
             {rows.map(row => {
               prepareRow(row);
               return (
-                <tr key={row.id} {...row.getRowProps()} style={isRadicadoInPdf(row.original.radicado) ? { backgroundColor: 'lightgreen' } : {}}>
-                  {row.cells.map(cell => {
-                    return <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                  })}
+                <tr {...row.getRowProps()} className={isRadicadoInPdf(row.original.radicado) ? 'highlighted' : ''}>
+                  {row.cells.map(cell => (
+                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                  ))}
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-      <form className="case-form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <DatePicker
           selected={form.fecha}
           onChange={handleDateChange}
           dateFormat="yyyy-MM-dd"
-          className="date-picker"
         />
-        <input type="text" name="escritura" value={form.escritura} onChange={handleChange} placeholder="Escritura" />
-        <input type="text" name="radicado" value={form.radicado} onChange={handleChange} placeholder="Radicado" />
-        <select name="protocolista" value={form.protocolista} onChange={handleChange}>
+        <input
+          type="text"
+          name="escritura"
+          value={form.escritura}
+          onChange={handleChange}
+          placeholder="Escritura"
+          required
+        />
+        <input
+          type="text"
+          name="radicado"
+          value={form.radicado}
+          onChange={handleChange}
+          placeholder="Radicado"
+          required
+        />
+        <select
+          name="protocolista"
+          value={form.protocolista}
+          onChange={handleChange}
+          required
+        >
           <option value="">Selecciona un protocolista</option>
-          {protocolists.map((protocolista) => (
-            <option key={protocolista.id} value={protocolista.nombre}>{protocolista.nombre}</option>
+          {protocolists.map(protocolist => (
+            <option key={protocolist.id} value={protocolist.nombre}>
+              {protocolist.nombre}
+            </option>
           ))}
         </select>
-        <textarea name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones"></textarea>
+        <textarea
+          name="observaciones"
+          value={form.observaciones}
+          onChange={handleChange}
+          placeholder="Observaciones"
+        />
         <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
       </form>
     </div>
   );
 };
 
-const DefaultColumnFilter = ({
-  column: { filterValue, preFilteredRows, setFilter },
-}) => {
-  const count = preFilteredRows.length;
-
+function DefaultColumnFilter({ column: { filterValue, setFilter } }) {
   return (
     <input
       value={filterValue || ''}
-      onClick={(e) => e.stopPropagation()}
-      onChange={e => {
-        setFilter(e.target.value || undefined);
-      }}
-      placeholder={`Buscar ${count} registros...`}
+      onChange={e => setFilter(e.target.value || undefined)}
+      placeholder={`Buscar registros...`}
     />
   );
-};
+}
 
 export default CaseForm;
