@@ -195,7 +195,7 @@ const CaseForm = () => {
       Header: 'Radicado',
       accessor: 'radicado',
       Cell: ({ row }) => (
-        <RadicadoDropdown caseId={row.original.id} />
+        <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
       ),
       Filter: DefaultColumnFilter,
     },
@@ -232,7 +232,7 @@ const CaseForm = () => {
     prepareRow,
   } = useTable({ columns, data }, useFilters, useSortBy);
 
-  const RadicadoDropdown = ({ caseId }) => {
+  const RadicadoDropdown = ({ caseId, initialRadicado }) => {
     const [radicados, setRadicados] = useState([]);
 
     useEffect(() => {
@@ -243,16 +243,17 @@ const CaseForm = () => {
       loadRadicados();
     }, [caseId]);
 
-    if (radicados.length > 0) {
+    if (radicados.length > 1) {
       return (
-        <select>
-          {radicados.map((r) => (
+        <select defaultValue={initialRadicado}>
+          <option value={initialRadicado}>{initialRadicado}</option>
+          {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
             <option key={r.id} value={r.radicado}>{r.radicado}</option>
           ))}
         </select>
       );
     } else {
-      return <span>No Radicados</span>;
+      return <span>{initialRadicado || 'No Radicados'}</span>;
     }
   };
 
