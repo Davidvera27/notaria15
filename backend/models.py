@@ -4,10 +4,11 @@ db = SQLAlchemy()
 
 class Case(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.String(10))
+    fecha = db.Column(db.String(50))
     escritura = db.Column(db.Integer)
-    radicado = db.Column(db.String(20))
+    radicado = db.Column(db.String(50))
     protocolista = db.Column(db.String(50))
+    observaciones = db.Column(db.String(255))  # Nueva columna para observaciones
 
     def to_dict(self):
         return {
@@ -15,7 +16,8 @@ class Case(db.Model):
             'fecha': self.fecha,
             'escritura': self.escritura,
             'radicado': self.radicado,
-            'protocolista': self.protocolista
+            'protocolista': self.protocolista,
+            'observaciones': self.observaciones  # Incluye observaciones en el diccionario
         }
 
 class Protocolist(db.Model):
