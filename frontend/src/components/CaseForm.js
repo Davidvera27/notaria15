@@ -249,14 +249,14 @@ const CaseForm = () => {
         // Actualiza el radicado en el backend
         await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
         // Refrescar la lista de casos para que se refleje el cambio y resalte si es necesario
-        fetchCases();
+        await fetchCases();
       } catch (error) {
         console.error('Error updating radicado:', error);
       }
     };
 
     return (
-      <select defaultValue={initialRadicado} onChange={handleRadicadoChange}>
+      <select value={initialRadicado} onChange={handleRadicadoChange}>
         <option value={initialRadicado}>{initialRadicado}</option>
         {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
           <option key={r.id} value={r.radicado}>{r.radicado}</option>
