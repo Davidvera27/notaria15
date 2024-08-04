@@ -28,6 +28,16 @@ const CaseForm = () => {
     }
   }, []);
 
+  const fetchRadicados = useCallback(async (caseId) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/cases/${caseId}/radicados`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching radicados for case ${caseId}:`, error);
+      return [];
+    }
+  }, []);
+
   const fetchProtocolists = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/protocolists');
@@ -46,18 +56,19 @@ const CaseForm = () => {
       console.error('Error fetching PDF data:', error);
     }
   }, []);
-  
+
   useEffect(() => {
-    fetchCases();
-    fetchProtocolists();
-    fetchPdfData();
-    const intervalId = setInterval(() => {
-      fetchCases();
-      fetchPdfData();
-    }, 10000); // Refrescar cada 10 segundos
-    return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar el componente
+    const fetchAllData = async () => {
+      await fetchCases();
+      await fetchProtocolists();
+      await fetchPdfData();
+    };
+
+    fetchAllData();
+    const intervalId = setInterval(fetchAllData, 10000); // Refresh every 10 seconds
+    return () => clearInterval(intervalId); // Clear interval on component unmount
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
-  
+
   useEffect(() => {
     if (currentCase) {
       setForm({
@@ -151,7 +162,7 @@ const CaseForm = () => {
     if (radicado) {
       try {
         await axios.post(`http://127.0.0.1:5000/cases/${caseItem.id}/radicados`, { radicado });
-        fetchCases(); // Actualizar la lista de casos para reflejar el nuevo radicado
+        fetchCases(); // Refresh case list to reflect new radicado
         Swal.fire('Éxito', 'Nuevo radicado añadido.', 'success');
       } catch (error) {
         console.error('Error adding new radicado:', error);
@@ -167,50 +178,51 @@ const CaseForm = () => {
       return pdfRadicado === caseRadicado;
     });
   };
-  
+
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
-      {
-        Header: 'Fecha',
-        accessor: 'fecha',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Escritura',
-        accessor: 'escritura',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Radicado',
-        accessor: 'radicado',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Protocolista',
-        accessor: 'protocolista',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Observaciones',
-        accessor: 'observaciones',
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: 'Acciones',
-        accessor: 'acciones',
-        disableSortBy: true,
-        disableFilters: true,
-        Cell: ({ row }) => (
-          <>
-            <button onClick={() => handleEdit(row.original)}>Editar</button>
-            <button onClick={() => handleDelete(row.original.id)}>Eliminar</button>
-            <button onClick={() => handleAddRadicado(row.original)}>Añadir Radicado</button>
-          </>
-        ),
-      },
-    ],
-    [handleEdit, handleDelete, handleAddRadicado] // Ensure handleAddRadicado is included
-  );
+    {
+      Header: 'Fecha',
+      accessor: 'fecha',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Escritura',
+      accessor: 'escritura',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Radicado',
+      accessor: 'radicado',
+      Cell: ({ row }) => (
+        <RadicadoDropdown caseId={row.original.id} />
+      ),
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Protocolista',
+      accessor: 'protocolista',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Observaciones',
+      accessor: 'observaciones',
+      Filter: DefaultColumnFilter,
+    },
+    {
+      Header: 'Acciones',
+      accessor: 'acciones',
+      disableSortBy: true,
+      disableFilters: true,
+      Cell: ({ row }) => (
+        <>
+          <button onClick={() => handleEdit(row.original)}>Editar</button>
+          <button onClick={() => handleDelete(row.original.id)}>Eliminar</button>
+          <button onClick={() => handleAddRadicado(row.original)}>Añadir Radicado</button>
+        </>
+      ),
+    },
+  ], [handleEdit, handleDelete, handleAddRadicado]);
 
   const {
     getTableProps,
@@ -219,6 +231,30 @@ const CaseForm = () => {
     rows,
     prepareRow,
   } = useTable({ columns, data }, useFilters, useSortBy);
+
+  const RadicadoDropdown = ({ caseId }) => {
+    const [radicados, setRadicados] = useState([]);
+
+    useEffect(() => {
+      const loadRadicados = async () => {
+        const radicadoList = await fetchRadicados(caseId);
+        setRadicados(radicadoList);
+      };
+      loadRadicados();
+    }, [caseId]);
+
+    if (radicados.length > 0) {
+      return (
+        <select>
+          {radicados.map((r) => (
+            <option key={r.id} value={r.radicado}>{r.radicado}</option>
+          ))}
+        </select>
+      );
+    } else {
+      return <span>No Radicados</span>;
+    }
+  };
 
   return (
     <div>
