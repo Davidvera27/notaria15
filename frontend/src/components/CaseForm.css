@@ -1,3 +1,4 @@
+/* CaseForm.css */
 .table-container {
   max-height: 400px;
   overflow-y: auto;
@@ -13,6 +14,7 @@
 .case-table th, .case-table td {
   border: 1px solid #ddd;
   padding: 8px;
+  font-size: 14px;
 }
 
 .case-table th {
@@ -44,10 +46,17 @@
   margin: 20px auto;
 }
 
-.case-form input, .case-form select {
+.case-form input, .case-form select, .case-form textarea {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.case-form input:focus, .case-form select:focus, .case-form textarea:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
 .case-form button {
@@ -57,9 +66,24 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .case-form button:hover {
   background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+select {
+  width: 100%;
+  background-color: white;
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: #007bff;
+  outline: none;
 }
