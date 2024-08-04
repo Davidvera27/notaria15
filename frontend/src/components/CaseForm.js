@@ -20,7 +20,7 @@ const CaseForm = () => {
 
   const fetchCases = useCallback(async () => {
     try {
-      const response = await axios.get('https://notaria15-backend.vercel.app/api/cases');
+      const response = await axios.get('http://127.0.0.1:5000/cases');
       setCases(response.data);
     } catch (error) {
       console.error('Error fetching cases:', error);
@@ -29,7 +29,7 @@ const CaseForm = () => {
 
   const fetchProtocolists = useCallback(async () => {
     try {
-      const response = await axios.get('https://notaria15-backend.vercel.app/api/protocolists');
+      const response = await axios.get('http://127.0.0.1:5000/protocolists');
       setProtocolists(response.data);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
@@ -38,7 +38,7 @@ const CaseForm = () => {
 
   const fetchPdfData = useCallback(async () => {
     try {
-      const response = await axios.get('https://notaria15-backend.vercel.app/api/extract-data');
+      const response = await axios.get('http://127.0.0.1:5000/extract-data');
       setPdfData(response.data);
       console.log('PDF Data:', response.data);
     } catch (error) {
@@ -85,13 +85,13 @@ const CaseForm = () => {
     e.preventDefault();
     try {
       if (currentCase) {
-        await axios.put(`https://notaria15-backend.vercel.app/api/cases/${currentCase.id}`, {
+        await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, {
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
         setCurrentCase(null);
       } else {
-        await axios.post('https://notaria15-backend.vercel.app/api/cases', {
+        await axios.post('http://127.0.0.1:5000/cases', {
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
@@ -124,7 +124,7 @@ const CaseForm = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`https://notaria15-backend.vercel.app/api/cases/${id}`);
+        await axios.delete(`http://127.0.0.1:5000/cases/${id}`);
         fetchCases();
         Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
       } catch (error) {
