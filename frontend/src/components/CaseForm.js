@@ -18,7 +18,6 @@ const CaseForm = () => {
     protocolista: '',
     observaciones: ''
   });
-  const [radicados, setRadicados] = useState({});
 
   const fetchCases = useCallback(async () => {
     try {
@@ -45,15 +44,6 @@ const CaseForm = () => {
       console.log('PDF Data:', response.data);
     } catch (error) {
       console.error('Error fetching PDF data:', error);
-    }
-  }, []);
-  
-  const fetchRadicados = useCallback(async (caseId) => {
-    try {
-      const response = await axios.get(`http://127.0.0.1:5000/cases/${caseId}/radicados`);
-      setRadicados((prev) => ({ ...prev, [caseId]: response.data }));
-    } catch (error) {
-      console.error('Error fetching radicados:', error);
     }
   }, []);
   
@@ -162,14 +152,13 @@ const CaseForm = () => {
       try {
         await axios.post(`http://127.0.0.1:5000/cases/${caseItem.id}/radicados`, { radicado });
         fetchCases(); // Actualizar la lista de casos para reflejar el nuevo radicado
-        fetchRadicados(caseItem.id); // Actualizar la lista de radicados
         Swal.fire('Éxito', 'Nuevo radicado añadido.', 'success');
       } catch (error) {
         console.error('Error adding new radicado:', error);
         Swal.fire('Error', 'Hubo un problema al añadir el nuevo radicado.', 'error');
       }
     }
-  }, [fetchCases, fetchRadicados]);
+  }, [fetchCases]);
 
   const isRadicadoInPdf = (radicado) => {
     return pdfData.some((pdf) => {
@@ -195,16 +184,6 @@ const CaseForm = () => {
         Header: 'Radicado',
         accessor: 'radicado',
         Filter: DefaultColumnFilter,
-        Cell: ({ row }) => (
-          <select
-            value={row.original.radicado}
-            onChange={(e) => console.log(`Radicado seleccionado: ${e.target.value}`)}
-          >
-            {(radicados[row.original.id] || []).map((r) => (
-              <option key={r.id} value={r.radicado}>{r.radicado}</option>
-            ))}
-          </select>
-        ),
       },
       {
         Header: 'Protocolista',
@@ -230,7 +209,7 @@ const CaseForm = () => {
         ),
       },
     ],
-    [handleEdit, handleDelete, handleAddRadicado, radicados] // Ensure handleAddRadicado and radicados are included
+    [handleEdit, handleDelete, handleAddRadicado] // Ensure handleAddRadicado is included
   );
 
   const {
