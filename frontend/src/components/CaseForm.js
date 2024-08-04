@@ -16,7 +16,7 @@ const CaseForm = () => {
     escritura: '',
     radicado: '',
     protocolista: '',
-    observaciones: '' // Añadir observaciones al estado del formulario
+    observaciones: ''
   });
 
   const fetchCases = useCallback(async () => {
@@ -70,7 +70,7 @@ const CaseForm = () => {
         escritura: '',
         radicado: '',
         protocolista: '',
-        observaciones: '' // Reiniciar observaciones
+        observaciones: ''
       });
     }
   }, [currentCase]);
@@ -102,7 +102,7 @@ const CaseForm = () => {
         escritura: '',
         radicado: '',
         protocolista: '',
-        observaciones: '' // Reiniciar observaciones
+        observaciones: ''
       });
     } catch (error) {
       console.error('Error adding/updating case:', error);
@@ -135,6 +135,31 @@ const CaseForm = () => {
     }
   }, [fetchCases]);
 
+  const handleAddRadicado = useCallback(async (caseItem) => {
+    if (!caseItem) {
+      return Swal.fire('Error', 'No hay un caso seleccionado.', 'error');
+    }
+
+    const { value: radicado } = await Swal.fire({
+      title: 'Ingrese el nuevo radicado',
+      input: 'text',
+      inputLabel: 'Nuevo Radicado',
+      inputPlaceholder: 'Ingrese el nuevo número de radicado',
+      showCancelButton: true
+    });
+
+    if (radicado) {
+      try {
+        await axios.post(`http://127.0.0.1:5000/cases/${caseItem.id}/radicados`, { radicado });
+        fetchCases(); // Actualizar la lista de casos para reflejar el nuevo radicado
+        Swal.fire('Éxito', 'Nuevo radicado añadido.', 'success');
+      } catch (error) {
+        console.error('Error adding new radicado:', error);
+        Swal.fire('Error', 'Hubo un problema al añadir el nuevo radicado.', 'error');
+      }
+    }
+  }, [fetchCases]);
+
   const isRadicadoInPdf = (radicado) => {
     return pdfData.some((pdf) => {
       const pdfRadicado = pdf.data["RADICADO N°"].trim();
@@ -144,8 +169,7 @@ const CaseForm = () => {
   };
   
   const data = useMemo(() => cases, [cases]);
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => [
       {
         Header: 'Fecha',
         accessor: 'fecha',
@@ -168,7 +192,7 @@ const CaseForm = () => {
       },
       {
         Header: 'Observaciones',
-        accessor: 'observaciones', // Nueva columna para observaciones
+        accessor: 'observaciones',
         Filter: DefaultColumnFilter,
       },
       {
@@ -180,11 +204,12 @@ const CaseForm = () => {
           <>
             <button onClick={() => handleEdit(row.original)}>Editar</button>
             <button onClick={() => handleDelete(row.original.id)}>Eliminar</button>
+            <button onClick={() => handleAddRadicado(row.original)}>Añadir Radicado</button>
           </>
         ),
       },
     ],
-    [handleEdit, handleDelete]
+    [handleEdit, handleDelete, handleAddRadicado] // Ensure handleAddRadicado is included
   );
 
   const {
