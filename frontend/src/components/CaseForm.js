@@ -195,7 +195,7 @@ const CaseForm = () => {
       Header: 'Radicado',
       accessor: 'radicado',
       Cell: ({ row }) => (
-        <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
+        <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} row={row} />
       ),
       Filter: DefaultColumnFilter,
     },
@@ -232,7 +232,7 @@ const CaseForm = () => {
     prepareRow,
   } = useTable({ columns, data }, useFilters, useSortBy);
 
-  const RadicadoDropdown = ({ caseId, initialRadicado }) => {
+  const RadicadoDropdown = ({ caseId, initialRadicado, row }) => {
     const [radicados, setRadicados] = useState([]);
 
     useEffect(() => {
@@ -246,8 +246,18 @@ const CaseForm = () => {
     const handleRadicadoChange = async (e) => {
       const selectedRadicado = e.target.value;
       try {
+        // Prepara los datos para enviar al servidor
+        const updatedCase = {
+          fecha: row.original.fecha, // Asegúrate de incluir todos los campos necesarios
+          escritura: row.original.escritura,
+          radicado: selectedRadicado,
+          protocolista: row.original.protocolista,
+          observaciones: row.original.observaciones,
+        };
+    
         // Actualiza el radicado en el backend
-        await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
+        await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, updatedCase);
+    
         // Refrescar la lista de casos para que se refleje el cambio y resalte si es necesario
         await fetchCases();
       } catch (error) {
