@@ -6,8 +6,6 @@ import './CaseForm.css';
 import { useTable, useFilters, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Valor por defecto para desarrollo local
-
 const CaseForm = () => {
   const [cases, setCases] = useState([]);
   const [protocolists, setProtocolists] = useState([]);
@@ -22,32 +20,32 @@ const CaseForm = () => {
 
   const fetchCases = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/cases`);
+      const response = await axios.get('https://notaria15-backend.vercel.app/api/cases');
       setCases(response.data);
     } catch (error) {
       console.error('Error fetching cases:', error);
     }
-  }, [API_URL]); // Incluir API_URL en las dependencias
+  }, []);
 
   const fetchProtocolists = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/protocolists`);
+      const response = await axios.get('https://notaria15-backend.vercel.app/api/protocolists');
       setProtocolists(response.data);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
     }
-  }, [API_URL]); // Incluir API_URL en las dependencias
+  }, []);
 
   const fetchPdfData = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/extract-data`);
+      const response = await axios.get('https://notaria15-backend.vercel.app/api/extract-data');
       setPdfData(response.data);
       console.log('PDF Data:', response.data);
     } catch (error) {
       console.error('Error fetching PDF data:', error);
     }
-  }, [API_URL]); // Incluir API_URL en las dependencias
-
+  }, []);
+  
   useEffect(() => {
     fetchCases();
     fetchProtocolists();
@@ -58,7 +56,7 @@ const CaseForm = () => {
     }, 10000); // Refrescar cada 10 segundos
     return () => clearInterval(intervalId); // Limpiar el intervalo al desmontar el componente
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
-
+  
   useEffect(() => {
     if (currentCase) {
       setForm({
@@ -87,13 +85,13 @@ const CaseForm = () => {
     e.preventDefault();
     try {
       if (currentCase) {
-        await axios.put(`${API_URL}/api/cases/${currentCase.id}`, {
+        await axios.put(`https://notaria15-backend.vercel.app/api/cases/${currentCase.id}`, {
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
         setCurrentCase(null);
       } else {
-        await axios.post(`${API_URL}/api/cases`, {
+        await axios.post('https://notaria15-backend.vercel.app/api/cases', {
           ...form,
           fecha: form.fecha.toISOString().split('T')[0]
         });
@@ -126,7 +124,7 @@ const CaseForm = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`${API_URL}/api/cases/${id}`);
+        await axios.delete(`https://notaria15-backend.vercel.app/api/cases/${id}`);
         fetchCases();
         Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
       } catch (error) {
@@ -143,7 +141,7 @@ const CaseForm = () => {
       return pdfRadicado === caseRadicado;
     });
   };
-
+  
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(
     () => [
