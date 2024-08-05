@@ -18,10 +18,6 @@ const CaseForm = () => {
     protocolista: '',
     observaciones: ''
   });
-  
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(0);
-  const casesPerPage = 100;
 
   const fetchCases = useCallback(async () => {
     try {
@@ -69,7 +65,7 @@ const CaseForm = () => {
     };
 
     fetchAllData();
-    const intervalId = setInterval(fetchAllData, 100000); // Refresh every 10 seconds
+    const intervalId = setInterval(fetchAllData, 10000); // Refresh every 10 seconds
     return () => clearInterval(intervalId); // Clear interval on component unmount
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
 
@@ -183,24 +179,7 @@ const CaseForm = () => {
     });
   };
 
-  // Pagination logic
-  const totalPages = Math.ceil(cases.length / casesPerPage);
-
-  const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
-  };
-
-  const paginatedCases = useMemo(() => {
-    const start = currentPage * casesPerPage;
-    const end = start + casesPerPage;
-    return cases.slice(start, end);
-  }, [cases, currentPage, casesPerPage]);
-
-  const data = useMemo(() => paginatedCases, [paginatedCases]);
+  const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
     {
       Header: 'Fecha',
@@ -326,17 +305,6 @@ const CaseForm = () => {
             })}
           </tbody>
         </table>
-      </div>
-      <div className="pagination-controls">
-        <button onClick={handlePreviousPage} disabled={currentPage === 0}>
-          Anterior
-        </button>
-        <span>
-          Página {currentPage + 1} de {totalPages}
-        </span>
-        <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
-          Siguiente
-        </button>
       </div>
       <form className="case-form" onSubmit={handleSubmit}>
         <DatePicker
