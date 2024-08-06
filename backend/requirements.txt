@@ -5,3 +5,5 @@ requests
 watchdog
 PyMuPDF
 fitz
+redis
+Flask-Caching
