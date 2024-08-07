@@ -8,7 +8,7 @@ class Case(db.Model):
     escritura = db.Column(db.Integer)
     radicado = db.Column(db.String(50))
     protocolista = db.Column(db.String(50))
-    observaciones = db.Column(db.String(255))  # Nueva columna para observaciones
+    observaciones = db.Column(db.String(255))
 
     def to_dict(self):
         return {
@@ -17,7 +17,7 @@ class Case(db.Model):
             'escritura': self.escritura,
             'radicado': self.radicado,
             'protocolista': self.protocolista,
-            'observaciones': self.observaciones  # Incluye observaciones en el diccionario
+            'observaciones': self.observaciones
         }
 
 class Protocolist(db.Model):
