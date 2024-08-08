@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import CaseForm from './components/CaseForm';
-import ProtocolistTable from './components/ProtocolistTable';
-import Home from './components/Home';
+import React, { useState, useEffect, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+
+const CaseForm = React.lazy(() => import('./components/CaseForm'));
+const ProtocolistTable = React.lazy(() => import('./components/ProtocolistTable'));
+const Home = React.lazy(() => import('./components/Home'));
 
 function App() {
   const [userSettings, setUserSettings] = useState(() => {
@@ -18,16 +21,15 @@ function App() {
       });
       const data = await response.json();
       if (response.ok) {
-        alert(data.message);
+        toast.success(data.message);
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error}`);
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
-  // Función para alternar el tema
   const toggleTheme = () => {
     setUserSettings(prevSettings => {
       const newTheme = prevSettings.theme === 'light' ? 'dark' : 'light';
@@ -53,11 +55,14 @@ function App() {
             Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
           </button>
         </nav>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/cases" element={<CaseForm />} />
-          <Route path="/protocolists" element={<ProtocolistTable />} />
-        </Routes>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/cases" element={<CaseForm />} />
+            <Route path="/protocolists" element={<ProtocolistTable />} />
+          </Routes>
+        </Suspense>
+        <ToastContainer />
       </div>
     </Router>
   );
