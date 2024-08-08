@@ -5,6 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './CaseForm.css';
 import { useTable, useFilters, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const CaseForm = () => {
   const [cases, setCases] = useState([]);
@@ -18,10 +19,6 @@ const CaseForm = () => {
     protocolista: '',
     observaciones: ''
   });
-  
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(0);
-  const casesPerPage = 100;
 
   const fetchCases = useCallback(async () => {
     try {
@@ -69,8 +66,6 @@ const CaseForm = () => {
     };
 
     fetchAllData();
-    const intervalId = setInterval(fetchAllData, 100000); // Refresh every 10 seconds
-    return () => clearInterval(intervalId); // Clear interval on component unmount
   }, [fetchCases, fetchProtocolists, fetchPdfData]);
 
   useEffect(() => {
@@ -119,8 +114,10 @@ const CaseForm = () => {
         protocolista: '',
         observaciones: ''
       });
+      toast.success('Caso guardado exitosamente');
     } catch (error) {
       console.error('Error adding/updating case:', error);
+      toast.error('Hubo un problema al guardar el caso');
     }
   };
 
@@ -177,30 +174,13 @@ const CaseForm = () => {
 
   const isRadicadoInPdf = (radicado) => {
     return pdfData.some((pdf) => {
-      const pdfRadicado = pdf.data["RADICADO N°"].trim();
-      const caseRadicado = radicado.trim();
+      const pdfRadicado = pdf.data["RADICADO N°"]?.trim();
+      const caseRadicado = radicado?.trim();
       return pdfRadicado === caseRadicado;
     });
   };
 
-  // Pagination logic
-  const totalPages = Math.ceil(cases.length / casesPerPage);
-
-  const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
-  };
-
-  const paginatedCases = useMemo(() => {
-    const start = currentPage * casesPerPage;
-    const end = start + casesPerPage;
-    return cases.slice(start, end);
-  }, [cases, currentPage, casesPerPage]);
-
-  const data = useMemo(() => paginatedCases, [paginatedCases]);
+  const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
     {
       Header: 'Fecha',
@@ -237,9 +217,15 @@ const CaseForm = () => {
       disableFilters: true,
       Cell: ({ row }) => (
         <>
-          <button onClick={() => handleEdit(row.original)}>Editar</button>
-          <button onClick={() => handleDelete(row.original.id)}>Eliminar</button>
-          <button onClick={() => handleAddRadicado(row.original)}>Añadir Radicado</button>
+          <button onClick={() => handleEdit(row.original)}>
+            <i className="fas fa-edit"></i> Editar
+          </button>
+          <button onClick={() => handleDelete(row.original.id)}>
+            <i className="fas fa-trash"></i> Eliminar
+          </button>
+          <button onClick={() => handleAddRadicado(row.original)}>
+            <i className="fas fa-plus"></i> Añadir Radicado
+          </button>
         </>
       ),
     },
@@ -285,7 +271,7 @@ const CaseForm = () => {
         </select>
       );
     } else {
-      return <span>{initialRadicado || 'No Radicados'}</span>;
+      return <span>{initialRadicado || 'Sin radicado'}</span>;
     }
   };
 
@@ -326,17 +312,6 @@ const CaseForm = () => {
             })}
           </tbody>
         </table>
-      </div>
-      <div className="pagination-controls">
-        <button onClick={handlePreviousPage} disabled={currentPage === 0}>
-          Anterior
-        </button>
-        <span>
-          Página {currentPage + 1} de {totalPages}
-        </span>
-        <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
-          Siguiente
-        </button>
       </div>
       <form className="case-form" onSubmit={handleSubmit}>
         <DatePicker
