@@ -2,17 +2,37 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { io } from 'socket.io-client';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 import './App.css';
 
-const CaseForm = React.lazy(() => import('./components/CaseForm'));
-const ProtocolistTable = React.lazy(() => import('./components/ProtocolistTable'));
-const Home = React.lazy(() => import('./components/Home'));
+const CaseForm = React.lazy(() => {
+  NProgress.start();
+  return import('./components/CaseForm').finally(NProgress.done);
+});
+const ProtocolistTable = React.lazy(() => {
+  NProgress.start();
+  return import('./components/ProtocolistTable').finally(NProgress.done);
+});
+const Home = React.lazy(() => {
+  NProgress.start();
+  return import('./components/Home').finally(NProgress.done);
+});
+
+const socket = io('http://127.0.0.1:5000');
 
 function App() {
   const [userSettings, setUserSettings] = useState(() => {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
   });
+
+  useEffect(() => {
+    socket.on('data-updated', (data) => {
+      toast.info('Datos actualizados: ' + data.message);
+    });
+  }, []);
 
   const handleCheckEmails = async () => {
     try {
