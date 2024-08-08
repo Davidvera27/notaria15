@@ -24,6 +24,16 @@ body.dark {
   --table-header-background: #555; /* fondo del encabezado */
 }
 
+button {
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+
 .app-container {
   font-family: "Open Sans", sans-serif;
   padding: 20px;
@@ -48,6 +58,10 @@ body.dark {
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .nav-link {
@@ -55,6 +69,13 @@ body.dark {
   color: white;
   font-weight: bold;
   margin: 0 10px;
+}
+.nav-button, .nav-link {
+  transition: background-color 0.3s, color 0.3s;
+}
+.nav-button:hover, .nav-link:hover {
+  background-color: #0056b3;
+  color: #fff;
 }
 
 .nav-button {
@@ -64,12 +85,12 @@ body.dark {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .nav-button:hover {
   background-color: #0056b3;
-  color: white;
+  color: #fff;
 }
 
 .nav-link:hover {
@@ -143,4 +164,14 @@ body.dark {
 
 .case-form button:hover, .protocolist-form button:hover {
   background-color: #0056b3;
+}
+/*<------------------------------------------------------------------> */
+/* Media query para diseño responsivo */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+  }
+  .table-container {
+    overflow-x: auto;
+  }
 }
