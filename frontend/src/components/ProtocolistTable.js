@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTable, useFilters, useSortBy } from 'react-table';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 import './ProtocolistTable.css';
 
 const ProtocolistTable = () => {
@@ -70,8 +71,10 @@ const ProtocolistTable = () => {
       }
       setForm({ nombre: '', correo_electronico: '' });
       fetchProtocolists();
+      toast.success('Protocolista guardado exitosamente');
     } catch (error) {
       console.error('Error adding/updating protocolist:', error);
+      toast.error('Hubo un problema al guardar el protocolista');
     }
   };
 
@@ -100,8 +103,12 @@ const ProtocolistTable = () => {
         disableFilters: true,
         Cell: ({ row }) => (
           <>
-            <button onClick={() => handleEdit(row.original)}>Editar</button>
-            <button onClick={() => handleDelete(row.original.id)}>Eliminar</button>
+            <button onClick={() => handleEdit(row.original)}>
+              <i className="fas fa-edit"></i> Editar
+            </button>
+            <button onClick={() => handleDelete(row.original.id)}>
+              <i className="fas fa-trash"></i> Eliminar
+            </button>
           </>
         ),
       },
