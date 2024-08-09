@@ -1,12 +1,13 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { io } from 'socket.io-client';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import './App.css';
 
+// Importación de componentes
 const CaseForm = React.lazy(() => {
   NProgress.start();
   return import('./components/CaseForm').finally(NProgress.done);
@@ -19,20 +20,24 @@ const Home = React.lazy(() => {
   NProgress.start();
   return import('./components/Home').finally(NProgress.done);
 });
-
-const socket = io('http://127.0.0.1:5000');
+const Profile = React.lazy(() => {
+  NProgress.start();
+  return import('./components/Profile').finally(NProgress.done);
+});
 
 function App() {
+  const { isAuthenticated, loginWithRedirect, logout, user, isLoading } = useAuth0();
+
   const [userSettings, setUserSettings] = useState(() => {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
   });
 
   useEffect(() => {
-    socket.on('data-updated', (data) => {
-      toast.info('Datos actualizados: ' + data.message);
-    });
-  }, []);
+    if (!isAuthenticated && !isLoading) {
+      loginWithRedirect();
+    }
+  }, [isAuthenticated, isLoading, loginWithRedirect]);
 
   const handleCheckEmails = async () => {
     try {
@@ -65,26 +70,35 @@ function App() {
     document.body.className = userSettings.theme;
   }, [userSettings.theme]);
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Router>
-      <div>
-        <nav className="nav">
-          <Link to="/" className="nav-link">Inicio</Link>
-          <button onClick={handleCheckEmails} className="nav-button">Procesar Correos</button>
-          <button onClick={toggleTheme} className="nav-button">
-            Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
-          </button>
-        </nav>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/cases" element={<CaseForm />} />
-            <Route path="/protocolists" element={<ProtocolistTable />} />
-          </Routes>
-        </Suspense>
-        <ToastContainer />
-      </div>
-    </Router>
+    isAuthenticated && (
+      <Router>
+        <div>
+          <nav className="nav">
+            <Link to="/" className="nav-link">Inicio</Link>
+            <button onClick={handleCheckEmails} className="nav-button">Procesar Correos</button>
+            <button onClick={toggleTheme} className="nav-button">
+              Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
+            </button>
+            <Link to="/profile" className="nav-link">Perfil</Link>
+            <button onClick={() => logout({ returnTo: window.location.origin })} className="nav-button">Logout</button>
+          </nav>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/cases" element={<CaseForm />} />
+              <Route path="/protocolists" element={<ProtocolistTable />} />
+              <Route path="/profile" element={<Profile user={user} />} />
+            </Routes>
+          </Suspense>
+          <ToastContainer />
+        </div>
+      </Router>
+    )
   );
 }
 
