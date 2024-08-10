@@ -24,6 +24,10 @@ const Profile = React.lazy(() => {
   NProgress.start();
   return import('./components/Profile').finally(NProgress.done);
 });
+const Register = React.lazy(() => {
+  NProgress.start();
+  return import('./components/Register').finally(NProgress.done);
+});
 
 function App() {
   const { isAuthenticated, loginWithRedirect, logout, user, isLoading } = useAuth0();
@@ -80,6 +84,9 @@ function App() {
         <div>
           <nav className="nav">
             <Link to="/" className="nav-link">Inicio</Link>
+            <Link to="/cases" className="nav-link">Gestión de Casos</Link>
+            <Link to="/protocolists" className="nav-link">Gestión de Protocolistas</Link>
+            <Link to="/register" className="nav-link">Registrar Usuario</Link>
             <button onClick={handleCheckEmails} className="nav-button">Procesar Correos</button>
             <button onClick={toggleTheme} className="nav-button">
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
@@ -93,6 +100,7 @@ function App() {
               <Route path="/cases" element={<CaseForm />} />
               <Route path="/protocolists" element={<ProtocolistTable />} />
               <Route path="/profile" element={<Profile user={user} />} />
+              <Route path="/register" element={<Register />} />
             </Routes>
           </Suspense>
           <ToastContainer />
