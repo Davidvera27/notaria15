@@ -48,12 +48,12 @@ const ProtocolistTable = () => {
       try {
         await axios.delete(`http://127.0.0.1:5000/protocolists/${id}`);
         fetchProtocolists();
-        Swal.fire('¡Eliminado!', 'El protocolista ha sido eliminado.', 'success');
+        Swal.fire('¡Eliminado!', 'El Protocolista ha sido eliminado.', 'success');
       } catch (error) {
-        console.error('Error deleting protocolist:', error);
-        Swal.fire('Error', 'Hubo un problema al eliminar el protocolista.', 'error');
+          console.error('Error deleting case:', error);
+          Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
       }
-    }
+  }
   }, [fetchProtocolists]);
 
   const handleChange = (e) => {
@@ -63,20 +63,26 @@ const ProtocolistTable = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (currentProtocolist) {
-        await axios.put(`http://127.0.0.1:5000/protocolists/${currentProtocolist.id}`, form);
-        setCurrentProtocolist(null);
-      } else {
-        await axios.post('http://127.0.0.1:5000/protocolists', form);
-      }
-      setForm({ nombre: '', correo_electronico: '' });
-      fetchProtocolists();
-      toast.success('Protocolista guardado exitosamente');
+        // Remover el ID del objeto de datos antes de enviar
+        const { id, ...protocolistData } = form;
+  
+        if (currentProtocolist) {
+            await axios.put(`http://127.0.0.1:5000/protocolists/${currentProtocolist.id}`, protocolistData);
+            setCurrentProtocolist(null);
+        } else {
+            await axios.post('http://127.0.0.1:5000/protocolists', protocolistData);
+        }
+  
+        setForm({ nombre: '', correo_electronico: '' });
+        fetchProtocolists();
+        toast.success('Protocolista guardado exitosamente');
     } catch (error) {
-      console.error('Error adding/updating protocolist:', error);
-      toast.error('Hubo un problema al guardar el protocolista');
+        console.error('Error adding/updating protocolist:', error);
+        toast.error('Hubo un problema al guardar el protocolista');
     }
   };
+  
+
 
   const data = useMemo(() => protocolists, [protocolists]);
   const columns = useMemo(
