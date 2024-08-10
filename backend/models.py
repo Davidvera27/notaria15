@@ -45,3 +45,27 @@ class Radicado(db.Model):
             'radicado': self.radicado,
             'fecha': self.fecha
         }
+
+class UserProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name1 = db.Column(db.String(50))
+    first_name2 = db.Column(db.String(50), nullable=True)
+    last_name1 = db.Column(db.String(50))
+    last_name2 = db.Column(db.String(50), nullable=True)
+    phone_number = db.Column(db.String(15))
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    birth_date = db.Column(db.Date)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'first_name1': self.first_name1,
+            'first_name2': self.first_name2,
+            'last_name1': self.last_name1,
+            'last_name2': self.last_name2,
+            'phone_number': self.phone_number,
+            'email': self.email,
+            'birth_date': self.birth_date,
+            'username': self.username
+        }
