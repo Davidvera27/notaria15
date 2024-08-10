@@ -96,30 +96,36 @@ const CaseForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const caseData = {
-        ...form,
-        fecha: form.fecha.toISOString().split('T')[0]
-      };
-      if (currentCase) {
-        await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
-        setCurrentCase(null);
-      } else {
-        await axios.post('http://127.0.0.1:5000/cases', caseData);
-      }
-      fetchCases();
-      setForm({
-        fecha: new Date(),
-        escritura: '',
-        radicado: '',
-        protocolista: '',
-        observaciones: ''
-      });
-      toast.success('Caso guardado exitosamente');
+        const { id, ...caseData } = {
+            ...form,
+            fecha: form.fecha.toISOString().split('T')[0]  // Convertimos la fecha al formato correcto
+        };
+
+        if (currentCase) {
+            // Para edición de casos
+            await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
+            setCurrentCase(null);
+        } else {
+            // Para creación de nuevos casos
+            await axios.post('http://127.0.0.1:5000/cases', caseData);
+        }
+
+        fetchCases();  // Actualizamos la lista de casos
+        setForm({
+            fecha: new Date(),
+            escritura: '',
+            radicado: '',
+            protocolista: '',
+            observaciones: ''
+        });
+        toast.success('Caso guardado exitosamente');
     } catch (error) {
-      console.error('Error adding/updating case:', error);
-      toast.error('Hubo un problema al guardar el caso');
+        console.error('Error adding/updating case:', error);
+        toast.error('Hubo un problema al guardar el caso');
     }
-  };
+};
+
+
 
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
@@ -127,25 +133,25 @@ const CaseForm = () => {
 
   const handleDelete = useCallback(async (id) => {
     const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¡No podrás revertir esto!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+        title: '¿Estás seguro?',
+        text: "¡No podrás revertir esto!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
     });
 
     if (result.isConfirmed) {
-      try {
-        await axios.delete(`http://127.0.0.1:5000/cases/${id}`);
-        fetchCases();
-        Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
-      } catch (error) {
-        console.error('Error deleting case:', error);
-        Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
-      }
+        try {
+            await axios.delete(`http://127.0.0.1:5000/cases/${id}`);
+            fetchCases();
+            Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
+        } catch (error) {
+            console.error('Error deleting case:', error);
+            Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
+        }
     }
-  }, [fetchCases]);
+}, [fetchCases]);
 
   const handleAddRadicado = useCallback(async (caseItem) => {
     if (!caseItem) {
