@@ -96,21 +96,27 @@ const CaseForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const { id, ...caseData } = {
-            ...form,
-            fecha: form.fecha.toISOString().split('T')[0]  // Convertimos la fecha al formato correcto
+        // Validar que todos los campos requeridos están presentes
+        if (!form.fecha || !form.escritura || !form.radicado || !form.protocolista) {
+            toast.error('Todos los campos son obligatorios');
+            return;
+        }
+
+        const caseData = {
+            fecha: form.fecha.toISOString().split('T')[0],  // Asegúrate de que la fecha esté en formato correcto
+            escritura: form.escritura,
+            radicado: form.radicado,
+            protocolista: form.protocolista,
+            observaciones: form.observaciones
         };
 
         if (currentCase) {
-            // Para edición de casos
             await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
             setCurrentCase(null);
         } else {
-            // Para creación de nuevos casos
             await axios.post('http://127.0.0.1:5000/cases', caseData);
         }
 
-        fetchCases();  // Actualizamos la lista de casos
         setForm({
             fecha: new Date(),
             escritura: '',
@@ -118,12 +124,14 @@ const CaseForm = () => {
             protocolista: '',
             observaciones: ''
         });
+        fetchCases();  // Actualizamos la lista de casos
         toast.success('Caso guardado exitosamente');
     } catch (error) {
         console.error('Error adding/updating case:', error);
         toast.error('Hubo un problema al guardar el caso');
     }
 };
+
 
 
 
