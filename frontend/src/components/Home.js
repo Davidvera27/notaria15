@@ -1,24 +1,41 @@
-// Home.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useSpring, animated } from '@react-spring/web';
+import { motion } from 'framer-motion';
 import './Home.css';
 
 const Home = () => {
-  const fadeIn = useSpring({
-    from: { opacity: 0, transform: 'translate3d(0,-50px,0)' },
-    to: { opacity: 1, transform: 'translate3d(0,0,0)' },
-    config: { duration: 1000 },
-  });
-
   return (
-    <animated.div style={fadeIn} className="home-container">
-      <h1 className="home-title">Bienvenido a Gestión de Rentas - Notaria 15</h1>
-      <div className="home-buttons">
+    <motion.div
+      className="home-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+    >
+      <motion.div
+        className="title-wrapper"
+        initial={{ scale: 0.95 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.h1
+          className="home-title"
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          Bienvenido a Gestión de Rentas - Notaria 15
+        </motion.h1>
+      </motion.div>
+      <motion.div
+        className="home-buttons"
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5, duration: 1 }}
+      >
         <Link to="/cases" className="home-button">Gestión de Casos</Link>
         <Link to="/protocolists" className="home-button">Gestión de Protocolistas</Link>
-      </div>
-    </animated.div>
+      </motion.div>
+    </motion.div>
   );
 };
 
