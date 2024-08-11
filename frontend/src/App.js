@@ -7,7 +7,6 @@ import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import './App.css';
 
-// Importación de componentes
 const CaseForm = React.lazy(() => {
   NProgress.start();
   return import('./components/CaseForm').finally(NProgress.done);
@@ -31,7 +30,7 @@ const Register = React.lazy(() => {
 
 function App() {
   const { isAuthenticated, loginWithRedirect, logout, user, isLoading } = useAuth0();
-
+  const [menuOpen, setMenuOpen] = useState(false);
   const [userSettings, setUserSettings] = useState(() => {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
@@ -81,18 +80,23 @@ function App() {
   return (
     isAuthenticated && (
       <Router>
-        <div>
-          <nav className="nav">
-            <Link to="/" className="nav-link">Inicio</Link>
-            <Link to="/cases" className="nav-link">Gestión de Casos</Link>
-            <Link to="/protocolists" className="nav-link">Gestión de Protocolistas</Link>
-            <Link to="/register" className="nav-link">Registrar Usuario</Link>
-            <button onClick={handleCheckEmails} className="nav-button">Procesar Correos</button>
-            <button onClick={toggleTheme} className="nav-button">
+        <div className="app-container">
+          <div className={`hamburger-menu ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+          </div>
+          <nav className={`nav ${menuOpen ? 'open' : ''}`}>
+            <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Inicio</Link>
+            <Link to="/cases" className="nav-link" onClick={() => setMenuOpen(false)}>Gestión de Casos</Link>
+            <Link to="/protocolists" className="nav-link" onClick={() => setMenuOpen(false)}>Gestión de Protocolistas</Link>
+            <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
+            <button onClick={() => { handleCheckEmails(); setMenuOpen(false); }} className="nav-button">Procesar Correos</button>
+            <button onClick={() => { toggleTheme(); setMenuOpen(false); }} className="nav-button">
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
             </button>
-            <Link to="/profile" className="nav-link">Perfil</Link>
-            <button onClick={() => logout({ returnTo: window.location.origin })} className="nav-button">Logout</button>
+            <Link to="/profile" className="nav-link" onClick={() => setMenuOpen(false)}>Perfil</Link>
+            <button onClick={() => { logout({ returnTo: window.location.origin }); setMenuOpen(false); }} className="nav-button">Logout</button>
           </nav>
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>
