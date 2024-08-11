@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './Profile.css'; // Utilizando el mismo estilo del perfil para coherencia
+import './Register.css'; // Importando el nuevo archivo de estilos
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -15,7 +15,9 @@ const Register = () => {
   });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    // Convertir a mayúsculas sostenidas si no es el campo de correo electrónico
+    const value = e.target.name !== 'email' ? e.target.value.toUpperCase() : e.target.value;
+    setForm({ ...form, [e.target.name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -40,23 +42,23 @@ const Register = () => {
   };
 
   return (
-    <div className="profile-container">
+    <div className="register-container">
       <h2>Registrar Nuevo Usuario</h2>
       <form onSubmit={handleSubmit}>
         <label>
-          Nombre 1:
+          Primer Nombre:
           <input type="text" name="first_name1" value={form.first_name1} onChange={handleChange} required />
         </label>
         <label>
-          Nombre 2:
+          Segundo Nombre:
           <input type="text" name="first_name2" value={form.first_name2} onChange={handleChange} />
         </label>
         <label>
-          Apellido 1:
+          Primer Apellido:
           <input type="text" name="last_name1" value={form.last_name1} onChange={handleChange} required />
         </label>
         <label>
-          Apellido 2:
+          Segundo Apellido:
           <input type="text" name="last_name2" value={form.last_name2} onChange={handleChange} />
         </label>
         <label>
