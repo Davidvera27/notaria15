@@ -48,13 +48,13 @@ class Radicado(db.Model):
 
 class UserProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    first_name1 = db.Column(db.String(50))
-    first_name2 = db.Column(db.String(50), nullable=True)
-    last_name1 = db.Column(db.String(50))
-    last_name2 = db.Column(db.String(50), nullable=True)
-    phone_number = db.Column(db.String(15))
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    birth_date = db.Column(db.Date)
+    first_name1 = db.Column(db.String(50), nullable=False)
+    first_name2 = db.Column(db.String(50))
+    last_name1 = db.Column(db.String(50), nullable=False)
+    last_name2 = db.Column(db.String(50))
+    phone_number = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    birth_date = db.Column(db.Date, nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
 
     def to_dict(self):
