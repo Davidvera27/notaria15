@@ -132,9 +132,6 @@ const CaseForm = () => {
     }
 };
 
-
-
-
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
   }, []);
