@@ -7,6 +7,7 @@ from routes.cases import cases_bp
 from routes.protocolists import protocolists_bp
 from routes.user_profiles import user_profiles_bp
 from routes.extract_data import extract_data_bp
+from routes.user_data import user_data_bp
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -16,6 +17,7 @@ db.init_app(app)
 
 # Registro de Blueprints para las rutas
 app.register_blueprint(cases_bp)
+app.register_blueprint(user_data_bp)
 app.register_blueprint(protocolists_bp)
 app.register_blueprint(user_profiles_bp)
 app.register_blueprint(extract_data_bp)
