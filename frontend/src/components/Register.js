@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth0 } from '@auth0/auth0-react';
 import './Register.css'; // Importando el nuevo archivo de estilos
 
 const Register = () => {
+  const { user, isAuthenticated } = useAuth0(); // Obtén los datos del usuario de Auth0
   const [form, setForm] = useState({
     first_name1: '',
     first_name2: '',
@@ -13,6 +15,22 @@ const Register = () => {
     birth_date: '',
     username: '',
   });
+
+  // Función para prellenar los datos si el usuario está autenticado
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setForm({
+        first_name1: user.given_name || '',
+        first_name2: '', // Asumimos que Auth0 no proporciona el segundo nombre directamente
+        last_name1: user.family_name || '',
+        last_name2: '', // Asumimos que Auth0 no proporciona el segundo apellido directamente
+        phone_number: '', // Asumimos que el número de teléfono no está disponible en Auth0
+        email: user.email || '',
+        birth_date: '', // Asumimos que Auth0 no proporciona la fecha de nacimiento directamente
+        username: user.nickname || '', // Auth0 a veces usa 'nickname' como nombre de usuario
+      });
+    }
+  }, [isAuthenticated, user]);
 
   const handleChange = (e) => {
     // Convertir a mayúsculas sostenidas si no es el campo de correo electrónico
@@ -71,7 +89,7 @@ const Register = () => {
         </label>
         <label>
           Fecha de nacimiento:
-          <input type="date" name="birth_date" value={form.birth_date} onChange={handleChange} required />
+          <input type="date" name="birth_date" value={form.birth_date} onChange={handleChange} />
         </label>
         <label>
           Nombre de usuario:
