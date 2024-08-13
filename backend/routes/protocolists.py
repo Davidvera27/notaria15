@@ -11,7 +11,10 @@ def get_protocolists():
 @protocolists_bp.route('/protocolists', methods=['POST'])
 def add_protocolist():
     data = request.json
-    new_protocolist = Protocolist(nombre=data['nombre'], correo_electronico=data['correo_electronico'])
+    new_protocolist = Protocolist(
+        nombre=data['nombre'], 
+        correo_electronico=data['correo_electronico']
+    )
     db.session.add(new_protocolist)
     db.session.commit()
     return jsonify(new_protocolist.to_dict())
