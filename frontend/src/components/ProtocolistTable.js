@@ -13,10 +13,16 @@ const ProtocolistTable = () => {
     correo_electronico: ''
   });
 
+  // Función para obtener los protocolistas y el número de casos asociados a cada uno
   const fetchProtocolists = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/protocolists');
-      setProtocolists(response.data);
+      const casesResponse = await axios.get('http://127.0.0.1:5000/cases');
+      const protocolistsData = response.data.map(protocolist => {
+        const caseCount = casesResponse.data.filter(c => c.protocolista === protocolist.nombre).length;
+        return { ...protocolist, caseCount };
+      });
+      setProtocolists(protocolistsData);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
     }
@@ -50,10 +56,10 @@ const ProtocolistTable = () => {
         fetchProtocolists();
         Swal.fire('¡Eliminado!', 'El Protocolista ha sido eliminado.', 'success');
       } catch (error) {
-          console.error('Error deleting case:', error);
-          Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
+          console.error('Error deleting protocolist:', error);
+          Swal.fire('Error', 'Hubo un problema al eliminar el protocolista.', 'error');
       }
-  }
+    }
   }, [fetchProtocolists]);
 
   const handleChange = (e) => {
@@ -63,26 +69,21 @@ const ProtocolistTable = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        // Remover el ID del objeto de datos antes de enviar
-        const { id, ...protocolistData } = form;
-  
-        if (currentProtocolist) {
-            await axios.put(`http://127.0.0.1:5000/protocolists/${currentProtocolist.id}`, protocolistData);
-            setCurrentProtocolist(null);
-        } else {
-            await axios.post('http://127.0.0.1:5000/protocolists', protocolistData);
-        }
-  
-        setForm({ nombre: '', correo_electronico: '' });
-        fetchProtocolists();
-        toast.success('Protocolista guardado exitosamente');
+      const { id, ...protocolistData } = form;
+      if (currentProtocolist) {
+        await axios.put(`http://127.0.0.1:5000/protocolists/${currentProtocolist.id}`, protocolistData);
+        setCurrentProtocolist(null);
+      } else {
+        await axios.post('http://127.0.0.1:5000/protocolists', protocolistData);
+      }
+      setForm({ nombre: '', correo_electronico: '' });
+      fetchProtocolists();
+      toast.success('Protocolista guardado exitosamente');
     } catch (error) {
-        console.error('Error adding/updating protocolist:', error);
-        toast.error('Hubo un problema al guardar el protocolista');
+      console.error('Error adding/updating protocolist:', error);
+      toast.error('Hubo un problema al guardar el protocolista');
     }
   };
-  
-
 
   const data = useMemo(() => protocolists, [protocolists]);
   const columns = useMemo(
@@ -100,6 +101,11 @@ const ProtocolistTable = () => {
       {
         Header: 'Correo Electrónico',
         accessor: 'correo_electronico',
+        Filter: DefaultColumnFilter,
+      },
+      {
+        Header: 'Número de Casos',
+        accessor: 'caseCount',  // Nueva columna para mostrar el número de casos
         Filter: DefaultColumnFilter,
       },
       {
