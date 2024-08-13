@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import Case, Radicado, db
+from models import Case, Radicado,Protocolist, db
 
 cases_bp = Blueprint('cases', __name__)
 
@@ -23,11 +23,15 @@ def add_case():
         return jsonify({'error': 'Todos los campos son obligatorios'}), 400
 
     try:
+        protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
+        if not protocolista:
+            return jsonify({'error': 'Protocolista no encontrado'}), 400
+
         new_case = Case(
             fecha=data['fecha'],
             escritura=int(data['escritura']),
             radicado=data['radicado'],
-            protocolista=data['protocolista'],
+            protocolista_id=protocolista.id,
             observaciones=data.get('observaciones', '')
         )
         db.session.add(new_case)
@@ -44,13 +48,17 @@ def update_case(id):
     case = Case.query.get(id)
     if not case:
         return jsonify({'error': 'Case not found'}), 404
-    
+
+    protocolista = Protocolist.query.filter_by(nombre=data.get('protocolista')).first()
+    if not protocolista:
+        return jsonify({'error': 'Protocolista no encontrado'}), 400
+
     case.fecha = data.get('fecha', case.fecha)
     case.escritura = data.get('escritura', case.escritura)
     case.radicado = data.get('radicado', case.radicado)
-    case.protocolista = data.get('protocolista', case.protocolista)
+    case.protocolista_id = protocolista.id
     case.observaciones = data.get('observaciones', case.observaciones)
-    
+
     db.session.commit()
     return jsonify(case.to_dict())
 
@@ -59,7 +67,7 @@ def delete_case(id):
     case = Case.query.get(id)
     if not case:
         return jsonify({'error': 'Case not found'}), 404
-    
+
     db.session.delete(case)
     db.session.commit()
     return '', 204
