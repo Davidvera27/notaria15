@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_caching import Cache
+from flask_mail import Mail
 from models import db
 from config import Config
 from routes.cases import cases_bp
@@ -10,8 +11,10 @@ from routes.extract_data import extract_data_bp
 from routes.user_data import user_data_bp
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+mail = Mail(app)
 app.config.from_object(Config)
+
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 db.init_app(app)
 
