@@ -96,14 +96,13 @@ const CaseForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        // Validar que todos los campos requeridos están presentes
         if (!form.fecha || !form.escritura || !form.radicado || !form.protocolista) {
             toast.error('Todos los campos son obligatorios');
             return;
         }
 
         const caseData = {
-            fecha: form.fecha.toISOString().split('T')[0],  // Asegúrate de que la fecha esté en formato correcto
+            fecha: form.fecha.toISOString().split('T')[0],
             escritura: form.escritura,
             radicado: form.radicado,
             protocolista: form.protocolista,
@@ -124,13 +123,13 @@ const CaseForm = () => {
             protocolista: '',
             observaciones: ''
         });
-        fetchCases();  // Actualizamos la lista de casos
+        fetchCases();
         toast.success('Caso guardado exitosamente');
     } catch (error) {
         console.error('Error adding/updating case:', error);
         toast.error('Hubo un problema al guardar el caso');
     }
-};
+  };
 
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
@@ -156,7 +155,7 @@ const CaseForm = () => {
             Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
         }
     }
-}, [fetchCases]);
+  }, [fetchCases]);
 
   const handleAddRadicado = useCallback(async (caseItem) => {
     if (!caseItem) {
@@ -174,7 +173,7 @@ const CaseForm = () => {
     if (radicado) {
       try {
         await axios.post(`http://127.0.0.1:5000/cases/${caseItem.id}/radicados`, { radicado });
-        fetchCases(); // Refresh case list to reflect new radicado
+        fetchCases();
         Swal.fire('Éxito', 'Nuevo radicado añadido.', 'success');
       } catch (error) {
         console.error('Error adding new radicado:', error);
@@ -182,6 +181,25 @@ const CaseForm = () => {
       }
     }
   }, [fetchCases]);
+
+  const handleSendEmail = useCallback(async (caseItem) => {
+    try {
+        const response = await axios.post('http://127.0.0.1:5000/send_email', { 
+            radicado: caseItem.radicado,
+            use_outlook: true  // Cambia esto según el método que desees usar
+        });
+        if (response.data.message) {
+            toast.success(response.data.message);
+        } else {
+            toast.error(`Error: ${response.data.error}`);
+        }
+    } catch (error) {
+        toast.error('Hubo un problema al enviar el correo');
+    }
+}, []);
+
+
+
 
   const isRadicadoInPdf = (radicado) => {
     return pdfData.some((pdf) => {
@@ -237,10 +255,13 @@ const CaseForm = () => {
           <button onClick={() => handleAddRadicado(row.original)}>
             <i className="fas fa-plus"></i> Añadir Radicado
           </button>
+          <button onClick={() => handleSendEmail(row.original)}>
+            <i className="fas fa-envelope"></i> Enviar Documento
+          </button>
         </>
       ),
     },
-  ], [handleEdit, handleDelete, handleAddRadicado]);
+  ], [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]);
 
   const {
     getTableProps,
@@ -265,7 +286,6 @@ const CaseForm = () => {
       const selectedRadicado = event.target.value;
       try {
         await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
-        // Actualiza la lista de casos después de cambiar el radicado
         fetchCases();
       } catch (error) {
         console.error('Error updating radicado:', error);
