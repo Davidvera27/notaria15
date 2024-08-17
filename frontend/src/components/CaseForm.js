@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCases } from '../features/caseSlice';
+import { fetchProtocolists } from '../features/protocolistSlice';
+import { fetchPdfData } from '../features/pdfDataSlice';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,9 +12,11 @@ import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 
 const CaseForm = () => {
-  const [cases, setCases] = useState([]);
-  const [protocolists, setProtocolists] = useState([]);
-  const [pdfData, setPdfData] = useState([]);
+  const dispatch = useDispatch();
+  const { cases, status: casesStatus } = useSelector((state) => state.cases);
+  const { protocolists, status: protocolistsStatus } = useSelector((state) => state.protocolists);
+  const { pdfData, status: pdfDataStatus } = useSelector((state) => state.pdfData);
+
   const [currentCase, setCurrentCase] = useState(null);
   const [form, setForm] = useState({
     fecha: new Date(),
@@ -19,55 +25,19 @@ const CaseForm = () => {
     protocolista: '',
     observaciones: ''
   });
-
-  const fetchCases = useCallback(async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:5000/cases');
-      setCases(response.data);
-    } catch (error) {
-      console.error('Error fetching cases:', error);
-      toast.error('No se pudieron cargar los casos. Por favor, inténtelo de nuevo más tarde.');
-    }
-  }, []);
-
-  const fetchRadicados = useCallback(async (caseId) => {
-    try {
-      const response = await axios.get(`http://127.0.0.1:5000/cases/${caseId}/radicados`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching radicados for case ${caseId}:`, error);
-      return [];
-    }
-  }, []);
-
-  const fetchProtocolists = useCallback(async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:5000/protocolists');
-      setProtocolists(response.data);
-    } catch (error) {
-      console.error('Error fetching protocolists:', error);
-    }
-  }, []);
-
-  const fetchPdfData = useCallback(async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:5000/extract-data');
-      setPdfData(response.data);
-      console.log('PDF Data:', response.data);
-    } catch (error) {
-      console.error('Error fetching PDF data:', error);
-    }
-  }, []);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const fetchAllData = async () => {
-      await fetchCases();
-      await fetchProtocolists();
-      await fetchPdfData();
-    };
-
-    fetchAllData();
-  }, [fetchCases, fetchProtocolists, fetchPdfData]);
+    if (casesStatus === 'idle') {
+      dispatch(fetchCases());
+    }
+    if (protocolistsStatus === 'idle') {
+      dispatch(fetchProtocolists());
+    }
+    if (pdfDataStatus === 'idle') {
+      dispatch(fetchPdfData());
+    }
+  }, [casesStatus, protocolistsStatus, pdfDataStatus, dispatch]);
 
   useEffect(() => {
     if (currentCase) {
@@ -86,8 +56,37 @@ const CaseForm = () => {
     }
   }, [currentCase]);
 
+  const validateForm = (name, value) => {
+    let errorMsg = '';
+    switch (name) {
+      case 'escritura':
+        if (!/^\d+$/.test(value)) {
+          errorMsg = 'La escritura debe ser un número entero.';
+        }
+        break;
+      case 'radicado':
+        if (!value) {
+          errorMsg = 'El radicado es obligatorio.';
+        }
+        break;
+      case 'protocolista':
+        if (!value) {
+          errorMsg = 'Debe seleccionar un protocolista.';
+        }
+        break;
+      default:
+        break;
+    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: errorMsg,
+    }));
+  };
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    validateForm(name, value);
   };
 
   const handleDateChange = (date) => {
@@ -96,6 +95,12 @@ const CaseForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const hasErrors = Object.values(errors).some((error) => error);
+    if (hasErrors) {
+      toast.error('Corrija los errores antes de enviar el formulario.');
+      return;
+    }
+
     try {
       if (!form.fecha || !form.escritura || !form.radicado || !form.protocolista) {
         toast.error('Todos los campos son obligatorios');
@@ -124,7 +129,7 @@ const CaseForm = () => {
         protocolista: '',
         observaciones: ''
       });
-      fetchCases();
+      dispatch(fetchCases());
       toast.success('Caso guardado exitosamente');
     } catch (error) {
       console.error('Error adding/updating case:', error);
@@ -132,31 +137,32 @@ const CaseForm = () => {
     }
   };
 
+
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
   }, []);
 
   const handleDelete = useCallback(async (id) => {
     const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¡No podrás revertir esto!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
+      title: '¿Estás seguro?',
+      text: "¡No podrás revertir esto!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
     });
 
     if (result.isConfirmed) {
-        try {
-            await axios.delete(`http://127.0.0.1:5000/cases/${id}`);
-            fetchCases();
-            Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
-        } catch (error) {
-            console.error('Error deleting case:', error);
-            Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
-        }
+      try {
+        await axios.delete(`http://127.0.0.1:5000/cases/${id}`);
+        dispatch(fetchCases());
+        Swal.fire('¡Eliminado!', 'El caso ha sido eliminado.', 'success');
+      } catch (error) {
+        console.error('Error deleting case:', error);
+        Swal.fire('Error', 'Hubo un problema al eliminar el caso.', 'error');
+      }
     }
-  }, [fetchCases]);
+  }, [dispatch]);
 
   const handleAddRadicado = useCallback(async (caseItem) => {
     if (!caseItem) {
@@ -174,41 +180,38 @@ const CaseForm = () => {
     if (radicado) {
       try {
         await axios.post(`http://127.0.0.1:5000/cases/${caseItem.id}/radicados`, { radicado });
-        fetchCases();
+        dispatch(fetchCases());
         Swal.fire('Éxito', 'Nuevo radicado añadido.', 'success');
       } catch (error) {
         console.error('Error adding new radicado:', error);
         Swal.fire('Error', 'Hubo un problema al añadir el nuevo radicado.', 'error');
       }
     }
-  }, [fetchCases]);
+  }, [dispatch]);
 
   const handleSendEmail = useCallback(async (caseItem) => {
     try {
-        const response = await axios.post('http://127.0.0.1:5000/send_email', { 
-            radicado: caseItem.radicado,
-            use_outlook: true  // Cambia esto según el método que desees usar
-        });
-        if (response.data.message) {
-            toast.success(response.data.message);
-        } else {
-            toast.error(`Error: ${response.data.error}`);
-        }
+      const response = await axios.post('http://127.0.0.1:5000/send_email', { 
+        radicado: caseItem.radicado,
+        use_outlook: true
+      });
+      if (response.data.message) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(`Error: ${response.data.error}`);
+      }
     } catch (error) {
-        toast.error('Hubo un problema al enviar el correo');
+      toast.error('Hubo un problema al enviar el correo');
     }
-}, []);
+  }, []);
 
-
-
-
-  const isRadicadoInPdf = (radicado) => {
+  const isRadicadoInPdf = useMemo(() => (radicado) => {
     return pdfData.some((pdf) => {
       const pdfRadicado = pdf.data["RADICADO N°"]?.trim();
       const caseRadicado = radicado?.trim();
       return pdfRadicado === caseRadicado;
     });
-  };
+  }, [pdfData]);
 
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
@@ -216,11 +219,13 @@ const CaseForm = () => {
       Header: 'Fecha',
       accessor: 'fecha',
       Filter: DefaultColumnFilter,
+      maxWidth: 150, // Establecer un ancho máximo
     },
     {
       Header: 'Escritura',
       accessor: 'escritura',
       Filter: DefaultColumnFilter,
+      maxWidth: 150, // Establecer un ancho máximo
     },
     {
       Header: 'Radicado',
@@ -229,16 +234,19 @@ const CaseForm = () => {
         <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
       ),
       Filter: DefaultColumnFilter,
+      maxWidth: 150, // Establecer un ancho máximo
     },
     {
       Header: 'Protocolista',
       accessor: 'protocolista',
       Filter: DefaultColumnFilter,
+      maxWidth: 150, // Establecer un ancho máximo
     },
     {
       Header: 'Observaciones',
       accessor: 'observaciones',
       Filter: DefaultColumnFilter,
+      maxWidth: 150, // Establecer un ancho máximo
     },
     {
       Header: 'Acciones',
@@ -246,22 +254,23 @@ const CaseForm = () => {
       disableSortBy: true,
       disableFilters: true,
       Cell: ({ row }) => (
-        <>
-          <button onClick={() => handleEdit(row.original)}>
+        <div className="actions-container">
+          <button className="btn-edit" onClick={() => handleEdit(row.original)}>
             <i className="fas fa-edit"></i> Editar
           </button>
-          <button onClick={() => handleDelete(row.original.id)}>
+          <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
             <i className="fas fa-trash"></i> Eliminar
           </button>
-          <button onClick={() => handleAddRadicado(row.original)}>
+          <button className="btn-add" onClick={() => handleAddRadicado(row.original)}>
             <i className="fas fa-plus"></i> Añadir Radicado
           </button>
-          <button onClick={() => handleSendEmail(row.original)}>
+          <button className="btn-email" onClick={() => handleSendEmail(row.original)}>
             <i className="fas fa-envelope"></i> Enviar Documento
           </button>
-        </>
+        </div>
       ),
-    },
+      maxWidth: 150, // Establecer un ancho máximo
+    }
   ], [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]);
 
   const {
@@ -287,7 +296,7 @@ const CaseForm = () => {
       const selectedRadicado = event.target.value;
       try {
         await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
-        fetchCases();
+        dispatch(fetchCases());
       } catch (error) {
         console.error('Error updating radicado:', error);
       }
@@ -316,7 +325,7 @@ const CaseForm = () => {
             {headerGroups.map(headerGroup => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
-                  <th key={column.id} {...column.getHeaderProps()} onClick={() => !column.disableSortBy && column.toggleSortBy(!column.isSortedDesc)}>
+                  <th key={column.id} {...column.getHeaderProps()} style={{ maxWidth: column.maxWidth }}>
                     {column.render('Header')}
                     <span>
                       {column.isSorted
@@ -352,15 +361,45 @@ const CaseForm = () => {
           dateFormat="yyyy-MM-dd"
           className="date-picker"
         />
-        <input type="text" name="escritura" value={form.escritura} onChange={handleChange} placeholder="Escritura" />
-        <input type="text" name="radicado" value={form.radicado} onChange={handleChange} placeholder="Radicado" />
-        <select name="protocolista" value={form.protocolista} onChange={handleChange}>
+        <input 
+          type="text" 
+          name="escritura" 
+          value={form.escritura} 
+          onChange={handleChange} 
+          placeholder="Ej: 12345" 
+          className={errors.escritura ? 'input-error' : ''}
+        />
+        {errors.escritura && <span className="error-message">{errors.escritura}</span>}
+
+        <input 
+          type="text" 
+          name="radicado" 
+          value={form.radicado} 
+          onChange={handleChange} 
+          placeholder="Ej: 20240101234432" 
+          className={errors.radicado ? 'input-error' : ''}
+        />
+        {errors.radicado && <span className="error-message">{errors.radicado}</span>}
+
+        <select 
+          name="protocolista" 
+          value={form.protocolista} 
+          onChange={handleChange} 
+          className={errors.protocolista ? 'input-error' : ''}
+        >
           <option value="">Selecciona un protocolista</option>
           {protocolists.map((protocolista) => (
             <option key={protocolista.id} value={protocolista.nombre}>{protocolista.nombre}</option>
           ))}
         </select>
-        <textarea name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones"></textarea>
+        {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
+
+        <textarea 
+          name="observaciones" 
+          value={form.observaciones} 
+          onChange={handleChange} 
+          placeholder="Observaciones adicionales (opcional)"
+        ></textarea>
         <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
       </form>
     </div>
@@ -382,6 +421,17 @@ const DefaultColumnFilter = ({
       placeholder={`Buscar ${count} registros...`}
     />
   );
+};
+
+const fetchRadicados = async (caseId) => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:5000/cases/${caseId}/radicados`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching radicados for case ${caseId}:`, error);
+    toast.error('No se pudieron cargar los radicados. Por favor, inténtelo de nuevo más tarde.');
+    return [];
+  }
 };
 
 export default CaseForm;
