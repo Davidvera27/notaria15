@@ -1,87 +1,76 @@
-/* Register.css */
-
-/* Fondo de la página con degradado diagonal */
 body {
-    background: linear-gradient(135deg, #ffffff, #87CEFA);
+    background: linear-gradient(135deg, #ffffff, #2eb135);
     margin: 0;
     padding: 0;
     font-family: 'Open Sans', sans-serif;
     height: 100vh;
-    display: flex; /* Usamos flexbox para centrar el contenido */
-    align-items: center; /* Centramos verticalmente */
-    justify-content: center; /* Centramos horizontalmente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background 1s ease-in-out;
     box-sizing: border-box;
-}
-
-/* Estilo para el contenedor principal del formulario */
-.register-container {
+  }
+  
+  .register-container {
     width: 90%;
     max-width: 1000px;
     padding: 30px;
-    background-color: rgba(255, 255, 255, 0.8); /* Semitransparente */
+    background-color: rgba(255, 255, 255, 0.8);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     border-radius: 15px;
     backdrop-filter: blur(10px);
     animation: fadeIn 1s ease-in-out;
-}
-
-/* Estilo para el título de la página */
-.register-container h2 {
+  }
+  
+  .register-container h2 {
     text-align: center;
     color: #333;
     font-family: 'Merriweather', serif;
     margin-bottom: 30px;
     font-size: 24px;
-}
-
-/* Estilo para el formulario utilizando grid layout */
-.register-container form {
+  }
+  
+  .register-container form {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-}
-
-/* Estilo para los campos de formulario */
-.register-container form label {
+  }
+  
+  .register-container form label {
     display: block;
     font-size: 14px;
     margin-bottom: 5px;
     color: #333;
     font-weight: bold;
-}
-
-.register-container form input {
+  }
+  
+  .register-container form input {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
     box-sizing: border-box;
     font-size: 14px;
-    font-family: 'Open Sans', sans-serif;
     transition: border-color 0.3s ease;
-}
-
-.register-container form input:focus {
-    border-color: #007bff;
+  }
+  
+  .register-container form input:focus {
+    border-color: #2eb135;
     outline: none;
-}
-
-/* Campo que ocupa ambas columnas */
-.register-container form input[name="email"] {
+  }
+  
+  .register-container form input[name="email"] {
     grid-column: span 2;
-}
-
-/* Aplicar mayúsculas sostenidas excepto al correo electrónico */
-.register-container form input[type="text"]:not([name="email"]) {
+  }
+  
+  .register-container form input[type="text"]:not([name="email"]) {
     text-transform: uppercase;
-}
-
-/* Estilo para el botón que ocupa ambas columnas */
-.register-container form button {
+  }
+  
+  .register-container form button {
     grid-column: span 2;
     padding: 15px;
-    background-color: #007bff;
+    background-color: #2eb135;
     color: white;
     border: none;
     border-radius: 8px;
@@ -89,44 +78,43 @@ body {
     transition: background-color 0.3s ease, transform 0.2s ease;
     font-size: 18px;
     font-weight: bold;
-}
-
-.register-container form button:hover {
-    background-color: #0056b3;
+  }
+  
+  .register-container form button:hover {
+    background-color: #239426;
     transform: translateY(-2px);
-}
-
-/* Animación para la aparición del formulario */
-@keyframes fadeIn {
+  }
+  
+  @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-/* Media Query para dispositivos móviles */
-@media (max-width: 600px) {
+  }
+  
+  @media (max-width: 600px) {
     .register-container {
-        padding: 20px;
+      padding: 20px;
     }
-
+  
     .register-container h2 {
-        font-size: 20px;
+      font-size: 20px;
     }
-
+  
     .register-container form {
-        grid-template-columns: 1fr;
+      grid-template-columns: 1fr;
     }
-
+  
     .register-container form label {
-        font-size: 14px;
+      font-size: 14px;
     }
-
+  
     .register-container form input {
-        font-size: 12px;
-        padding: 10px;
+      font-size: 12px;
+      padding: 10px;
     }
-
+  
     .register-container form button {
-        font-size: 16px;
-        padding: 12px;
+      font-size: 16px;
+      padding: 12px;
     }
-}
+  }
+  
