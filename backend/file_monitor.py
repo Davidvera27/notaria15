@@ -12,7 +12,7 @@ class FileHandler(FileSystemEventHandler):
         for filename in os.listdir(self.folder_to_monitor):
             if filename.endswith('.pdf'):
                 file_path = os.path.join(self.folder_to_monitor, filename)
-                response = requests.get(f'http://127.0.0.1:5000/extract-data')
+                response = requests.post(f'http://127.0.0.1:5000/extract-data', json={'file_path': file_path})
                 if response.status_code == 200:
                     print(f"Processed {filename}")
 
