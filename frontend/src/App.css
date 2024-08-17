@@ -1,215 +1,263 @@
 @import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;700&display=swap");
-/* Importa dos fuentes desde Google Fonts: 'Merriweather' y 'Open Sans'. Estas fuentes se utilizan en los textos del sitio web. */
 
 body {
-  font-family: "Open Sans", sans-serif; /* Aplica la fuente 'Open Sans' al cuerpo de todo el documento. */
-  background-color: var(--background-color); /* Define el color de fondo del cuerpo utilizando una variable CSS. */
-  color: var(--text-color); /* Define el color del texto utilizando una variable CSS. */
-  margin: 0; /* Elimina el margen predeterminado del cuerpo. */
-  padding: 0; /* Elimina el padding predeterminado del cuerpo. */
+  font-family: "Open Sans", sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  height: 100vh;
 }
 
 body.light {
-  --background-color: white; /* Establece el fondo blanco para el tema claro. */
-  --text-color: black; /* Establece el color del texto negro para el tema claro. */
-  --table-row-background: #f9f9f9; /* Establece el color de fondo para filas alternas en tablas en el tema claro. */
-  --table-row-hover: #f1f1f1; /* Establece el color de fondo cuando se pasa el cursor sobre una fila de tabla en el tema claro. */
-  --table-header-background: #f2f2f2; /* Establece el color de fondo del encabezado de tabla en el tema claro. */
+  --background-color: white;
+  --text-color: black;
+  --table-row-background: #f9f9f9;
+  --table-row-hover: #e9f7df;
+  --table-header-background: #2eb135;
 }
 
 body.dark {
-  --background-color: #121212; /* Establece un fondo oscuro para el tema oscuro. */
-  --text-color: #e0e0e0; /* Establece un color de texto claro para el tema oscuro. */
-  --table-row-background: #2c2c2c; /* Establece el color de fondo para filas alternas en tablas en el tema oscuro. */
-  --table-row-hover: #3c3c3c; /* Establece el color de fondo cuando se pasa el cursor sobre una fila de tabla en el tema oscuro. */
-  --table-header-background: #424242; /* Establece el color de fondo del encabezado de tabla en el tema oscuro. */
+  --background-color: #000000;
+  --text-color: #000000;
+  --table-row-background: #000000;
+  --table-row-hover: #ffffff;
+  --table-header-background: #2eb135;
+}
+
+body.profile-page {
+  --background-color: linear-gradient(135deg, #e3ffe7, #d9e7ff);
+  --text-color: #333;
 }
 
 button {
-  transition: background-color 0.3s, transform 0.2s; /* Añade una transición suave al cambiar el color de fondo y la transformación (e.g., desplazamiento) de los botones. */
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 button:hover {
-  background-color: #0056b3; /* Cambia el color de fondo del botón a un azul más oscuro cuando el usuario pasa el cursor sobre él. */
-  transform: translateY(-2px); /* Desplaza el botón hacia arriba 2 píxeles cuando el usuario pasa el cursor sobre él, creando un efecto de "elevación". */
+  background-color: #239426;
+  transform: translateY(-2px);
 }
 
 .app-container {
-  font-family: "Open Sans", sans-serif; /* Aplica la fuente 'Open Sans' a los textos dentro del contenedor de la aplicación. */
-  padding: 20px; /* Añade 20 píxeles de padding alrededor del contenido dentro del contenedor de la aplicación. */
-  max-width: 100%; /* Limita el ancho máximo del contenedor al 100% del ancho de la pantalla. */
-  margin: 0 auto; /* Centra el contenedor dentro de la pantalla. */
-  background-color: var(--background-color); /* Aplica el color de fondo definido por la variable CSS. */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añade una sombra sutil alrededor del contenedor para darle un efecto de elevación. */
+  height: 100vh;
+  padding-top: 60px;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: var(--background-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
-  text-align: center; /* Centra el texto del título horizontalmente. */
-  color: var(--text-color); /* Aplica el color de texto definido por la variable CSS. */
-  font-size: 2em; /* Establece el tamaño de fuente del título a 2em (2 veces el tamaño base de la fuente). */
-  margin-bottom: 20px; /* Añade un margen inferior de 20 píxeles debajo del título. */
-  font-family: "Merriweather", serif; /* Aplica la fuente 'Merriweather' específicamente al título. */
+  text-align: center;
+  color: var(--text-color);
+  font-size: 2em;
+  margin-bottom: 20px;
+  font-family: "Merriweather", serif;
 }
 
-/* Estilos para el menú hamburguesa */
+/* Menú Hamburguesa */
 .hamburger-menu {
-  display: flex; /* Usa flexbox para alinear y distribuir los elementos dentro del menú hamburguesa. */
-  flex-direction: column; /* Coloca las barras del menú una encima de la otra. */
-  justify-content: space-between; /* Distribuye el espacio de manera uniforme entre las barras. */
-  width: 30px; /* Establece el ancho del menú hamburguesa a 30 píxeles. */
-  height: 20px; /* Establece la altura del menú hamburguesa a 20 píxeles. */
-  cursor: pointer; /* Cambia el cursor a una mano cuando el usuario pasa sobre el menú, indicando que es interactivo. */
-  position: fixed; /* Fija la posición del menú en la pantalla, para que no se mueva al hacer scroll. */
-  top: 15px; /* Coloca el menú a 15 píxeles de la parte superior de la pantalla. */
-  left: 20px; /* Coloca el menú a 20 píxeles del lado izquierdo de la pantalla. */
-  z-index: 1001; /* Asegura que el menú hamburguesa esté por encima de otros elementos con un z-index más bajo. */
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 20px;
+  cursor: pointer;
+  position: fixed;
+  top: 15px;
+  left: 20px;
+  z-index: 1001;
 }
 
 .hamburger-menu .bar {
-  height: 4px; /* Establece la altura de cada barra en el menú hamburguesa a 4 píxeles. */
-  width: 100%; /* Hace que cada barra tenga el mismo ancho que el contenedor (30 píxeles). */
-  background-color: var(--text-color); /* Aplica el color del texto (definido por la variable CSS) como color de fondo de las barras. */
-  border-radius: 10px; /* Redondea las esquinas de las barras para un aspecto más suave. */
-  transition: 0.4s; /* Aplica una transición suave a las barras cuando cambian de estado (e.g., al hacer clic). */
+  height: 4px;
+  width: 100%;
+  background-color: var(--text-color);
+  border-radius: 10px;
+  transition: 0.4s;
 }
 
 .nav {
-  display: flex; /* Usa flexbox para organizar los elementos dentro del menú de navegación. */
-  flex-direction: column; /* Coloca los elementos del menú uno debajo del otro. */
-  justify-content: center; /* Centra verticalmente los elementos dentro del menú. */
-  align-items: center; /* Centra horizontalmente los elementos dentro del menú. */
-  background-color: #007bff; /* Establece el color de fondo del menú de navegación en azul. */
-  position: fixed; /* Fija el menú de navegación en la pantalla, para que no se mueva al hacer scroll. */
-  top: 0; /* Coloca el menú en la parte superior de la pantalla. */
-  left: -100%; /* Coloca el menú fuera de la pantalla, a la izquierda, cuando está cerrado. */
-  width: 250px; /* Establece el ancho del menú de navegación a 250 píxeles. */
-  height: 100%; /* Establece la altura del menú de navegación para cubrir toda la pantalla. */
-  transition: left 0.4s ease-in-out; /* Aplica una transición suave cuando el menú se desliza dentro o fuera de la pantalla. */
-  z-index: 1000; /* Coloca el menú de navegación por debajo del menú hamburguesa (z-index: 1001). */
-  padding-top: 60px; /* Añade 60 píxeles de padding en la parte superior del menú para evitar superposición con el menú hamburguesa. */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #74e77483;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px; /* Ajustamos la altura para que sea más adecuada para un menú horizontal */
+  transition: top 0.4s ease-in-out;
+  z-index: 1000;
+  padding: 0 20px; /* Ajustamos el padding para un mejor aspecto */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav.open {
-  left: 0; /* Mueve el menú de navegación dentro de la pantalla cuando está abierto. */
+  top: 0; /* Mantenemos el menú visible siempre */
 }
 
-/* Estilo uniforme para todos los items del menú (enlaces y botones) */
 .nav-link, .nav-button {
-  text-decoration: none; /* Elimina cualquier subrayado en los enlaces del menú. */
-  color: white; /* Establece el color del texto de los elementos del menú en blanco. */
-  font-weight: bold; /* Hace que el texto de los elementos del menú sea negrita. */
-  margin: 15px 0; /* Añade 15 píxeles de margen arriba y abajo de cada elemento del menú. */
-  font-size: 1.2em; /* Establece el tamaño de la fuente a 1.2 veces el tamaño base. */
-  text-align: center; /* Centra el texto dentro de cada elemento del menú. */
-  width: 80%; /* Hace que los elementos del menú ocupen el 80% del ancho del menú de navegación. */
-  padding: 10px 0; /* Añade 10 píxeles de padding arriba y abajo de cada elemento del menú. */
-  background-color: transparent; /* Hace que el fondo de los elementos del menú sea transparente por defecto. */
-  border: none; /* Elimina cualquier borde de los elementos del menú. */
-  border-radius: 10px; /* Redondea las esquinas de los elementos del menú para un aspecto más suave. */
-  cursor: pointer; /* Cambia el cursor a una mano cuando se pasa sobre un elemento del menú, indicando que es interactivo. */
-  transition: background-color 0.3s, color 0.3s; /* Aplica una transición suave al cambiar el color de fondo y el color del texto cuando se pasa el cursor sobre un elemento del menú. */
+  text-decoration: none;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  margin: 0 10px; /* Espaciado horizontal entre los elementos */
+  font-size: 1em;
+  text-align: center;
+  padding: 10px 20px;
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .nav-link:hover, .nav-button:hover {
-  background-color: #0056b3; /* Cambia el color de fondo a un azul más oscuro cuando se pasa el cursor sobre un elemento del menú. */
-  color: #fff; /* Cambia el color del texto a blanco cuando se pasa el cursor sobre un elemento del menú. */
+  background-color: #239426;
+  color: #fff;
 }
 
-/* Estilos adicionales para cuando el menú está abierto */
+/* Dropdown de usuario */
+.nav-user-dropdown {
+  position: relative;
+  cursor: pointer;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+  padding: 10px 20px;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  z-index: 1000;
+}
+
+.dropdown-menu.open {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+  text-align: left;
+  text-decoration: none;
+  display: block;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* Efecto del menú hamburguesa al abrirse */
 .hamburger-menu.open .bar:nth-child(1) {
-  transform: rotate(-45deg) translate(-5px, 6px); /* Rota la primera barra para formar una diagonal hacia abajo cuando el menú está abierto. */
+  transform: rotate(-45deg) translate(-5px, 6px);
 }
 
 .hamburger-menu.open .bar:nth-child(2) {
-  opacity: 0; /* Hace que la segunda barra sea invisible (desaparece) cuando el menú está abierto. */
+  opacity: 0;
 }
 
 .hamburger-menu.open .bar:nth-child(3) {
-  transform: rotate(45deg) translate(-5px, -6px); /* Rota la tercera barra para formar una diagonal hacia arriba cuando el menú está abierto, formando una "X" con la primera barra. */
+  transform: rotate(45deg) translate(-5px, -6px);
 }
 
+/* Estilos para tablas y formularios */
 .table-container {
-  max-height: 400px; /* Limita la altura máxima del contenedor de la tabla a 400 píxeles. */
-  overflow-y: auto; /* Permite que el contenido dentro del contenedor de la tabla sea desplazable verticalmente si supera la altura máxima. */
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 20px;
 }
 
 .case-table, .protocolist-table {
-  width: 100%; /* Establece el ancho de las tablas para que ocupen el 100% del contenedor. */
-  border-collapse: collapse; /* Colapsa los bordes de la tabla para que no haya espacio entre las celdas. */
-  margin-bottom: 20px; /* Añade 20 píxeles de margen debajo de la tabla. */
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
 }
 
 .case-table th, .case-table td, .protocolist-table th, .protocolist-table td {
-  border: 1px solid #ddd; /* Añade un borde gris claro alrededor de cada celda de la tabla. */
-  padding: 8px; /* Añade 8 píxeles de padding dentro de cada celda de la tabla. */
-  color: var(--text-color); /* Aplica el color de texto definido por la variable CSS a las celdas de la tabla. */
+  border: 1px solid #ddd;
+  padding: 8px;
+  color: var(--text-color);
 }
 
 .case-table th, .protocolist-table th {
-  background-color: var(--table-header-background); /* Aplica el color de fondo definido por la variable CSS a los encabezados de las tablas. */
-  text-align: left; /* Alinea el texto dentro de las celdas de los encabezados a la izquierda. */
+  background-color: var(--table-header-background);
+  text-align: left;
 }
 
 .case-table tbody tr:nth-child(even), .protocolist-table tbody tr:nth-child(even) {
-  background-color: var(--table-row-background); /* Aplica un color de fondo definido por la variable CSS a las filas pares de la tabla. */
+  background-color: var(--table-row-background);
 }
 
 .case-table tr:hover, .protocolist-table tr:hover {
-  background-color: var(--table-row-hover); /* Cambia el color de fondo de una fila cuando se pasa el cursor sobre ella. */
+  background-color: var(--table-row-hover);
 }
 
 .case-form, .protocolist-form {
-  display: flex; /* Usa flexbox para organizar los elementos dentro del formulario. */
-  flex-direction: column; /* Coloca los elementos del formulario en una columna. */
-  gap: 15px; /* Añade un espacio de 15 píxeles entre los elementos del formulario. */
-  padding: 20px; /* Añade 20 píxeles de padding alrededor del contenido del formulario. */
-  border: 1px solid #ccc; /* Añade un borde gris claro alrededor del formulario. */
-  border-radius: 10px; /* Redondea las esquinas del formulario para un aspecto más suave. */
-  background: linear-gradient(135deg, #f0f0f0, #ffffff); /* Aplica un degradado suave como fondo del formulario, de un gris claro a un blanco. */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añade una sombra sutil alrededor del formulario para darle un efecto de elevación. */
-  max-width: 600px; /* Limita el ancho máximo del formulario a 600 píxeles. */
-  margin: 20px auto; /* Centra el formulario dentro de su contenedor con 20 píxeles de margen arriba y abajo. */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f0f0f0, #ffffff);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  flex-shrink: 0;
+  margin: 20px auto;
 }
 
 .case-form input, .protocolist-form input {
-  padding: 12px; /* Añade 12 píxeles de padding dentro de los campos de entrada del formulario. */
-  border: 1px solid #ccc; /* Añade un borde gris claro alrededor de los campos de entrada. */
-  border-radius: 5px; /* Redondea las esquinas de los campos de entrada para un aspecto más suave. */
-  background-color: var(--background-color); /* Aplica el color de fondo definido por la variable CSS a los campos de entrada. */
-  color: var(--text-color); /* Aplica el color de texto definido por la variable CSS a los campos de entrada. */
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .case-form button, .protocolist-form button {
-  padding: 10px; /* Añade 10 píxeles de padding dentro de los botones del formulario. */
-  background-color: #007bff; /* Establece el color de fondo de los botones a un azul. */
-  color: white; /* Establece el color del texto de los botones a blanco. */
-  border: none; /* Elimina cualquier borde de los botones. */
-  border-radius: 5px; /* Redondea las esquinas de los botones para un aspecto más suave. */
-  cursor: pointer; /* Cambia el cursor a una mano cuando se pasa sobre un botón, indicando que es interactivo. */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Aplica una transición suave al cambiar el color de fondo y al desplazar el botón al hacer hover. */
+  padding: 10px;
+  background-color: #2eb135;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .case-form button:hover, .protocolist-form button:hover {
-  background-color: #0056b3; /* Cambia el color de fondo del botón a un azul más oscuro cuando el usuario pasa el cursor sobre él. */
-  transform: translateY(-2px); /* Desplaza el botón hacia arriba 2 píxeles cuando el usuario pasa el cursor sobre él, creando un efecto de "elevación". */
+  background-color: #239426;
+  transform: translateY(-2px);
 }
 
 .btn-delete {
-  background-color: #dc3545; /* Establece el color de fondo de los botones de eliminar a un rojo. */
-  color: white; /* Establece el color del texto de los botones de eliminar a blanco. */
+  background-color: #dc3545;
+  color: white;
 }
 
 .btn-delete:hover {
-  background-color: #c82333; /* Cambia el color de fondo del botón de eliminar a un rojo más oscuro cuando el usuario pasa el cursor sobre él. */
+  background-color: #c82333;
 }
 
-/* Media query para ajustar el diseño en pantallas pequeñas */
+/* Ajustes para pantallas pequeñas */
 @media (max-width: 768px) {
   .nav-link {
-    font-size: 1em; /* Reduce el tamaño de la fuente de los enlaces del menú para pantallas pequeñas. */
+    font-size: 1em;
   }
   .case-form, .protocolist-form {
-    width: 100%; /* Hace que el formulario ocupe el 100% del ancho disponible en pantallas pequeñas. */
-    padding: 15px; /* Reduce el padding dentro del formulario en pantallas pequeñas. */
+    width: 100%;
+    padding: 15px;
   }
 }
