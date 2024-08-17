@@ -3,8 +3,17 @@ from models import Case, Radicado, Protocolist, db
 from utils import send_email_via_outlook, extract_pdf_data
 import os
 from flask import current_app
+from marshmallow import Schema, fields, ValidationError
 
 cases_bp = Blueprint('cases', __name__)
+
+# Definir el esquema de validación con marshmallow
+class CaseSchema(Schema):
+    fecha = fields.Date(required=True, error_messages={"required": "La fecha es obligatoria"})
+    escritura = fields.Integer(required=True, error_messages={"required": "La escritura es obligatoria"})
+    radicado = fields.String(required=True, error_messages={"required": "El radicado es obligatorio"})
+    protocolista = fields.String(required=True, error_messages={"required": "El protocolista es obligatorio"})
+    observaciones = fields.String(missing='')
 
 @cases_bp.route('/cases', methods=['GET'])
 def get_cases():
@@ -20,10 +29,11 @@ def get_cases():
 
 @cases_bp.route('/cases', methods=['POST'])
 def add_case():
-    data = request.json
-
-    if not data.get('fecha') or not data.get('escritura') or not data.get('radicado') or not data.get('protocolista'):
-        return jsonify({'error': 'Todos los campos son obligatorios'}), 400
+    schema = CaseSchema()
+    try:
+        data = schema.load(request.json)  # Validar y deserializar los datos de la solicitud
+    except ValidationError as err:
+        return jsonify({"errors": err.messages}), 400
 
     try:
         protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
