@@ -25,6 +25,7 @@ const ProtocolistTable = () => {
       setProtocolists(protocolistsData);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
+      toast.error('No se pudieron cargar los protocolistas. Por favor, inténtelo de nuevo más tarde.');
     }
   }, []);
 
@@ -54,10 +55,10 @@ const ProtocolistTable = () => {
       try {
         await axios.delete(`http://127.0.0.1:5000/protocolists/${id}`);
         fetchProtocolists();
-        Swal.fire('¡Eliminado!', 'El Protocolista ha sido eliminado.', 'success');
+        Swal.fire('¡Eliminado!', 'El protocolista ha sido eliminado.', 'success');
       } catch (error) {
-          console.error('Error deleting protocolist:', error);
-          Swal.fire('Error', 'Hubo un problema al eliminar el protocolista.', 'error');
+        console.error('Error deleting protocolist:', error);
+        Swal.fire('Error', 'Hubo un problema al eliminar el protocolista. Por favor, inténtelo de nuevo.', 'error');
       }
     }
   }, [fetchProtocolists]);
