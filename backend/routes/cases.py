@@ -1,5 +1,8 @@
-from flask import Blueprint, jsonify, request
-from models import Case, Radicado,Protocolist, db
+from flask import Blueprint, jsonify, request, current_app as app
+from models import Case, Radicado, Protocolist, db
+from utils import send_email_via_outlook, extract_pdf_data
+import os
+from flask import current_app
 
 cases_bp = Blueprint('cases', __name__)
 
@@ -41,6 +44,46 @@ def add_case():
         db.session.rollback()
         print(f"Error al crear el caso: {e}")
         return jsonify({'error': 'Hubo un problema al crear el caso.'}), 500
+
+@cases_bp.route('/send_email', methods=['POST'])
+def send_case_email():
+    data = request.json
+    radicado = data.get('radicado')
+
+    case = Case.query.filter_by(radicado=radicado).first()
+
+    if not case:
+        return jsonify({'error': 'Case not found'}), 404
+
+    protocolista = Protocolist.query.get(case.protocolista_id)
+    if not protocolista:
+        return jsonify({'error': 'Protocolist not found'}), 404
+
+    # Buscar el archivo PDF
+    pdf_path = None
+    uploads_dir = current_app.config['UPLOAD_FOLDER']
+    for filename in os.listdir(uploads_dir):
+        if filename.endswith('.pdf'):
+            file_path = os.path.join(uploads_dir, filename)
+            pdf_data = extract_pdf_data(file_path)
+            if pdf_data['RADICADO N°'] == radicado:
+                pdf_path = file_path
+                break
+
+    if not pdf_path:
+        return jsonify({'error': 'PDF not found in uploads'}), 404
+
+    subject = f"BOLETA DE RENTAS {radicado}"
+    body = f"Señor(a) {protocolista.nombre},\n\nAdjunto encontrará el documento Liquidación De Impuesto De Registro, correspondiente al radicado No. {radicado} de la escritura {case.escritura}.\n\nAtentamente,\nAuxiliar de rentas Notaría 15."
+
+    # Usar send_email_via_outlook para enviar el correo
+    send_email_via_outlook(recipients=[protocolista.correo_electronico], 
+                           subject=subject, 
+                           body=body, 
+                           attachments=[pdf_path])
+
+    return jsonify({'message': 'Email sent successfully'})
+
 
 @cases_bp.route('/cases/<int:id>', methods=['PUT'])
 def update_case(id):
