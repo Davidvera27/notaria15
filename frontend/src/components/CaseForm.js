@@ -26,6 +26,7 @@ const CaseForm = () => {
       setCases(response.data);
     } catch (error) {
       console.error('Error fetching cases:', error);
+      toast.error('No se pudieron cargar los casos. Por favor, inténtelo de nuevo más tarde.');
     }
   }, []);
 
@@ -96,38 +97,38 @@ const CaseForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        if (!form.fecha || !form.escritura || !form.radicado || !form.protocolista) {
-            toast.error('Todos los campos son obligatorios');
-            return;
-        }
+      if (!form.fecha || !form.escritura || !form.radicado || !form.protocolista) {
+        toast.error('Todos los campos son obligatorios');
+        return;
+      }
 
-        const caseData = {
-            fecha: form.fecha.toISOString().split('T')[0],
-            escritura: form.escritura,
-            radicado: form.radicado,
-            protocolista: form.protocolista,
-            observaciones: form.observaciones
-        };
+      const caseData = {
+        fecha: form.fecha.toISOString().split('T')[0],
+        escritura: form.escritura,
+        radicado: form.radicado,
+        protocolista: form.protocolista,
+        observaciones: form.observaciones
+      };
 
-        if (currentCase) {
-            await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
-            setCurrentCase(null);
-        } else {
-            await axios.post('http://127.0.0.1:5000/cases', caseData);
-        }
+      if (currentCase) {
+        await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
+        setCurrentCase(null);
+      } else {
+        await axios.post('http://127.0.0.1:5000/cases', caseData);
+      }
 
-        setForm({
-            fecha: new Date(),
-            escritura: '',
-            radicado: '',
-            protocolista: '',
-            observaciones: ''
-        });
-        fetchCases();
-        toast.success('Caso guardado exitosamente');
+      setForm({
+        fecha: new Date(),
+        escritura: '',
+        radicado: '',
+        protocolista: '',
+        observaciones: ''
+      });
+      fetchCases();
+      toast.success('Caso guardado exitosamente');
     } catch (error) {
-        console.error('Error adding/updating case:', error);
-        toast.error('Hubo un problema al guardar el caso');
+      console.error('Error adding/updating case:', error);
+      toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
     }
   };
 
