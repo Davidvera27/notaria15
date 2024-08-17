@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { useAuth0 } from '@auth0/auth0-react';
 import './Register.css'; // Importando el nuevo archivo de estilos
 
@@ -42,7 +43,7 @@ const Register = () => {
     e.preventDefault();
     try {
       await axios.post('http://127.0.0.1:5000/userprofiles', form);
-      alert('Usuario creado exitosamente');
+      toast.success('Usuario creado exitosamente');
       setForm({
         first_name1: '',
         first_name2: '',
@@ -55,7 +56,7 @@ const Register = () => {
       });
     } catch (error) {
       console.error('Error al crear el usuario:', error);
-      alert('Hubo un problema al crear el usuario');
+      toast.error('Hubo un problema al crear el usuario. Por favor, inténtelo de nuevo más tarde.');
     }
   };
 
