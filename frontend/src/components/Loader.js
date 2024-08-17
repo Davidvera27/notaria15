@@ -1,4 +1,3 @@
-// src/components/Loader.js
 import React from 'react';
 import { TailSpin } from 'react-loader-spinner';
 import './Loader.css';
