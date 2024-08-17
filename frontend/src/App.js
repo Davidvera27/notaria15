@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import './App.css';
+import Loader from './components/Loader';
 
 const CaseForm = React.lazy(() => {
   NProgress.start();
@@ -36,6 +37,7 @@ function App() {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
   });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -113,10 +115,15 @@ function App() {
             <button onClick={() => { toggleTheme(); setMenuOpen(false); }} className="nav-button">
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
             </button>
-            <Link to="/profile" className="nav-link" onClick={() => setMenuOpen(false)}>Perfil</Link>
-            <button onClick={() => { logout({ returnTo: window.location.origin }); setMenuOpen(false); }} className="nav-button">Salir</button>
+            <div className="nav-user-dropdown" onClick={() => setDropdownOpen(!dropdownOpen)}>
+              {user?.name} {/* Muestra el nombre del usuario */}
+              <div className={`dropdown-menu ${dropdownOpen ? 'open' : ''}`}>
+                <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>Información de perfil</Link>
+                <button onClick={() => logout({ returnTo: window.location.origin })} className="dropdown-item">Cerrar Sesión</button>
+              </div>
+            </div>
           </nav>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/cases" element={<CaseForm />} />
