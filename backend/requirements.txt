@@ -7,3 +7,4 @@ PyMuPDF
 fitz
 redis
 Flask-Caching
+pywin32==303
