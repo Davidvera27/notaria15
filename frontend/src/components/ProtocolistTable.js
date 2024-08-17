@@ -13,12 +13,15 @@ const ProtocolistTable = () => {
     correo_electronico: ''
   });
 
-  // Función para obtener los protocolistas y el número de casos asociados a cada uno
+  // Función para obtener los protocolistas y el número de casos asociados a cada uno, con memoización para evitar llamadas redundantes
   const fetchProtocolists = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/protocolists');
-      const casesResponse = await axios.get('http://127.0.0.1:5000/cases');
-      const protocolistsData = response.data.map(protocolist => {
+      const [protocolistsResponse, casesResponse] = await Promise.all([
+        axios.get('http://127.0.0.1:5000/protocolists'),
+        axios.get('http://127.0.0.1:5000/cases')
+      ]);
+
+      const protocolistsData = protocolistsResponse.data.map(protocolist => {
         const caseCount = casesResponse.data.filter(c => c.protocolista === protocolist.nombre).length;
         return { ...protocolist, caseCount };
       });
@@ -67,7 +70,7 @@ const ProtocolistTable = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     try {
       const { id, ...protocolistData } = form;
@@ -84,7 +87,7 @@ const ProtocolistTable = () => {
       console.error('Error adding/updating protocolist:', error);
       toast.error('Hubo un problema al guardar el protocolista');
     }
-  };
+  }, [currentProtocolist, form, fetchProtocolists]);
 
   const data = useMemo(() => protocolists, [protocolists]);
   const columns = useMemo(
@@ -93,21 +96,25 @@ const ProtocolistTable = () => {
         Header: 'ID',
         accessor: 'id',
         Filter: DefaultColumnFilter,
+        maxWidth: 80, // Restringir ancho
       },
       {
         Header: 'Nombre',
         accessor: 'nombre',
         Filter: DefaultColumnFilter,
+        maxWidth: 80, // Restringir ancho
       },
       {
         Header: 'Correo Electrónico',
         accessor: 'correo_electronico',
         Filter: DefaultColumnFilter,
+        maxWidth: 80, // Restringir ancho
       },
       {
         Header: 'Número de Casos',
         accessor: 'caseCount',  // Nueva columna para mostrar el número de casos
         Filter: DefaultColumnFilter,
+        maxWidth: 80, // Restringir ancho
       },
       {
         Header: 'Acciones',
@@ -115,16 +122,17 @@ const ProtocolistTable = () => {
         disableSortBy: true,
         disableFilters: true,
         Cell: ({ row }) => (
-          <>
-            <button onClick={() => handleEdit(row.original)}>
+          <div className="actions-container">
+            <button className="btn-edit" onClick={() => handleEdit(row.original)}>
               <i className="fas fa-edit"></i> Editar
             </button>
-            <button onClick={() => handleDelete(row.original.id)}>
+            <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
               <i className="fas fa-trash"></i> Eliminar
             </button>
-          </>
+          </div>
         ),
-      },
+        maxWidth: 80, // Restringir ancho
+      }      
     ],
     [handleEdit, handleDelete]
   );
@@ -146,7 +154,7 @@ const ProtocolistTable = () => {
             {headerGroups.map(headerGroup => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
-                  <th key={column.id} {...column.getHeaderProps()} onClick={() => !column.disableSortBy && column.toggleSortBy(!column.isSortedDesc)}>
+                  <th key={column.id} {...column.getHeaderProps()} style={{ maxWidth: column.maxWidth }}>
                     {column.render('Header')}
                     <span>
                       {column.isSorted
