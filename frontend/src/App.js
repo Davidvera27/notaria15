@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -31,6 +31,7 @@ const Register = React.lazy(() => {
 function App() {
   const { isAuthenticated, loginWithRedirect, logout, user, isLoading } = useAuth0();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [emailsToSendCount, setEmailsToSendCount] = useState(0);
   const [userSettings, setUserSettings] = useState(() => {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
@@ -57,6 +58,21 @@ function App() {
       toast.error(`Error: ${error.message}`);
     }
   };
+
+  const checkEmailsToSend = useCallback(async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/cases');
+      const cases = await response.json();
+      const pendingEmails = cases.filter(c => c.hasPdf).length;
+      setEmailsToSendCount(pendingEmails);
+    } catch (error) {
+      console.error('Error fetching cases:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkEmailsToSend();
+  }, [checkEmailsToSend]);
 
   const toggleTheme = () => {
     setUserSettings(prevSettings => {
@@ -91,12 +107,14 @@ function App() {
             <Link to="/cases" className="nav-link" onClick={() => setMenuOpen(false)}>Gestión de Casos</Link>
             <Link to="/protocolists" className="nav-link" onClick={() => setMenuOpen(false)}>Gestión de Protocolistas</Link>
             <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
-            <button onClick={() => { handleCheckEmails(); setMenuOpen(false); }} className="nav-button">Procesar Correos</button>
+            <button onClick={() => { handleCheckEmails(); setMenuOpen(false); }} className="nav-button">
+              Procesar Correos {emailsToSendCount > 0 && <span className="notification-badge">{emailsToSendCount}</span>}
+            </button>
             <button onClick={() => { toggleTheme(); setMenuOpen(false); }} className="nav-button">
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
             </button>
             <Link to="/profile" className="nav-link" onClick={() => setMenuOpen(false)}>Perfil</Link>
-            <button onClick={() => { logout({ returnTo: window.location.origin }); setMenuOpen(false); }} className="nav-button">Logout</button>
+            <button onClick={() => { logout({ returnTo: window.location.origin }); setMenuOpen(false); }} className="nav-button">Salir</button>
           </nav>
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>
