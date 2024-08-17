@@ -1,9 +1,10 @@
-/* index.css */
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
 }
 
 h2 {
@@ -16,7 +17,7 @@ h2 {
   justify-content: center;
   gap: 20px;
   padding: 20px;
-  background-color: #007bff;
+  background-color: #2eb135;
 }
 
 .nav-link {
