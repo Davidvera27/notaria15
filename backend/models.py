@@ -21,6 +21,25 @@ class Case(db.Model):
             'protocolista': self.protocolista.nombre,
             'observaciones': self.observaciones
         }
+        
+class CaseFinished(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.String(50))
+    escritura = db.Column(db.Integer)
+    radicado = db.Column(db.String(50))
+    protocolista = db.Column(db.String(50))
+    observaciones = db.Column(db.String(255))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'fecha': self.fecha,
+            'escritura': self.escritura,
+            'radicado': self.radicado,
+            'protocolista': self.protocolista,
+            'observaciones': self.observaciones
+        }
+
 
 class Protocolist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,3 +91,5 @@ class UserProfile(db.Model):
             'birth_date': self.birth_date,
             'username': self.username
         }
+        
+        
