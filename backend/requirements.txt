@@ -1,6 +1,7 @@
 Flask
 flask_sqlalchemy
 flask_cors
+Flask_Migrate
 requests
 watchdog
 PyMuPDF
