@@ -13,6 +13,9 @@ const Profile = () => {
         age: ''
     });
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [editField, setEditField] = useState({});
+
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
@@ -44,6 +47,36 @@ const Profile = () => {
         return age;
     };
 
+    const getNextBirthday = (birthDate) => {
+        const today = new Date();
+        const birthDateObj = new Date(birthDate);
+        birthDateObj.setFullYear(today.getFullYear());
+
+        if (birthDateObj < today) {
+            birthDateObj.setFullYear(today.getFullYear() + 1);
+        }
+
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return birthDateObj.toLocaleDateString(undefined, options);
+    };
+
+    const handleEditClick = (field) => {
+        setIsEditing(true);
+        setEditField({ ...editField, [field]: profileData[field] });
+    };
+
+    const handleSaveClick = async (field) => {
+        try {
+            await axios.put(`http://localhost:5000/api/profile/${user.email}`, {
+                [field]: editField[field]
+            });
+            setProfileData({ ...profileData, [field]: editField[field] });
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Error saving profile data", error);
+        }
+    };
+
     return (
         <div className="profile-container">
             <div className="profile-avatar">
@@ -52,7 +85,17 @@ const Profile = () => {
             <div className="profile-details">
                 <div className="profile-field">
                     <label>Nombre completo:</label>
-                    <input type="text" value={profileData.fullName} readOnly />
+                    {isEditing ? (
+                        <input 
+                            type="text" 
+                            value={editField.fullName} 
+                            onChange={(e) => setEditField({ ...editField, fullName: e.target.value })} 
+                        />
+                    ) : (
+                        <input type="text" value={profileData.fullName} readOnly />
+                    )}
+                    <button onClick={() => handleEditClick('fullName')}>Editar</button>
+                    <button onClick={() => handleSaveClick('fullName')}>Guardar</button>
                 </div>
                 <div className="profile-field">
                     <label>Correo Electrónico:</label>
@@ -67,8 +110,8 @@ const Profile = () => {
                     <input type="text" value={profileData.phoneNumber} readOnly />
                 </div>
                 <div className="profile-field">
-                    <label>Cumpleaños:</label>
-                    <input type="text" value={profileData.birthDate} readOnly />
+                    <label>Próximo Cumpleaños:</label>
+                    <input type="text" value={getNextBirthday(profileData.birthDate)} readOnly />
                 </div>
                 <div className="profile-field">
                     <label>Edad:</label>
