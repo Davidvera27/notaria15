@@ -1,49 +1,43 @@
-body {
-  background: linear-gradient(135deg, var(--background-color-light), var(--main-accent-color));
+body.register-page {
+  background: linear-gradient(135deg, #f0f4c3, #dcedc8);
   margin: 0;
   padding: 0;
-  font-family: var(--body-font-family);
-  height: flex;
+  font-family: 'Poppins', sans-serif;
   display: flex;
-  align-items: center;
   justify-content: center;
-  box-sizing: border-box;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .register-container {
-  width: 100%;
-  height: auto;
-  padding: var(--main-padding);
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  border-radius: 0; /* Eliminar bordes redondeados para ocupar todo el espacio */
-  backdrop-filter: blur(10px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-sizing: border-box;
+  width: 60%; /* Aumenta o reduce según sea necesario */
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin: auto;
+  animation: fadeIn 1s ease-in-out;
 }
 
 .register-container h2 {
   text-align: center;
-  color: var(--text-color-dark);
-  font-family: var(--heading-font-family);
+  color: #2c3e50;
+  font-family: 'Poppins', sans-serif;
   margin-bottom: 30px;
   font-size: 24px;
 }
 
 .register-container form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr; /* Dos columnas para una distribución uniforme */
   gap: 20px;
-  height: 100%; /* Asegurar que el formulario ocupe toda la altura disponible */
 }
 
 .register-container form label {
   display: block;
   font-size: 14px;
   margin-bottom: 5px;
-  color: var(--text-color-dark);
+  color: #2c3e50;
   font-weight: bold;
 }
 
@@ -58,12 +52,12 @@ body {
 }
 
 .register-container form input:focus {
-  border-color: var(--main-accent-color);
+  border-color: #239426;
   outline: none;
 }
 
 .register-container form input[name="email"] {
-  grid-column: span 2;
+  grid-column: span 2; /* Ocupa toda la fila */
 }
 
 .register-container form input[type="text"]:not([name="email"]) {
@@ -71,10 +65,10 @@ body {
 }
 
 .register-container form button {
-  grid-column: span 2;
+  grid-column: span 2; /* Botón ocupa toda la fila */
   padding: 15px;
-  background-color: var(--main-accent-color);
-  color: var(--link-color);
+  background-color: #239426;
+  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -84,34 +78,35 @@ body {
 }
 
 .register-container form button:hover {
-  background-color: #239426;
+  background-color: #1b7e21;
   transform: translateY(-2px);
 }
 
 @media (max-width: 600px) {
   .register-container {
-      padding: var(--main-padding-small);
+    width: 100%;
+    padding: 20px;
   }
 
   .register-container h2 {
-      font-size: 20px;
+    font-size: 20px;
   }
 
   .register-container form {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* En pantallas pequeñas, el formulario es de una columna */
   }
 
   .register-container form label {
-      font-size: 14px;
+    font-size: 14px;
   }
 
   .register-container form input {
-      font-size: 12px;
-      padding: 10px;
+    font-size: 12px;
+    padding: 10px;
   }
 
   .register-container form button {
-      font-size: 16px;
-      padding: 12px;
+    font-size: 16px;
+    padding: 12px;
   }
 }
