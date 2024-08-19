@@ -1,22 +1,22 @@
 body.profile-page {
-  background: linear-gradient(135deg, #e3ffe7, #d9e7ff);
+  background: linear-gradient(135deg, #ffffff, #b7fcd1);
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--body-font-family);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh; /* Ajuste flexible */
 }
 
 .profile-container {
-  background: linear-gradient(135deg, #ffffff, #2eb135);
+  width: 40%;
+  max-width: flex;
+  padding: var(--main-padding);
+  background-color: rgba(8, 8, 8, 0.308);
   border-radius: 20px;
-  padding: 40px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
-  width: 100%;
-  text-align: center;
+  margin: auto; /* Centrar el contenedor */
   animation: fadeIn 1s ease-in-out;
 }
 
