@@ -137,7 +137,6 @@ const CaseForm = () => {
     }
   };
 
-
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
   }, []);
@@ -191,25 +190,24 @@ const CaseForm = () => {
 
   const handleSendEmail = useCallback(async (caseItem) => {
     try {
-        const response = await axios.post('http://127.0.0.1:5000/send_email', { 
-            radicado: caseItem.radicado,
-            use_outlook: true
+      const response = await axios.post('http://127.0.0.1:5000/send_email', { 
+        radicado: caseItem.radicado,
+        use_outlook: true
+      });
+      if (response.data.message) {
+        toast.success(response.data.message);
+        // Remover el caso del estado local
+        dispatch({
+          type: 'cases/removeCase',
+          payload: caseItem.id
         });
-        if (response.data.message) {
-            toast.success(response.data.message);
-            // Remover el caso del estado local
-            dispatch({
-                type: 'cases/removeCase',
-                payload: caseItem.id
-            });
-        } else {
-            toast.error(`Error: ${response.data.error}`);
-        }
+      } else {
+        toast.error(`Error: ${response.data.error}`);
+      }
     } catch (error) {
-        toast.error('Hubo un problema al enviar el correo');
+      toast.error('Hubo un problema al enviar el correo');
     }
-}, [dispatch]);
-
+  }, [dispatch]);
 
   const isRadicadoInPdf = useMemo(() => (radicado) => {
     return pdfData.some((pdf) => {
@@ -219,19 +217,59 @@ const CaseForm = () => {
     });
   }, [pdfData]);
 
+  // New function to send all emails simultaneously
+  const handleSendAllEmails = useCallback(async () => {
+    const emailsToSend = cases.filter(caseItem => isRadicadoInPdf(caseItem.radicado));
+
+    if (emailsToSend.length === 0) {
+      return Swal.fire('No hay correos por enviar', 'No hay casos con documentos para enviar.', 'info');
+    }
+
+    const result = await Swal.fire({
+      title: 'Confirmar Envío de Correos',
+      text: `¿Realmente desea enviar ${emailsToSend.length} correos a los destinatarios de forma simultánea?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, enviar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const emailPromises = emailsToSend.map(caseItem => 
+          axios.post('http://127.0.0.1:5000/send_email', { 
+            radicado: caseItem.radicado,
+            use_outlook: true 
+          })
+        );
+        await Promise.all(emailPromises);
+        toast.success(`${emailsToSend.length} correos enviados exitosamente`);
+        // Optionally, remove the cases after sending emails
+        emailsToSend.forEach(caseItem => {
+          dispatch({
+            type: 'cases/removeCase',
+            payload: caseItem.id
+          });
+        });
+      } catch (error) {
+        toast.error('Hubo un problema al enviar los correos');
+      }
+    }
+  }, [cases, dispatch, isRadicadoInPdf]);
+
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
     {
       Header: 'Fecha',
       accessor: 'fecha',
       Filter: DefaultColumnFilter,
-      maxWidth: 150, // Establecer un ancho máximo
+      maxWidth: 150,
     },
     {
       Header: 'Escritura',
       accessor: 'escritura',
       Filter: DefaultColumnFilter,
-      maxWidth: 150, // Establecer un ancho máximo
+      maxWidth: 150,
     },
     {
       Header: 'Radicado',
@@ -240,19 +278,19 @@ const CaseForm = () => {
         <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
       ),
       Filter: DefaultColumnFilter,
-      maxWidth: 150, // Establecer un ancho máximo
+      maxWidth: 150,
     },
     {
       Header: 'Protocolista',
       accessor: 'protocolista',
       Filter: DefaultColumnFilter,
-      maxWidth: 150, // Establecer un ancho máximo
+      maxWidth: 150,
     },
     {
       Header: 'Observaciones',
       accessor: 'observaciones',
       Filter: DefaultColumnFilter,
-      maxWidth: 150, // Establecer un ancho máximo
+      maxWidth: 150,
     },
     {
       Header: 'Acciones',
@@ -275,7 +313,7 @@ const CaseForm = () => {
           </button>
         </div>
       ),
-      maxWidth: 150, // Establecer un ancho máximo
+      maxWidth: 150,
     }
   ], [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]);
 
@@ -292,34 +330,33 @@ const CaseForm = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const loadRadicados = async () => {
-            const radicadoList = await fetchRadicados(caseId);
-            setRadicados(radicadoList);
-        };
-        loadRadicados();
+      const loadRadicados = async () => {
+        const radicadoList = await fetchRadicados(caseId);
+        setRadicados(radicadoList);
+      };
+      loadRadicados();
     }, [caseId]);
 
     const handleRadicadoChange = async (event) => {
-        const selectedRadicado = event.target.value;
-        try {
-          await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
-            dispatch(fetchCases());  // Actualizar la lista de casos en el frontend
-        } catch (error) {
-            console.error('Error updating radicado:', error);
-            toast.error('Hubo un problema al actualizar el radicado.');
-        }
+      const selectedRadicado = event.target.value;
+      try {
+        await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
+        dispatch(fetchCases());
+      } catch (error) {
+        console.error('Error updating radicado:', error);
+        toast.error('Hubo un problema al actualizar el radicado.');
+      }
     };
 
     return (
-        <select defaultValue={initialRadicado} onChange={handleRadicadoChange}>
-            <option value={initialRadicado}>{initialRadicado}</option>
-            {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
-                <option key={r.id} value={r.radicado}>{r.radicado}</option>
-            ))}
-        </select>
+      <select defaultValue={initialRadicado} onChange={handleRadicadoChange}>
+        <option value={initialRadicado}>{initialRadicado}</option>
+        {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
+          <option key={r.id} value={r.radicado}>{r.radicado}</option>
+        ))}
+      </select>
     );
-};
-
+  };
 
   return (
     <div>
@@ -340,6 +377,11 @@ const CaseForm = () => {
                         : ''}
                     </span>
                     <div onClick={(e) => e.stopPropagation()}>{column.canFilter ? column.render('Filter') : null}</div>
+                    {column.id === 'acciones' && (
+                      <button onClick={handleSendAllEmails} className="btn-send-all-emails">
+                        Enviar Todos los Correos
+                      </button>
+                    )}
                   </th>
                 ))}
               </tr>
