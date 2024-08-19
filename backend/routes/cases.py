@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify, request, current_app as app
-from models import Case, Radicado, Protocolist, db, CaseFinished
+from models import Case, Protocolist, db, CaseFinished
 from utils import send_email_via_outlook, extract_pdf_data
 import os
-from flask import current_app
+import logging
 from marshmallow import Schema, fields, ValidationError
+from flask import current_app
 
 cases_bp = Blueprint('cases', __name__)
 
@@ -20,10 +21,7 @@ def get_cases():
     cases = Case.query.all()
     result = []
     for case in cases:
-        last_radicado = Radicado.query.filter_by(case_id=case.id).order_by(Radicado.fecha.desc()).first()
         case_data = case.to_dict()
-        if last_radicado:
-            case_data['radicado'] = last_radicado.radicado
         result.append(case_data)
     return jsonify(result)
 
@@ -106,31 +104,36 @@ def send_case_email():
         db.session.delete(case)
         db.session.commit()
 
-        return jsonify({'message': 'Email sent and case moved to finished successfully'})
+        return jsonify({'message': 'El documento ha sido enviado con éxito y el caso ha sido archivado.'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': f'Hubo un problema al enviar el correo: {e}'}), 500
 
+logging.basicConfig(level=logging.DEBUG)
 
 @cases_bp.route('/cases/<int:id>', methods=['PUT'])
 def update_case(id):
-    data = request.json
-    case = Case.query.get(id)
-    if not case:
-        return jsonify({'error': 'Case not found'}), 404
+    try:
+        logging.debug(f"Attempting to update case with ID: {id}")
+        data = request.json
+        case = Case.query.get(id)
+        logging.debug(f"Case data before update: {case.to_dict()}")
+        if not case:
+            return jsonify({'error': 'Case not found'}), 404
 
-    protocolista = Protocolist.query.filter_by(nombre=data.get('protocolista')).first()
-    if not protocolista:
-        return jsonify({'error': 'Protocolista no encontrado'}), 400
+        case.radicado = data['radicado']
+        logging.debug(f"Updating case radicado to: {data['radicado']}")
 
-    case.fecha = data.get('fecha', case.fecha)
-    case.escritura = data.get('escritura', case.escritura)
-    case.radicado = data.get('radicado', case.radicado)
-    case.protocolista_id = protocolista.id
-    case.observaciones = data.get('observaciones', case.observaciones)
+        db.session.commit()
+        logging.debug(f"Case updated successfully.")
+        return jsonify(case.to_dict())
+    except ValidationError as err:
+        logging.error(f"Validation error: {err.messages}")
+        return jsonify({"errors": err.messages}), 400
+    except Exception as e:
+        logging.error(f"Error al actualizar el caso: {e}")
+        return jsonify({'error': f'Hubo un problema al actualizar el caso: {e}'}), 500
 
-    db.session.commit()
-    return jsonify(case.to_dict())
 
 @cases_bp.route('/cases/<int:id>', methods=['DELETE'])
 def delete_case(id):
@@ -141,16 +144,3 @@ def delete_case(id):
     db.session.delete(case)
     db.session.commit()
     return '', 204
-
-@cases_bp.route('/cases/<int:case_id>/radicados', methods=['GET'])
-def get_radicados(case_id):
-    radicados = Radicado.query.filter_by(case_id=case_id).all()
-    return jsonify([radicado.to_dict() for radicado in radicados])
-
-@cases_bp.route('/cases/<int:case_id>/radicados', methods=['POST'])
-def add_radicado(case_id):
-    data = request.json
-    new_radicado = Radicado(case_id=case_id, radicado=data['radicado'])
-    db.session.add(new_radicado)
-    db.session.commit()
-    return jsonify(new_radicado.to_dict())
