@@ -57,8 +57,8 @@ body.dark {
   --background-color: var(--background-color-dark);
   --text-color: var(--text-color-dark);
   --table-row-background: var(--table-row-background-dark);
-  --table-row-hover: var(--table-row-hover-dark);
-  --table-header-background: var(--table-header-background-dark);
+  --table-row-hover-dark: var(--table-row-hover-dark);
+  --table-header-background-dark: var(--table-header-background-dark);
   --main-accent-color: var(--main-accent-color-dark);
   --btn-danger-bg: var(--btn-danger-bg-dark);
   --btn-danger-hover-bg: var(--btn-danger-hover-bg-dark);
@@ -168,6 +168,18 @@ button:hover {
   color: #fff;
 }
 
+/* Estilo para el logo */
+.logo {
+  height: 200px; /* Ajusta el tamaño del logo */
+  margin-right: 10px; /* Espacio entre el logo y la opción Inicio */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Dropdown de usuario */
 .nav-user-dropdown {
   position: relative;
@@ -206,6 +218,39 @@ button:hover {
   background-color: #f1f1f1;
 }
 
+/* Dropdown del menú de rentas */
+.nav-link {
+  position: relative;
+}
+
+.nav-link .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%; /* Justo debajo del elemento padre */
+  left: 0;
+  background-color: #74e77483; /* Mismo color que la barra del menú */
+  box-shadow: 0 4px 8px rgb(0, 0, 0);
+  border-radius: 5px;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.nav-link .dropdown-menu.open {
+  display: block;
+}
+
+.nav-link .dropdown-menu .dropdown-item {
+  padding: 10px 20px;
+  color: var(--text-color);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.nav-link .dropdown-menu .dropdown-item:hover {
+  background-color: var(--main-accent-color);
+  color: #000000;
+}
+
 /* Efecto del menú hamburguesa al abrirse */
 .hamburger-menu.open .bar:nth-child(1) {
   transform: rotate(-45deg) translate(-5px, 6px);
@@ -226,10 +271,14 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.case-table, .protocolist-table {
+.case-table, .protocolist-table, .finished-case-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+}
+.finished-case-table th, .finished-case-table td {
+  padding: 12px;
+  text-align: left;
 }
 
 .case-table th, .protocolist-table th {
@@ -242,6 +291,11 @@ button:hover {
   border: 1px solid #ddd;
   padding: 8px;
   color: var(--text-color);
+}
+
+body.dark .finished-case-table th, body.dark .finished-case-table td {
+  background-color: var(--table-row-background-dark);
+  color: var(--text-color-dark);
 }
 
 body.dark .case-table td, body.dark .protocolist-table td {
@@ -320,11 +374,10 @@ body.dark .case-form textarea, body.dark .protocolist-form textarea {
 /* Estilos para casos resaltados */
 .highlighted-row {
   background-color: var(--highlight-background); /* Verde claro */
-  color: var(--highlight-text); /* Texto oscuro */
+  color: var (--highlight-text); /* Texto oscuro */
 }
 
 body.dark .highlighted-row {
   background-color: var(--highlight-background-dark); /* Verde más claro */
-  color: var(--highlight-text-dark); /* Texto claro */
+  color: var(--highlight-text-dark);
 }
-  
