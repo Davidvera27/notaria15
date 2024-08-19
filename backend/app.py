@@ -11,6 +11,7 @@ from routes.protocolists import protocolists_bp
 from routes.user_profiles import user_profiles_bp
 from routes.extract_data import extract_data_bp
 from routes.user_data import user_data_bp
+from routes.radicados import radicados_bp
 
 app = Flask(__name__)
 mail = Mail(app)
@@ -29,6 +30,7 @@ app.register_blueprint(user_data_bp)
 app.register_blueprint(protocolists_bp)
 app.register_blueprint(user_profiles_bp)
 app.register_blueprint(extract_data_bp)
+app.register_blueprint(radicados_bp)
 
 if __name__ == '__main__':
     with app.app_context():
