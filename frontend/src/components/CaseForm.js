@@ -191,19 +191,25 @@ const CaseForm = () => {
 
   const handleSendEmail = useCallback(async (caseItem) => {
     try {
-      const response = await axios.post('http://127.0.0.1:5000/send_email', { 
-        radicado: caseItem.radicado,
-        use_outlook: true
-      });
-      if (response.data.message) {
-        toast.success(response.data.message);
-      } else {
-        toast.error(`Error: ${response.data.error}`);
-      }
+        const response = await axios.post('http://127.0.0.1:5000/send_email', { 
+            radicado: caseItem.radicado,
+            use_outlook: true
+        });
+        if (response.data.message) {
+            toast.success(response.data.message);
+            // Remover el caso del estado local
+            dispatch({
+                type: 'cases/removeCase',
+                payload: caseItem.id
+            });
+        } else {
+            toast.error(`Error: ${response.data.error}`);
+        }
     } catch (error) {
-      toast.error('Hubo un problema al enviar el correo');
+        toast.error('Hubo un problema al enviar el correo');
     }
-  }, []);
+}, [dispatch]);
+
 
   const isRadicadoInPdf = useMemo(() => (radicado) => {
     return pdfData.some((pdf) => {
@@ -283,38 +289,37 @@ const CaseForm = () => {
 
   const RadicadoDropdown = ({ caseId, initialRadicado }) => {
     const [radicados, setRadicados] = useState([]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-      const loadRadicados = async () => {
-        const radicadoList = await fetchRadicados(caseId);
-        setRadicados(radicadoList);
-      };
-      loadRadicados();
+        const loadRadicados = async () => {
+            const radicadoList = await fetchRadicados(caseId);
+            setRadicados(radicadoList);
+        };
+        loadRadicados();
     }, [caseId]);
 
     const handleRadicadoChange = async (event) => {
-      const selectedRadicado = event.target.value;
-      try {
-        await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
-        dispatch(fetchCases());
-      } catch (error) {
-        console.error('Error updating radicado:', error);
-      }
+        const selectedRadicado = event.target.value;
+        try {
+          await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
+            dispatch(fetchCases());  // Actualizar la lista de casos en el frontend
+        } catch (error) {
+            console.error('Error updating radicado:', error);
+            toast.error('Hubo un problema al actualizar el radicado.');
+        }
     };
 
-    if (radicados.length > 1) {
-      return (
+    return (
         <select defaultValue={initialRadicado} onChange={handleRadicadoChange}>
-          <option value={initialRadicado}>{initialRadicado}</option>
-          {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
-            <option key={r.id} value={r.radicado}>{r.radicado}</option>
-          ))}
+            <option value={initialRadicado}>{initialRadicado}</option>
+            {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
+                <option key={r.id} value={r.radicado}>{r.radicado}</option>
+            ))}
         </select>
-      );
-    } else {
-      return <span>{initialRadicado || 'Sin radicado'}</span>;
-    }
-  };
+    );
+};
+
 
   return (
     <div>
