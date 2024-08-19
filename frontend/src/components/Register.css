@@ -1,120 +1,117 @@
 body {
-    background: linear-gradient(135deg, #ffffff, #2eb135);
-    margin: 0;
-    padding: 0;
-    font-family: 'Open Sans', sans-serif;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 1s ease-in-out;
-    box-sizing: border-box;
-  }
-  
+  background: linear-gradient(135deg, var(--background-color-light), var(--main-accent-color));
+  margin: 0;
+  padding: 0;
+  font-family: var(--body-font-family);
+  height: flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.register-container {
+  width: 100%;
+  height: auto;
+  padding: var(--main-padding);
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 0; /* Eliminar bordes redondeados para ocupar todo el espacio */
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.register-container h2 {
+  text-align: center;
+  color: var(--text-color-dark);
+  font-family: var(--heading-font-family);
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.register-container form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: 100%; /* Asegurar que el formulario ocupe toda la altura disponible */
+}
+
+.register-container form label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: var(--text-color-dark);
+  font-weight: bold;
+}
+
+.register-container form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.register-container form input:focus {
+  border-color: var(--main-accent-color);
+  outline: none;
+}
+
+.register-container form input[name="email"] {
+  grid-column: span 2;
+}
+
+.register-container form input[type="text"]:not([name="email"]) {
+  text-transform: uppercase;
+}
+
+.register-container form button {
+  grid-column: span 2;
+  padding: 15px;
+  background-color: var(--main-accent-color);
+  color: var(--link-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.register-container form button:hover {
+  background-color: #239426;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
   .register-container {
-    width: 90%;
-    max-width: 1000px;
-    padding: 30px;
-    background-color: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    animation: fadeIn 1s ease-in-out;
+      padding: var(--main-padding-small);
   }
-  
+
   .register-container h2 {
-    text-align: center;
-    color: #333;
-    font-family: 'Merriweather', serif;
-    margin-bottom: 30px;
-    font-size: 24px;
-  }
-  
-  .register-container form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  
-  .register-container form label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #333;
-    font-weight: bold;
-  }
-  
-  .register-container form input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-  }
-  
-  .register-container form input:focus {
-    border-color: #2eb135;
-    outline: none;
-  }
-  
-  .register-container form input[name="email"] {
-    grid-column: span 2;
-  }
-  
-  .register-container form input[type="text"]:not([name="email"]) {
-    text-transform: uppercase;
-  }
-  
-  .register-container form button {
-    grid-column: span 2;
-    padding: 15px;
-    background-color: #2eb135;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .register-container form button:hover {
-    background-color: #239426;
-    transform: translateY(-2px);
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @media (max-width: 600px) {
-    .register-container {
-      padding: 20px;
-    }
-  
-    .register-container h2 {
       font-size: 20px;
-    }
-  
-    .register-container form {
+  }
+
+  .register-container form {
       grid-template-columns: 1fr;
-    }
-  
-    .register-container form label {
+  }
+
+  .register-container form label {
       font-size: 14px;
-    }
-  
-    .register-container form input {
+  }
+
+  .register-container form input {
       font-size: 12px;
       padding: 10px;
-    }
-  
-    .register-container form button {
+  }
+
+  .register-container form button {
       font-size: 16px;
       padding: 12px;
-    }
   }
-  
+}
