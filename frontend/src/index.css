@@ -1,31 +1,65 @@
+/* Importación de fuentes */
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;700&display=swap");
+
+/* Variables globales */
+:root {
+  --background-color: white;
+  --text-color: black;
+  --link-color: white;
+  --link-hover-color: #ffffff;
+  --nav-background-color: #2eb135;
+  --fallback-background-color: #f4f4f4;
+  --heading-font-family: 'Merriweather', serif;
+  --body-font-family: 'Open Sans', sans-serif;
+  --main-padding: 20px;
+}
+
+/* Estilos globales */
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  color: #333;
+  font-family: var(--body-font-family);
+  background-color: var(--fallback-background-color); /* Fallback background */
+  color: var(--text-color);
+  min-height: 100vh; /* Ajuste para no forzar altura */
+  display: flex;
+  flex-direction: column;
 }
 
 h2 {
   text-align: center;
   margin: 20px 0;
+  font-family: var(--heading-font-family);
 }
 
+/* Estilos de navegación */
 .nav {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  padding: 20px;
-  background-color: #2eb135;
+  gap: var(--main-padding);
+  padding: var(--main-padding);
+  background-color: var(--nav-background-color);
 }
 
 .nav-link {
-  color: white;
+  color: var(--link-color);
   text-decoration: none;
   font-weight: bold;
 }
 
 .nav-link.active {
   text-decoration: underline;
+}
+
+/* Responsividad básica */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-link {
+    margin: 10px 0;
+  }
 }
