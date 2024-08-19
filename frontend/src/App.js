@@ -7,6 +7,8 @@ import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import './App.css';
 import Loader from './components/Loader';
+import FinishedCaseTable from './components/FinishedCaseTable';
+import logo from './components/assets/logo_sin_fondo.png'; // Importación del logo
 
 const CaseForm = React.lazy(() => {
   NProgress.start();
@@ -38,6 +40,7 @@ function App() {
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
   });
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -91,6 +94,27 @@ function App() {
     document.body.className = userSettings.theme;
   }, [userSettings.theme]);
 
+  const handleDropdownToggle = (e) => {
+    e.stopPropagation(); // Prevents the event from propagating to the document
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const closeDropdown = () => {
+    setIsDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen) {
+        closeDropdown();
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -105,9 +129,18 @@ function App() {
             <div className="bar"></div>
           </div>
           <nav className={`nav ${menuOpen ? 'open' : ''}`}>
+            <Link to="/" className="nav-link logo-container" onClick={() => setMenuOpen(false)}>
+              <img src={logo} alt="Logo" className="logo" /> {/* Logo añadido */}
+            </Link>
             <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Inicio</Link>
-            <Link to="/cases" className="nav-link" onClick={() => setMenuOpen(false)}>Gestión de Casos</Link>
-            <Link to="/protocolists" className="nav-link" onClick={() => setMenuOpen(false)}>Gestión de Protocolistas</Link>
+            <div className="nav-link" onClick={handleDropdownToggle}>
+              Impuesto de Liquidación de Rentas
+              <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
+                <Link to="/cases" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>Gestión de Casos</Link>
+                <Link to="/protocolists" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>Gestión de Protocolistas</Link>
+                <Link to="/finished-cases" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>Casos Finalizados</Link>
+              </div>
+            </div>
             <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
             <button onClick={() => { handleCheckEmails(); setMenuOpen(false); }} className="nav-button">
               Procesar Correos {emailsToSendCount > 0 && <span className="notification-badge">{emailsToSendCount}</span>}
@@ -116,7 +149,7 @@ function App() {
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
             </button>
             <div className="nav-user-dropdown" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              {user?.name} {/* Muestra el nombre del usuario */}
+              {user?.name}
               <div className={`dropdown-menu ${dropdownOpen ? 'open' : ''}`}>
                 <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>Información de perfil</Link>
                 <button onClick={() => logout({ returnTo: window.location.origin })} className="dropdown-item">Cerrar Sesión</button>
@@ -128,6 +161,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/cases" element={<CaseForm />} />
               <Route path="/protocolists" element={<ProtocolistTable />} />
+              <Route path="/finished-cases" element={<FinishedCaseTable />} />
               <Route path="/profile" element={<Profile user={user} />} />
               <Route path="/register" element={<Register />} />
             </Routes>
