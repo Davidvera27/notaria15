@@ -1,7 +1,7 @@
-import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
@@ -34,7 +34,6 @@ const Register = React.lazy(() => {
 function App() {
   const { isAuthenticated, loginWithRedirect, logout, user, isLoading } = useAuth0();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [emailsToSendCount, setEmailsToSendCount] = useState(0);
   const [userSettings, setUserSettings] = useState(() => {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
@@ -47,37 +46,6 @@ function App() {
       loginWithRedirect();
     }
   }, [isAuthenticated, isLoading, loginWithRedirect]);
-
-  const handleCheckEmails = async () => {
-    try {
-      const response = await fetch('https://notaria15-backend.vercel.app/check-emails', {
-        method: 'POST',
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toast.success(data.message);
-      } else {
-        toast.error(`Error: ${data.error}`);
-      }
-    } catch (error) {
-      toast.error(`Error: ${error.message}`);
-    }
-  };
-
-  const checkEmailsToSend = useCallback(async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/cases');
-      const cases = await response.json();
-      const pendingEmails = cases.filter(c => c.hasPdf).length;
-      setEmailsToSendCount(pendingEmails);
-    } catch (error) {
-      console.error('Error fetching cases:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkEmailsToSend();
-  }, [checkEmailsToSend]);
 
   const toggleTheme = () => {
     setUserSettings(prevSettings => {
@@ -132,7 +100,6 @@ function App() {
             <Link to="/" className="nav-link logo-container" onClick={() => setMenuOpen(false)}>
               <img src={logo} alt="Logo" className="logo" /> {/* Logo añadido */}
             </Link>
-            <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Inicio</Link>
             <div className="nav-link" onClick={handleDropdownToggle}>
               Impuesto de Liquidación de Rentas
               <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
@@ -142,9 +109,6 @@ function App() {
               </div>
             </div>
             <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
-            <button onClick={() => { handleCheckEmails(); setMenuOpen(false); }} className="nav-button">
-              Procesar Correos {emailsToSendCount > 0 && <span className="notification-badge">{emailsToSendCount}</span>}
-            </button>
             <button onClick={() => { toggleTheme(); setMenuOpen(false); }} className="nav-button">
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
             </button>
