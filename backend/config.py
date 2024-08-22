@@ -13,6 +13,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
+    SECRET_KEY = '7e378a3c19662ab49a7297a16fe16ddb9346832dd4950100'
     SQLALCHEMY_DATABASE_URI = 'postgresql://david:david1243@localhost/notaria15_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = 'uploads'
