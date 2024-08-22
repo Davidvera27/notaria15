@@ -88,7 +88,7 @@ button:hover {
 
 .app-container {
   min-height: 100vh;
-  padding-top: 60px;
+  padding-top: 60px; /* Ajuste para evitar superposición de la barra de navegación */
   max-width: 100%;
   margin: 0 auto;
   background-color: var(--background-color); /* Consistencia de fondo */
@@ -132,7 +132,7 @@ button:hover {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background-color: #74e77483;
+  background-color: #74e774;
   position: fixed;
   top: 0;
   left: 0;
@@ -170,7 +170,7 @@ button:hover {
 
 /* Estilo para el logo */
 .logo {
-  height: 200px; /* Ajusta el tamaño del logo */
+  height: 170px; /* Ajuste del tamaño del logo */
   margin-right: 10px; /* Espacio entre el logo y la opción Inicio */
 }
 
@@ -369,15 +369,4 @@ body.dark .case-form textarea, body.dark .protocolist-form textarea {
 
 .btn-delete:hover {
   background-color: var(--btn-danger-hover-bg);
-}
-
-/* Estilos para casos resaltados */
-.highlighted-row {
-  background-color: var(--highlight-background); /* Verde claro */
-  color: var (--highlight-text); /* Texto oscuro */
-}
-
-body.dark .highlighted-row {
-  background-color: var(--highlight-background-dark); /* Verde más claro */
-  color: var(--highlight-text-dark);
 }
