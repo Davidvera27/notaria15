@@ -27,9 +27,10 @@ def get_cases():
 
 @cases_bp.route('/cases', methods=['POST'])
 def add_case():
+    from app import socketio  # Importar aquí para evitar la importación circular
     schema = CaseSchema()
     try:
-        data = schema.load(request.json)  # Validar y deserializar los datos de la solicitud
+        data = schema.load(request.json)
     except ValidationError as err:
         return jsonify({"errors": err.messages}), 400
 
@@ -47,6 +48,10 @@ def add_case():
         )
         db.session.add(new_case)
         db.session.commit()
+
+        # Emitir evento a todos los clientes conectados
+        socketio.emit('new_case', new_case.to_dict())
+
         return jsonify(new_case.to_dict())
     except Exception as e:
         db.session.rollback()
@@ -113,6 +118,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 @cases_bp.route('/cases/<int:id>', methods=['PUT'])
 def update_case(id):
+    from app import socketio  # Importar aquí para evitar la importación circular
     try:
         logging.debug(f"Attempting to update case with ID: {id}")
         data = request.json
@@ -125,6 +131,10 @@ def update_case(id):
         logging.debug(f"Updating case radicado to: {data['radicado']}")
 
         db.session.commit()
+
+        # Emitir evento de actualización de caso
+        socketio.emit('update_case', case.to_dict())
+
         logging.debug(f"Case updated successfully.")
         return jsonify(case.to_dict())
     except ValidationError as err:
@@ -133,7 +143,6 @@ def update_case(id):
     except Exception as e:
         logging.error(f"Error al actualizar el caso: {e}")
         return jsonify({'error': f'Hubo un problema al actualizar el caso: {e}'}), 500
-
 
 @cases_bp.route('/cases/<int:id>', methods=['DELETE'])
 def delete_case(id):
