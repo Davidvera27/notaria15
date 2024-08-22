@@ -1,14 +1,17 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import socketIOClient from 'socket.io-client';
 import './App.css';
 import Loader from './components/Loader';
 import FinishedCaseTable from './components/FinishedCaseTable';
 import logo from './components/assets/logo_sin_fondo.png'; // Importación del logo
+
+const ENDPOINT = "http://127.0.0.1:5000";  // Cambia esto según tu configuración
 
 const CaseForm = React.lazy(() => {
   NProgress.start();
@@ -46,6 +49,22 @@ function App() {
       loginWithRedirect();
     }
   }, [isAuthenticated, isLoading, loginWithRedirect]);
+
+  useEffect(() => {
+    const socket = socketIOClient(ENDPOINT);
+
+    socket.on('new_case', data => {
+      toast.success(`Nuevo caso creado: ${data.radicado}`);
+      // Aquí podrías actualizar el estado de los casos o manejar la actualización de la UI
+    });
+
+    socket.on('update_case', data => {
+      toast.info(`Caso actualizado: ${data.radicado}`);
+      // Aquí podrías actualizar el estado de los casos o manejar la actualización de la UI
+    });
+
+    return () => socket.disconnect();
+  }, []);
 
   const toggleTheme = () => {
     setUserSettings(prevSettings => {
