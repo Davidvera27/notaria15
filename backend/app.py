@@ -13,10 +13,18 @@ from routes.extract_data import extract_data_bp
 from routes.user_data import user_data_bp
 from routes.radicados import radicados_bp
 from routes.finished_cases import finished_cases_bp
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 mail = Mail(app)
 app.config.from_object(Config)
+
+# Generar una SECRET_KEY segura si no está definida en Config
+if not app.config.get('SECRET_KEY'):
+    import os
+    app.config['SECRET_KEY'] = os.urandom(24).hex()
+
+socketio = SocketIO(app)
 
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -34,8 +42,8 @@ app.register_blueprint(extract_data_bp)
 app.register_blueprint(radicados_bp)
 app.register_blueprint(finished_cases_bp, url_prefix='/api')
 
-
 if __name__ == '__main__':
+    socketio.run(app, debug=True)
     with app.app_context():
         db.create_all()
     app.run(debug=True, port=5000)
