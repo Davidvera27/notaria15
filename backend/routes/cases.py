@@ -127,8 +127,16 @@ def update_case(id):
         if not case:
             return jsonify({'error': 'Case not found'}), 404
 
+        # Update all fields including protocolista, escritura, fecha, observaciones
+        protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
+        if not protocolista:
+            return jsonify({'error': 'Protocolista no encontrado'}), 400
+
+        case.fecha = data['fecha']
+        case.escritura = int(data['escritura'])
         case.radicado = data['radicado']
-        logging.debug(f"Updating case radicado to: {data['radicado']}")
+        case.protocolista_id = protocolista.id
+        case.observaciones = data.get('observaciones', '')
 
         db.session.commit()
 
