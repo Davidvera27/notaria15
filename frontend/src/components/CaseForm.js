@@ -10,6 +10,9 @@ import './CaseForm.css';
 import { useTable, useFilters, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
+import { io } from 'socket.io-client'; // Importa socket.io-client
+
+const socket = io('http://127.0.0.1:5000'); // Conecta a tu backend en Flask
 
 const CaseForm = () => {
   const dispatch = useDispatch();
@@ -37,6 +40,20 @@ const CaseForm = () => {
     if (pdfDataStatus === 'idle') {
       dispatch(fetchPdfData());
     }
+
+    // Escucha eventos de actualizaciones en tiempo real desde el servidor
+    socket.on('new_case', (newCase) => {
+      dispatch(fetchCases());
+    });
+
+    socket.on('update_case', (updatedCase) => {
+      dispatch(fetchCases());
+    });
+
+    return () => {
+      socket.off('new_case');
+      socket.off('update_case');
+    };
   }, [casesStatus, protocolistsStatus, pdfDataStatus, dispatch]);
 
   useEffect(() => {
@@ -196,7 +213,6 @@ const CaseForm = () => {
       });
       if (response.data.message) {
         toast.success(response.data.message);
-        // Remover el caso del estado local
         dispatch({
           type: 'cases/removeCase',
           payload: caseItem.id
@@ -217,7 +233,6 @@ const CaseForm = () => {
     });
   }, [pdfData]);
 
-  // New function to send all emails simultaneously
   const handleSendAllEmails = useCallback(async () => {
     const emailsToSend = cases.filter(caseItem => isRadicadoInPdf(caseItem.radicado));
 
@@ -244,7 +259,6 @@ const CaseForm = () => {
         );
         await Promise.all(emailPromises);
         toast.success(`${emailsToSend.length} correos enviados exitosamente`);
-        // Optionally, remove the cases after sending emails
         emailsToSend.forEach(caseItem => {
           dispatch({
             type: 'cases/removeCase',
