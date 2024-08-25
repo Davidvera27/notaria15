@@ -7,12 +7,12 @@ import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './CaseForm.css';
-import { useTable, useFilters, useSortBy } from 'react-table';
+import { useTable, useFilters, useGroupBy, useSortBy } from 'react-table'; // Orden corregido
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
-import { io } from 'socket.io-client'; // Importa socket.io-client
+import { io } from 'socket.io-client';
 
-const socket = io('http://127.0.0.1:5000'); // Conecta a tu backend en Flask
+const socket = io('http://127.0.0.1:5000');
 
 const CaseForm = () => {
   const dispatch = useDispatch();
@@ -41,7 +41,6 @@ const CaseForm = () => {
       dispatch(fetchPdfData());
     }
 
-    // Escucha eventos de actualizaciones en tiempo real desde el servidor
     socket.on('new_case', (newCase) => {
       dispatch(fetchCases());
     });
@@ -278,12 +277,16 @@ const CaseForm = () => {
       accessor: 'fecha',
       Filter: DefaultColumnFilter,
       maxWidth: 150,
+      sortType: 'datetime',
+      aggregate: 'count',
     },
     {
       Header: 'Escritura',
       accessor: 'escritura',
       Filter: DefaultColumnFilter,
       maxWidth: 150,
+      sortType: 'basic',
+      aggregate: 'count',
     },
     {
       Header: 'Radicado',
@@ -293,18 +296,23 @@ const CaseForm = () => {
       ),
       Filter: DefaultColumnFilter,
       maxWidth: 150,
+      sortType: 'alphanumeric',
+      aggregate: 'count',
     },
     {
       Header: 'Protocolista',
       accessor: 'protocolista',
       Filter: DefaultColumnFilter,
       maxWidth: 150,
+      sortType: 'basic',
+      aggregate: 'count',
     },
     {
       Header: 'Observaciones',
       accessor: 'observaciones',
       Filter: DefaultColumnFilter,
       maxWidth: 150,
+      aggregate: 'count',
     },
     {
       Header: 'Acciones',
@@ -337,7 +345,7 @@ const CaseForm = () => {
     headerGroups,
     rows,
     prepareRow,
-  } = useTable({ columns, data }, useFilters, useSortBy);
+  } = useTable({ columns, data }, useFilters, useGroupBy, useSortBy); // Orden corregido
 
   const RadicadoDropdown = ({ caseId, initialRadicado }) => {
     const [radicados, setRadicados] = useState([]);
