@@ -142,7 +142,7 @@ button:hover {
 /* Etiqueta para desplegar el menú */
 .menu-toggle-label {
   position: fixed;
-  top: 10px;  /* Coloca la etiqueta en la parte superior */
+  top: 10px; /* Coloca la etiqueta en la parte superior */
   left: 10px; /* Ajusta el desplazamiento desde el borde izquierdo */
   transform: translateY(0);
   background-color: #239426;
@@ -181,7 +181,8 @@ button:hover {
   left: 0; /* Mueve la barra de navegación dentro de la vista */
 }
 
-.nav-link, .nav-button {
+.nav-link,
+.nav-button {
   text-decoration: none;
   color: var(--text-color);
   font-weight: bold;
@@ -196,7 +197,8 @@ button:hover {
   transition: background-color 0.3s, color 0.3s;
 }
 
-.nav-link:hover, .nav-button:hover {
+.nav-link:hover,
+.nav-button:hover {
   background-color: rgba(0, 0, 0, 0.1); /* Fondo semitransparente en hover */
   color: #fff;
 }
@@ -300,52 +302,63 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.case-table, .protocolist-table, .finished-case-table {
+.case-table,
+.protocolist-table,
+.finished-case-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
 }
 
-.finished-case-table th, .finished-case-table td {
+.finished-case-table th,
+.finished-case-table td {
   padding: 12px;
   text-align: left;
 }
 
-.case-table th, .protocolist-table th {
+.case-table th,
+.protocolist-table th {
   background-color: var(--table-header-background);
   text-align: left;
   color: var(--text-color);
 }
 
-.case-table td, .protocolist-table td {
+.case-table td,
+.protocolist-table td {
   border: 1px solid #ddd;
   padding: 8px;
   color: var(--text-color);
 }
 
-body.dark .finished-case-table th, body.dark .finished-case-table td {
+body.dark .finished-case-table th,
+body.dark .finished-case-table td {
   background-color: var(--table-row-background-dark);
   color: var(--text-color-dark);
 }
 
-body.dark .case-table td, body.dark .protocolist-table td {
+body.dark .case-table td,
+body.dark .protocolist-table td {
   background-color: var(--table-row-background-dark);
   color: var(--text-color-dark);
 }
 
-.case-table tbody tr:nth-child(even), .protocolist-table tbody tr:nth-child(even) {
+.case-table tbody tr:nth-child(even),
+.protocolist-table tbody tr:nth-child(even) {
   background-color: var(--table-row-background);
 }
 
-body.dark .case-table tr:nth-child(even), body.dark .protocolist-table tr:nth-child(even) {
+body.dark .case-table tr:nth-child(even),
+body.dark .protocolist-table tr:nth-child(even) {
   background-color: #2a2a2a;
 }
 
-.case-table tr:hover, .protocolist-table tr:hover {
+.case-table tr:hover,
+.protocolist-table tr:hover {
   background-color: var(--table-row-hover);
 }
 
-.case-form, .protocolist-form {
+.case-form,
+.protocolist-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -359,9 +372,12 @@ body.dark .case-table tr:nth-child(even), body.dark .protocolist-table tr:nth-ch
   margin: 20px auto;
 }
 
-.case-form input, .protocolist-form input,
-.case-form select, .protocolist-form select,
-.case-form textarea, .protocolist-form textarea {
+.case-form input,
+.protocolist-form input,
+.case-form select,
+.protocolist-form select,
+.case-form textarea,
+.protocolist-form textarea {
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -369,15 +385,19 @@ body.dark .case-table tr:nth-child(even), body.dark .protocolist-table tr:nth-ch
   color: var(--text-color);
 }
 
-body.dark .case-form input, body.dark .protocolist-form input,
-body.dark .case-form select, body.dark .protocolist-form select,
-body.dark .case-form textarea, body.dark .protocolist-form textarea {
+body.dark .case-form input,
+body.dark .protocolist-form input,
+body.dark .case-form select,
+body.dark .protocolist-form select,
+body.dark .case-form textarea,
+body.dark .protocolist-form textarea {
   background-color: #333333;
   color: var(--text-color-dark);
   border-color: #444444;
 }
 
-.case-form button, .protocolist-form button {
+.case-form button,
+.protocolist-form button {
   padding: 10px;
   background-color: var(--main-accent-color);
   color: white;
@@ -387,7 +407,8 @@ body.dark .case-form textarea, body.dark .protocolist-form textarea {
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.case-form button:hover, .protocolist-form button:hover {
+.case-form button:hover,
+.protocolist-form button:hover {
   background-color: var(--main-accent-color-dark);
   transform: translateY(-2px);
 }
