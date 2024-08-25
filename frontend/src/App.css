@@ -166,13 +166,15 @@ button:hover {
   left: -300px; /* Mueve la barra completamente fuera de la vista */
   height: 100%;
   width: 250px;
-  background-color: #74e774;
+  background-color: rgba(178, 255, 178, 0.8); /* Background semitransparente */
+  backdrop-filter: blur(4px); /* Efecto de vidrio */
   transition: left 0.3s ease; /* Hacemos la transición un poco más rápida */
   z-index: 999; /* Asegúrate de que esté detrás de la etiqueta */
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 60px 20px 20px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3); /* Sombra para darle profundidad */
 }
 
 .nav.open {
@@ -195,7 +197,7 @@ button:hover {
 }
 
 .nav-link:hover, .nav-button:hover {
-  background-color: var(--main-accent-color);
+  background-color: rgba(0, 0, 0, 0.1); /* Fondo semitransparente en hover */
   color: #fff;
 }
 
@@ -254,7 +256,7 @@ button:hover {
 
 .nav-link .dropdown-menu {
   display: none;
-  background-color: #74e77483;
+  background-color: rgba(255, 255, 255, 0.8); /* Semitransparente */
   box-shadow: 0 4px 8px rgb(0, 0, 0);
   border-radius: 5px;
   z-index: 1000;
@@ -268,13 +270,13 @@ button:hover {
 
 .nav-link .dropdown-menu .dropdown-item {
   padding: 10px 20px;
-  color: var(--text-color);
+  color: #000000; /* Cambia esto al color deseado */
   cursor: pointer;
   white-space: nowrap;
 }
 
 .nav-link .dropdown-menu .dropdown-item:hover {
-  background-color: var(--main-accent-color);
+  background-color: rgba(169, 255, 135, 0.699);
   color: #000000;
 }
 
