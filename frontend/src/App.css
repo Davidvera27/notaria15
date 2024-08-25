@@ -22,11 +22,11 @@
   --btn-danger-hover-bg-dark: #921b1e;
 
   /* Colores de resaltado */
-  --highlight-background: #c8f7c5; /* Verde claro para modo claro */
-  --highlight-text: #000000; /* Texto oscuro para modo claro */
+  --highlight-background: #c8f7c5;
+  --highlight-text: #000000;
 
-  --highlight-background-dark: #4caf50; /* Verde más claro para modo oscuro */
-  --highlight-text-dark: #ffffff; /* Texto blanco para contraste */
+  --highlight-background-dark: #4caf50;
+  --highlight-text-dark: #ffffff;
 }
 
 /* Estilos globales */
@@ -36,7 +36,7 @@ body {
   color: var(--text-color);
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Aseguramos que no haya scroll horizontal */
 }
 
 /* Definición de estilos específicos para modos claro y oscuro */
@@ -59,7 +59,7 @@ body.dark {
   --table-row-background: var(--table-row-background-dark);
   --table-row-hover-dark: var(--table-row-hover-dark);
   --table-header-background-dark: var(--table-header-background-dark);
-  --main-accent-color: var(--main-accent-color-dark);
+  --main-accent-color-dark: var(--main-accent-color-dark);
   --btn-danger-bg: var(--btn-danger-bg-dark);
   --btn-danger-hover-bg: var(--btn-danger-hover-bg-dark);
   --highlight-background: var(--highlight-background-dark);
@@ -68,13 +68,13 @@ body.dark {
 
 /* Estilos para casos resaltados */
 .highlighted-row {
-  background-color: var(--highlight-background); /* Verde claro */
-  color: var(--highlight-text); /* Texto oscuro */
+  background-color: var(--highlight-background);
+  color: var(--highlight-text);
 }
 
 body.dark .highlighted-row {
-  background-color: var(--highlight-background-dark); /* Verde más claro */
-  color: var(--highlight-text-dark); /* Texto claro */
+  background-color: var(--highlight-background-dark);
+  color: var(--highlight-text-dark);
 }
 
 button {
@@ -88,10 +88,10 @@ button:hover {
 
 .app-container {
   min-height: 100vh;
-  padding-top: 60px; /* Ajuste para evitar superposición de la barra de navegación */
+  padding-top: 60px;
   max-width: 100%;
   margin: 0 auto;
-  background-color: var(--background-color); /* Consistencia de fondo */
+  background-color: var(--background-color);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   display: flex;
@@ -108,7 +108,7 @@ button:hover {
 
 /* Menú Hamburguesa */
 .hamburger-menu {
-  display: none;
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
   width: 30px;
@@ -116,7 +116,7 @@ button:hover {
   cursor: pointer;
   position: fixed;
   top: 15px;
-  left: 20px;
+  left: 0;
   z-index: 1001;
 }
 
@@ -128,31 +128,62 @@ button:hover {
   transition: 0.4s;
 }
 
-.nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: #74e774;
+/* Hover Zone */
+.hover-zone {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 60px;
-  transition: top 0.4s ease-in-out;
+  height: 100%;
+  width: 30px; /* Aumentamos un poco más para asegurar que se detecte el hover */
+  z-index: 999;
+  cursor: pointer;
+}
+
+/* Etiqueta para desplegar el menú */
+.menu-toggle-label {
+  position: fixed;
+  top: 10px;  /* Coloca la etiqueta en la parte superior */
+  left: 10px; /* Ajusta el desplazamiento desde el borde izquierdo */
+  transform: translateY(0);
+  background-color: #239426;
+  padding: 10px 15px;
+  color: white;
+  cursor: pointer;
   z-index: 1000;
-  padding: 0 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, transform 0.3s;
+  border-radius: 0 5px 5px 0;
+}
+
+.menu-toggle-label:hover {
+  background-color: #1e7b38;
+  transform: translateX(5px);
+}
+
+/* Barra de navegación */
+.nav {
+  position: fixed;
+  top: 0;
+  left: -300px; /* Mueve la barra completamente fuera de la vista */
+  height: 100%;
+  width: 250px;
+  background-color: #74e774;
+  transition: left 0.3s ease; /* Hacemos la transición un poco más rápida */
+  z-index: 999; /* Asegúrate de que esté detrás de la etiqueta */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px 20px;
 }
 
 .nav.open {
-  top: 0;
+  left: 0; /* Mueve la barra de navegación dentro de la vista */
 }
 
 .nav-link, .nav-button {
   text-decoration: none;
   color: var(--text-color);
   font-weight: bold;
-  margin: 0 10px;
+  margin: 10px 0;
   font-size: 1em;
   text-align: center;
   padding: 10px 20px;
@@ -170,8 +201,8 @@ button:hover {
 
 /* Estilo para el logo */
 .logo {
-  height: 170px; /* Ajuste del tamaño del logo */
-  margin-right: 10px; /* Espacio entre el logo y la opción Inicio */
+  height: 200px;
+  margin-bottom: 20px;
 }
 
 .logo-container {
@@ -191,13 +222,11 @@ button:hover {
 
 .dropdown-menu {
   display: none;
-  position: absolute;
-  top: 60px;
-  right: 0;
   background-color: var(--background-color);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   z-index: 1000;
+  width: 100%;
 }
 
 .dropdown-menu.open {
@@ -225,14 +254,12 @@ button:hover {
 
 .nav-link .dropdown-menu {
   display: none;
-  position: absolute;
-  top: 100%; /* Justo debajo del elemento padre */
-  left: 0;
-  background-color: #74e77483; /* Mismo color que la barra del menú */
+  background-color: #74e77483;
   box-shadow: 0 4px 8px rgb(0, 0, 0);
   border-radius: 5px;
   z-index: 1000;
   padding: 10px;
+  width: 100%;
 }
 
 .nav-link .dropdown-menu.open {
@@ -276,6 +303,7 @@ button:hover {
   border-collapse: collapse;
   margin-bottom: 20px;
 }
+
 .finished-case-table th, .finished-case-table td {
   padding: 12px;
   text-align: left;
@@ -308,7 +336,7 @@ body.dark .case-table td, body.dark .protocolist-table td {
 }
 
 body.dark .case-table tr:nth-child(even), body.dark .protocolist-table tr:nth-child(even) {
-  background-color: #2a2a2a; /* Fondo más claro para filas alternas en modo oscuro */
+  background-color: #2a2a2a;
 }
 
 .case-table tr:hover, .protocolist-table tr:hover {
