@@ -9,7 +9,7 @@ import socketIOClient from 'socket.io-client';
 import './App.css';
 import Loader from './components/Loader';
 import FinishedCaseTable from './components/FinishedCaseTable';
-import logo from './components/assets/logo_sin_fondo.png'; // Importación del logo
+import logo from './components/assets/logo_sin_fondo.png';
 
 const ENDPOINT = "http://127.0.0.1:5000";  // Cambia esto según tu configuración
 
@@ -41,8 +41,7 @@ function App() {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
   });
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(null); // Track which dropdown is open
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -55,12 +54,10 @@ function App() {
 
     socket.on('new_case', data => {
       toast.success(`Nuevo caso creado: ${data.radicado}`);
-      // Aquí podrías actualizar el estado de los casos o manejar la actualización de la UI
     });
 
     socket.on('update_case', data => {
       toast.info(`Caso actualizado: ${data.radicado}`);
-      // Aquí podrías actualizar el estado de los casos o manejar la actualización de la UI
     });
 
     return () => socket.disconnect();
@@ -81,26 +78,9 @@ function App() {
     document.body.className = userSettings.theme;
   }, [userSettings.theme]);
 
-  const handleDropdownToggle = (e) => {
-    e.stopPropagation(); // Prevents the event from propagating to the document
-    setIsDropdownOpen(!isDropdownOpen);
+  const toggleDropdown = (dropdown) => {
+    setDropdownOpen(dropdownOpen === dropdown ? null : dropdown);
   };
-
-  const closeDropdown = () => {
-    setIsDropdownOpen(false);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isDropdownOpen) {
-        closeDropdown();
-      }
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [isDropdownOpen]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -110,31 +90,32 @@ function App() {
     isAuthenticated && (
       <Router>
         <div className="app-container">
-          <div className={`hamburger-menu ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
-            <div className="bar"></div>
-            <div className="bar"></div>
-            <div className="bar"></div>
+          <div 
+            className="menu-toggle-label" 
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? 'Cerrar menú' : 'Desplegar menú'}
           </div>
           <nav className={`nav ${menuOpen ? 'open' : ''}`}>
-            <Link to="/" className="nav-link logo-container" onClick={() => setMenuOpen(false)}>
-              <img src={logo} alt="Logo" className="logo" /> {/* Logo añadido */}
+            <Link to="/" className="nav-link logo-container">
+              <img src={logo} alt="Logo" className="logo" />
             </Link>
-            <div className="nav-link" onClick={handleDropdownToggle}>
+            <div className="nav-link" onClick={() => toggleDropdown('rentas')}>
               Impuesto de Liquidación de Rentas
-              <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
-                <Link to="/cases" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>Gestión de Casos</Link>
-                <Link to="/protocolists" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>Gestión de Protocolistas</Link>
-                <Link to="/finished-cases" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>Casos Finalizados</Link>
+              <div className={`dropdown-menu ${dropdownOpen === 'rentas' ? 'open' : ''}`}>
+                <Link to="/cases" className="dropdown-item">Gestión de Casos</Link>
+                <Link to="/protocolists" className="dropdown-item">Gestión de Protocolistas</Link>
+                <Link to="/finished-cases" className="dropdown-item">Casos Finalizados</Link>
               </div>
             </div>
-            <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
-            <button onClick={() => { toggleTheme(); setMenuOpen(false); }} className="nav-button">
+            <Link to="/register" className="nav-link">Registrar Usuario</Link>
+            <button onClick={toggleTheme} className="nav-button">
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
             </button>
-            <div className="nav-user-dropdown" onClick={() => setDropdownOpen(!dropdownOpen)}>
+            <div className="nav-user-dropdown" onClick={() => toggleDropdown('user')}>
               {user?.name}
-              <div className={`dropdown-menu ${dropdownOpen ? 'open' : ''}`}>
-                <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>Información de perfil</Link>
+              <div className={`dropdown-menu ${dropdownOpen === 'user' ? 'open' : ''}`}>
+                <Link to="/profile" className="dropdown-item">Información de perfil</Link>
                 <button onClick={() => logout({ returnTo: window.location.origin })} className="dropdown-item">Cerrar Sesión</button>
               </div>
             </div>
