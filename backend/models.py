@@ -92,4 +92,24 @@ class UserProfile(db.Model):
             'username': self.username
         }
         
-        
+class DavidRestrepoCase(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    protocolista_id = db.Column(db.Integer, db.ForeignKey('protocolist.id'), nullable=False)
+    radicado = db.Column(db.String(50))
+    escritura = db.Column(db.Integer)
+    fecha_escritura = db.Column(db.Date)
+    actos = db.Column(db.String(255))
+    estado_liquidacion_rentas = db.Column(db.String(50))
+
+    protocolista = db.relationship('Protocolist', backref=db.backref('david_restrepo_cases', lazy=True))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'protocolista_id': self.protocolista_id,
+            'radicado': self.radicado,
+            'escritura': self.escritura,
+            'fecha_escritura': self.fecha_escritura,
+            'actos': self.actos,
+            'estado_liquidacion_rentas': self.estado_liquidacion_rentas
+        }
