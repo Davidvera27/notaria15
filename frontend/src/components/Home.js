@@ -32,8 +32,9 @@ const Home = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
       >
-        <Link to="/cases" className="home-button">Gestión de Casos</Link>
-        <Link to="/protocolists" className="home-button">Gestión de Protocolistas</Link>
+        <Link to="/cases" className="home-button">Gestión de Rentas</Link>
+        <Link to="/protocolist-section" className="home-button">Protocolistas</Link>
+
       </motion.div>
     </motion.div>
   );
