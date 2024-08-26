@@ -8,8 +8,10 @@ import 'nprogress/nprogress.css';
 import socketIOClient from 'socket.io-client';
 import './App.css';
 import Loader from './components/Loader';
+import ProtocolistSection from './components/ProtocolistSection';
 import FinishedCaseTable from './components/FinishedCaseTable';
 import logo from './components/assets/logo_sin_fondo.png';
+
 
 const ENDPOINT = "http://127.0.0.1:5000";  // Cambia esto según tu configuración
 
@@ -122,6 +124,7 @@ function App() {
           </nav>
           <Suspense fallback={<Loader />}>
             <Routes>
+              <Route path="/protocolist-section" element={<ProtocolistSection />} />
               <Route path="/" element={<Home />} />
               <Route path="/cases" element={<CaseForm />} />
               <Route path="/protocolists" element={<ProtocolistTable />} />
