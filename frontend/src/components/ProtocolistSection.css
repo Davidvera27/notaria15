@@ -1,0 +1,142 @@
+.table-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom: 20px;
+  }
+  
+  .protocolist-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .protocolist-table th {
+    background: linear-gradient(135deg, #2eb135, #239426);
+    color: white;
+    text-align: left;
+    padding: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-weight: bold;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .protocolist-table th input {
+    width: 100%;
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 5px;
+    background-color: white;
+    color: #333;
+    font-size: 12px;
+    box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .protocolist-table th input:focus {
+    outline: none;
+    border: 1px solid #239426;
+  }
+  
+  .protocolist-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  .protocolist-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .protocolist-table tr:hover {
+    background-color: #d8ffd8;
+  }
+  
+  .protocolist-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f0f0f0, #ffffff);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+  }
+  
+  .protocolist-form input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .protocolist-form input:focus {
+    border-color: #2eb135;
+    box-shadow: 0 0 5px rgba(46, 177, 53, 0.5);
+    outline: none;
+  }
+  
+  .protocolist-form button {
+    padding: 10px;
+    background-color: #2eb135;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .protocolist-form button:hover {
+    background-color: #239426;
+    transform: translateY(-2px);
+  }
+  
+  .btn-delete {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-delete:hover {
+    background-color: #c82333;
+  }
+  
+  /* Estilos para los botones de acciones */
+  .actions-container {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .actions-container button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    background-color: #2eb135;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .actions-container button i {
+    margin-right: 5px;
+  }
+  
+  .actions-container button:hover {
+    background-color: #239426;
+    transform: translateY(-2px);
+  }
+  
+  .actions-container .btn-delete {
+    background-color: #dc3545;
+  }
+  
+  .actions-container .btn-delete:hover {
+    background-color: #c82333;
+  }
+  
