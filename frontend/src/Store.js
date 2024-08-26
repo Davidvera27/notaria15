@@ -3,6 +3,7 @@ import caseReducer from './features/caseSlice';
 import protocolistReducer from './features/protocolistSlice';
 import pdfDataReducer from './features/pdfDataSlice';
 import finishedCaseReducer from './features/finishedCaseSlice';
+import protocolistSectionReducer from './features/protocolistSectionSlice';
 
 
 const store = configureStore({
@@ -11,6 +12,7 @@ const store = configureStore({
     protocolists: protocolistReducer,
     pdfData: pdfDataReducer,
     finishedCases: finishedCaseReducer,
+    protocolistSection: protocolistSectionReducer,
   },
 });
 
