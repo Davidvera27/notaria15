@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request, current_app as app
+import socketio
 from models import Case, Protocolist, db, CaseFinished
 from utils import send_email_via_outlook, extract_pdf_data
 import os
 import logging
 from marshmallow import Schema, fields, ValidationError
 from flask import current_app
+
 
 cases_bp = Blueprint('cases', __name__)
 
@@ -27,12 +29,16 @@ def get_cases():
 
 @cases_bp.route('/cases', methods=['POST'])
 def add_case():
-    from app import socketio  # Importar aquí para evitar la importación circular
     schema = CaseSchema()
     try:
         data = schema.load(request.json)
     except ValidationError as err:
         return jsonify({"errors": err.messages}), 400
+
+    # Verificar si el radicado ya existe
+    radicado_existente = Case.query.filter_by(radicado=data['radicado']).first()
+    if radicado_existente:
+        return jsonify({"error": f"El radicado {data['radicado']} ya existe."}), 400
 
     try:
         protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
