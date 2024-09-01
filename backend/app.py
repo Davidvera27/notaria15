@@ -13,7 +13,6 @@ from routes.extract_data import extract_data_bp
 from routes.user_data import user_data_bp
 from routes.radicados import radicados_bp
 from routes.finished_cases import finished_cases_bp
-from routes.david_restrepo_cases import david_restrepo_cases_bp
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
@@ -37,12 +36,11 @@ migrate = Migrate(app, db)
 # Registro de Blueprints para las rutas
 app.register_blueprint(cases_bp)
 app.register_blueprint(user_data_bp)
-app.register_blueprint(protocolists_bp, url_prefix='/api')
+app.register_blueprint(protocolists_bp)
 app.register_blueprint(user_profiles_bp)
 app.register_blueprint(extract_data_bp)
 app.register_blueprint(radicados_bp)
 app.register_blueprint(finished_cases_bp, url_prefix='/api')
-app.register_blueprint(david_restrepo_cases_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     with app.app_context():
