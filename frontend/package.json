@@ -69,6 +69,7 @@
     ]
   },
   "devDependencies": {
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "workerize-loader": "^2.0.2"
   }
 }
