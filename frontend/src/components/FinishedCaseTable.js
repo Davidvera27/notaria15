@@ -1,13 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchFinishedCases } from '../features/finishedCaseSlice';
 import { useTable, useSortBy, useFilters } from 'react-table';
-import './CaseForm.css';
+import './FinishedCaseTable.css';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
 
 const FinishedCaseTable = () => {
     const dispatch = useDispatch();
     const finishedCases = useSelector(state => state.finishedCases.finishedCases);
     const status = useSelector(state => state.finishedCases.status);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedCase, setSelectedCase] = useState(null);
 
     useEffect(() => {
         if (status === 'idle') {
@@ -21,9 +26,9 @@ const FinishedCaseTable = () => {
             { Header: 'Escritura', accessor: 'escritura' },
             { Header: 'Radicado', accessor: 'radicado' },
             { Header: 'Protocolista', accessor: 'protocolista' },
-            { Header: 'Observaciones', accessor: 'observaciones' },
             { Header: 'Fecha del Documento', accessor: 'fecha_documento' },
-            { Header: 'Envíos', accessor: 'envios' },  // Nueva columna
+            { Header: 'Observaciones', accessor: 'observaciones' },
+            { Header: 'Envíos', accessor: 'envios' },
         ],
         []
     );
@@ -35,6 +40,16 @@ const FinishedCaseTable = () => {
         rows,
         prepareRow,
     } = useTable({ columns, data: finishedCases }, useFilters, useSortBy);
+
+    const openModal = (caseItem) => {
+        setSelectedCase(caseItem);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setSelectedCase(null);
+    };
 
     return (
         <div>
@@ -54,7 +69,7 @@ const FinishedCaseTable = () => {
                         {rows.map(row => {
                             prepareRow(row);
                             return (
-                                <tr {...row.getRowProps()}>
+                                <tr {...row.getRowProps()} onClick={() => openModal(row.original)}>
                                     {row.cells.map(cell => {
                                         return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                                     })}
@@ -64,6 +79,33 @@ const FinishedCaseTable = () => {
                     </tbody>
                 </table>
             </div>
+            {selectedCase && (
+                <Modal
+                    isOpen={modalIsOpen}
+                    onRequestClose={closeModal}
+                    contentLabel="Detalles del Caso"
+                    className="modal"
+                    overlayClassName="modal-overlay"
+                >
+                    <h2>Detalles del Caso</h2>
+                    <p><strong>Fecha:</strong> {selectedCase.fecha}</p>
+                    <p><strong>Escritura:</strong> {selectedCase.escritura}</p>
+                    <p><strong>Radicado:</strong> {selectedCase.radicado}</p>
+                    <p><strong>Protocolista:</strong> {selectedCase.protocolista}</p>
+                    <p><strong>Fecha del Documento:</strong> {selectedCase.fecha_documento}</p>
+                    <p><strong>Observaciones:</strong> {selectedCase.observaciones}</p>
+                    <p><strong>Envíos:</strong> {selectedCase.envios}</p>
+                    <h3>Historial de Cambios</h3>
+                    {/* Historial de cambios - Por implementar */}
+                    <h3>Comunicaciones y Envíos</h3>
+                    {/* Comunicaciones y envíos - Por implementar */}
+                    <h3>Archivos Adjuntos</h3>
+                    {/* Archivos adjuntos - Por implementar */}
+                    <h3>Notas Adicionales</h3>
+                    <p>No hay notas adicionales.</p>
+                    <button onClick={closeModal}>Cerrar</button>
+                </Modal>
+            )}
         </div>
     );
 };
