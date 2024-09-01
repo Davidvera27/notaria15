@@ -116,6 +116,20 @@ const CaseForm = () => {
       toast.error('Corrija los errores antes de enviar el formulario.');
       return;
     }
+  
+    // Verificar si el radicado ya existe
+    const radicadoExistente = cases.find(c => c.radicado === form.radicado);
+    if (radicadoExistente) {
+      const protocolista = radicadoExistente.protocolista;
+      const fila = cases.indexOf(radicadoExistente) + 1; // Número de fila
+      Swal.fire({
+        title: 'Radicado Duplicado',
+        text: `El radicado ya existe en la fila ${fila}, asignado al protocolista ${protocolista}.`,
+        icon: 'error',
+        confirmButtonText: 'Entendido'
+      });
+      return;
+    }
 
     try {
       if (!form.fecha || !form.escritura || !form.radicado || !form.protocolista) {
@@ -272,6 +286,14 @@ const CaseForm = () => {
 
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
+    {
+      Header: 'No.',
+      accessor: (row, i) => i + 1,  // Accesor para numerar las filas
+      disableFilters: true,
+      disableSortBy: true,
+      maxWidth: 50,
+    },
+
     {
       Header: 'Fecha',
       accessor: 'fecha',
