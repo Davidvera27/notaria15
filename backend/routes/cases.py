@@ -117,7 +117,9 @@ def send_case_email():
                 envios=1
             )
             db.session.add(finished_case)
-            db.session.delete(case)
+
+        # Eliminar el caso de la tabla `case` siempre, independientemente del estado
+        db.session.delete(case)
         db.session.commit()
 
         return jsonify({'message': 'El documento ha sido enviado con éxito y el caso ha sido archivado.'})
