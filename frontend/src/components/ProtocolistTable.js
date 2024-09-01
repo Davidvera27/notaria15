@@ -17,7 +17,7 @@ const ProtocolistTable = () => {
   const fetchProtocolists = useCallback(async () => {
     try {
       const [protocolistsResponse, casesResponse] = await Promise.all([
-        axios.get('http://127.0.0.1:5000/api/protocolists'),
+        axios.get('http://127.0.0.1:5000/protocolists'),
         axios.get('http://127.0.0.1:5000/cases')
       ]);
 
