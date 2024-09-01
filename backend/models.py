@@ -9,6 +9,7 @@ class Case(db.Model):
     radicado = db.Column(db.String(50))
     protocolista_id = db.Column(db.Integer, db.ForeignKey('protocolist.id'), nullable=False)
     observaciones = db.Column(db.String(255))
+    fecha_documento = db.Column(db.String(50))  # Nuevo campo
 
     protocolista = db.relationship('Protocolist', backref=db.backref('cases', lazy=True))
 
@@ -19,7 +20,8 @@ class Case(db.Model):
             'escritura': self.escritura,
             'radicado': self.radicado,
             'protocolista': self.protocolista.nombre,
-            'observaciones': self.observaciones
+            'observaciones': self.observaciones,
+            'fecha_documento': self.fecha_documento  # Añadir a la salida del diccionario
         }
         
 class CaseFinished(db.Model):
@@ -29,6 +31,8 @@ class CaseFinished(db.Model):
     radicado = db.Column(db.String(50))
     protocolista = db.Column(db.String(50))
     observaciones = db.Column(db.String(255))
+    fecha_documento = db.Column(db.String(50))  # Nuevo campo
+    envios = db.Column(db.Integer, default=1)  # Nueva columna para contar los envíos
 
     def to_dict(self):
         return {
@@ -37,7 +41,9 @@ class CaseFinished(db.Model):
             'escritura': self.escritura,
             'radicado': self.radicado,
             'protocolista': self.protocolista,
-            'observaciones': self.observaciones
+            'observaciones': self.observaciones,
+            'fecha_documento': self.fecha_documento,
+            'envios': self.envios  # Añadir a la salida del diccionario
         }
 
 
