@@ -1,28 +1,28 @@
 import os
 
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = 'postgresql://david:david1243@localhost/notaria15_db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'notaria15.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = 'uploads'
+
 
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-    SECRET_KEY = '7e378a3c19662ab49a7297a16fe16ddb9346832dd4950100'
-    SQLALCHEMY_DATABASE_URI = 'postgresql://david:david1243@localhost/notaria15_db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'notaria15.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = 'uploads'
+
 
     # Configuración de Flask-Mail para Outlook
     MAIL_SERVER = 'smtp-mail.outlook.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'drestrepo@correo.iue.edu.co')
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', 'vera.96082719544')
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'drestrepo@correo.iue.edu.co')
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'rentasnot15med@hotmail.com')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', 'Not4Ri41520a2*k')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'rentasnot15med@hotmail.com')
