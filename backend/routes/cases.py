@@ -15,6 +15,9 @@ class CaseSchema(Schema):
     radicado = fields.String(required=True, error_messages={"required": "El radicado es obligatorio"})
     protocolista = fields.String(required=True, error_messages={"required": "El protocolista es obligatorio"})
     observaciones = fields.String(missing='')
+    fecha_documento = fields.Date(required=True, error_messages={"required": "La fecha del documento es obligatoria"})
+    
+
 
 @cases_bp.route('/cases', methods=['GET'])
 def get_cases():
@@ -44,7 +47,8 @@ def add_case():
             escritura=int(data['escritura']),
             radicado=data['radicado'],
             protocolista_id=protocolista.id,
-            observaciones=data.get('observaciones', '')
+            observaciones=data.get('observaciones', ''),
+            fecha_documento=data.get('fecha_documento')
         )
         db.session.add(new_case)
         db.session.commit()
@@ -89,30 +93,38 @@ def send_case_email():
     subject = f"BOLETA DE RENTAS {radicado}"
     body = f"Señor(a) {protocolista.nombre},\n\nAdjunto encontrará el documento Liquidación De Impuesto De Registro, correspondiente al radicado No. {radicado} de la escritura {case.escritura}.\n\nAtentamente,\nAuxiliar de rentas Notaría 15."
 
-    # Usar send_email_via_outlook para enviar el correo
     try:
         send_email_via_outlook(recipients=[protocolista.correo_electronico], 
                                subject=subject, 
                                body=body, 
                                attachments=[pdf_path])
 
-        # Mover el caso a la tabla case_finished
-        finished_case = CaseFinished(
-            id=case.id,
-            fecha=case.fecha,
-            escritura=case.escritura,
-            radicado=case.radicado,
-            protocolista=protocolista.nombre,
-            observaciones=case.observaciones
-        )
-        db.session.add(finished_case)
-        db.session.delete(case)
+        # Verificar si el caso ya existe en `case_finished`
+        finished_case = CaseFinished.query.filter_by(id=case.id).first()
+        if finished_case:
+            # Si ya existe, incrementar el contador de envíos
+            finished_case.envios += 1
+        else:
+            # Si no existe, mover el caso a la tabla `case_finished`
+            finished_case = CaseFinished(
+                id=case.id,
+                fecha=case.fecha,
+                escritura=case.escritura,
+                radicado=case.radicado,
+                protocolista=protocolista.nombre,
+                observaciones=case.observaciones,
+                fecha_documento=case.fecha_documento,
+                envios=1
+            )
+            db.session.add(finished_case)
+            db.session.delete(case)
         db.session.commit()
 
         return jsonify({'message': 'El documento ha sido enviado con éxito y el caso ha sido archivado.'})
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': f'Hubo un problema al enviar el correo: {e}'}), 500
+        current_app.logger.error(f'Error al mover el caso de `case` a `case_finished`: {str(e)}')
+        return jsonify({'error': f'Hubo un problema al enviar el correo: {str(e)}'}), 500
 
 logging.basicConfig(level=logging.DEBUG)
 
