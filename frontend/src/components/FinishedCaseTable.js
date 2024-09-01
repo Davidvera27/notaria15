@@ -22,7 +22,8 @@ const FinishedCaseTable = () => {
             { Header: 'Radicado', accessor: 'radicado' },
             { Header: 'Protocolista', accessor: 'protocolista' },
             { Header: 'Observaciones', accessor: 'observaciones' },
-            { Header: 'Envíos', accessor: 'envios' },
+            { Header: 'Fecha del Documento', accessor: 'fecha_documento' },
+            { Header: 'Envíos', accessor: 'envios' },  // Nueva columna
         ],
         []
     );
