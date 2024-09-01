@@ -12,7 +12,6 @@ import ProtocolistSection from './components/ProtocolistSection';
 import FinishedCaseTable from './components/FinishedCaseTable';
 import logo from './components/assets/logo_sin_fondo.png';
 
-
 const ENDPOINT = "http://127.0.0.1:5000";  // Cambia esto según tu configuración
 
 const CaseForm = React.lazy(() => {
@@ -43,7 +42,7 @@ function App() {
     const savedSettings = localStorage.getItem('userSettings');
     return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
   });
-  const [dropdownOpen, setDropdownOpen] = useState(null); // Track which dropdown is open
+  const [dropdownOpen, setDropdownOpen] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -105,20 +104,23 @@ function App() {
             <div className="nav-link" onClick={() => toggleDropdown('rentas')}>
               Impuesto de Liquidación de Rentas
               <div className={`dropdown-menu ${dropdownOpen === 'rentas' ? 'open' : ''}`}>
-                <Link to="/cases" className="dropdown-item">Gestión de Casos</Link>
-                <Link to="/protocolists" className="dropdown-item">Gestión de Protocolistas</Link>
-                <Link to="/finished-cases" className="dropdown-item">Casos Finalizados</Link>
+                <Link to="/cases" className="dropdown-item" onClick={() => setMenuOpen(false)}>Gestión de Casos</Link>
+                <Link to="/protocolists" className="dropdown-item" onClick={() => setMenuOpen(false)}>Gestión de Protocolistas</Link>
+                <Link to="/finished-cases" className="dropdown-item" onClick={() => setMenuOpen(false)}>Casos Finalizados</Link>
               </div>
             </div>
-            <Link to="/register" className="nav-link">Registrar Usuario</Link>
+            <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
             <button onClick={toggleTheme} className="nav-button">
               Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
             </button>
             <div className="nav-user-dropdown" onClick={() => toggleDropdown('user')}>
               {user?.name}
               <div className={`dropdown-menu ${dropdownOpen === 'user' ? 'open' : ''}`}>
-                <Link to="/profile" className="dropdown-item">Información de perfil</Link>
-                <button onClick={() => logout({ returnTo: window.location.origin })} className="dropdown-item">Cerrar Sesión</button>
+                <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>Información de perfil</Link>
+                <button onClick={() => {
+                  setMenuOpen(false);
+                  logout({ returnTo: window.location.origin });
+                }} className="dropdown-item">Cerrar Sesión</button>
               </div>
             </div>
           </nav>
