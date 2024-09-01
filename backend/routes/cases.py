@@ -99,15 +99,14 @@ def send_case_email():
                                body=body, 
                                attachments=[pdf_path])
 
-        # Verificar si el caso ya existe en `case_finished`
-        finished_case = CaseFinished.query.filter_by(id=case.id).first()
+        # Verificar si el caso ya existe en `case_finished` basado en el radicado
+        finished_case = CaseFinished.query.filter_by(radicado=case.radicado).first()
         if finished_case:
             # Si ya existe, incrementar el contador de envíos
             finished_case.envios += 1
         else:
             # Si no existe, mover el caso a la tabla `case_finished`
             finished_case = CaseFinished(
-                id=case.id,
                 fecha=case.fecha,
                 escritura=case.escritura,
                 radicado=case.radicado,
@@ -118,7 +117,7 @@ def send_case_email():
             )
             db.session.add(finished_case)
 
-        # Eliminar el caso de la tabla `case` siempre, independientemente del estado
+        # Eliminar el caso de la tabla `case`
         db.session.delete(case)
         db.session.commit()
 
