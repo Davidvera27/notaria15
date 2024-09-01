@@ -171,6 +171,7 @@
   max-width: 500px;
   margin: auto;
   position: relative;
+  z-index: 1000; /* Asegura que el modal esté encima de otros elementos */
 }
 
 .modal h2 {
@@ -206,4 +207,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 999; /* Asegura que la superposición cubra toda la pantalla */
 }
