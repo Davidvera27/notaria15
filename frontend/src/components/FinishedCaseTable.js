@@ -86,6 +86,14 @@ const FinishedCaseTable = () => {
                     contentLabel="Detalles del Caso"
                     className="modal"
                     overlayClassName="modal-overlay"
+                    style={{
+                        overlay: {
+                            zIndex: 1000
+                        },
+                        content: {
+                            zIndex: 1001,
+                        }
+                    }}
                 >
                     <h2>Detalles del Caso</h2>
                     <p><strong>Fecha:</strong> {selectedCase.fecha}</p>
