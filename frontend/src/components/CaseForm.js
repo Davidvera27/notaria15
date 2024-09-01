@@ -26,8 +26,10 @@ const CaseForm = () => {
     escritura: '',
     radicado: '',
     protocolista: '',
-    observaciones: ''
+    observaciones: '',
+    fecha_documento: null // Añadido para manejar la fecha del documento
   });
+
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -59,7 +61,8 @@ const CaseForm = () => {
     if (currentCase) {
       setForm({
         ...currentCase,
-        fecha: new Date(currentCase.fecha)
+        fecha: new Date(currentCase.fecha),
+        fecha_documento: currentCase.fecha_documento ? new Date(currentCase.fecha_documento) : null
       });
     } else {
       setForm({
@@ -67,7 +70,8 @@ const CaseForm = () => {
         escritura: '',
         radicado: '',
         protocolista: '',
-        observaciones: ''
+        observaciones: '',
+        fecha_documento: null
       });
     }
   }, [currentCase]);
@@ -109,6 +113,10 @@ const CaseForm = () => {
     setForm({ ...form, fecha: date });
   };
 
+  const handleDocumentDateChange = (date) => {
+    setForm({ ...form, fecha_documento: date });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const hasErrors = Object.values(errors).some((error) => error);
@@ -117,11 +125,10 @@ const CaseForm = () => {
       return;
     }
   
-    // Verificar si el radicado ya existe
     const radicadoExistente = cases.find(c => c.radicado === form.radicado);
     if (radicadoExistente) {
       const protocolista = radicadoExistente.protocolista;
-      const fila = cases.indexOf(radicadoExistente) + 1; // Número de fila
+      const fila = cases.indexOf(radicadoExistente) + 1;
       Swal.fire({
         title: 'Radicado Duplicado',
         text: `El radicado ya existe en la fila ${fila}, asignado al protocolista ${protocolista}.`,
@@ -142,7 +149,8 @@ const CaseForm = () => {
         escritura: form.escritura,
         radicado: form.radicado,
         protocolista: form.protocolista,
-        observaciones: form.observaciones
+        observaciones: form.observaciones,
+        fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null
       };
 
       if (currentCase) {
@@ -157,7 +165,8 @@ const CaseForm = () => {
         escritura: '',
         radicado: '',
         protocolista: '',
-        observaciones: ''
+        observaciones: '',
+        fecha_documento: null
       });
       dispatch(fetchCases());
       toast.success('Caso guardado exitosamente');
@@ -311,6 +320,14 @@ const CaseForm = () => {
       aggregate: 'count',
     },
     {
+      Header: 'Fecha Del Documento', // Nueva columna para Fecha Del Documento
+      accessor: 'fecha_documento',
+      Filter: DefaultColumnFilter,
+      maxWidth: 150,
+      sortType: 'datetime',
+      aggregate: 'count',
+    },
+    {
       Header: 'Radicado',
       accessor: 'radicado',
       Cell: ({ row }) => (
@@ -452,6 +469,7 @@ const CaseForm = () => {
           dateFormat="yyyy-MM-dd"
           className="date-picker"
         />
+        <label htmlFor="escritura">Escritura</label>
         <input 
           type="text" 
           name="escritura" 
@@ -462,6 +480,15 @@ const CaseForm = () => {
         />
         {errors.escritura && <span className="error-message">{errors.escritura}</span>}
 
+        <label htmlFor="fecha_documento">Fecha del Documento</label>
+        <DatePicker
+          selected={form.fecha_documento}
+          onChange={handleDocumentDateChange}
+          dateFormat="yyyy-MM-dd"
+          className="date-picker"
+        />
+
+        <label htmlFor="radicado">Radicado</label>
         <input 
           type="text" 
           name="radicado" 
@@ -472,6 +499,7 @@ const CaseForm = () => {
         />
         {errors.radicado && <span className="error-message">{errors.radicado}</span>}
 
+        <label htmlFor="protocolista">Protocolista</label>
         <select 
           name="protocolista" 
           value={form.protocolista} 
@@ -485,6 +513,7 @@ const CaseForm = () => {
         </select>
         {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
 
+        <label htmlFor="observaciones">Observaciones</label>
         <textarea 
           name="observaciones" 
           value={form.observaciones} 
