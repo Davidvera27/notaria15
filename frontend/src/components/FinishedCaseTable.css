@@ -209,3 +209,49 @@
   justify-content: center;
   z-index: 999; /* Asegura que la superposición cubra toda la pantalla */
 }
+
+/* Estilos para la línea de tiempo */
+.timeline {
+  list-style-type: none;
+  position: relative;
+  padding: 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #17a2b8;
+  left: 20px;
+  margin-left: -2px;
+}
+
+.timeline > li {
+  margin: 20px 0;
+  padding-left: 40px;
+  position: relative;
+}
+
+.timeline > li::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  background: #fff;
+  border: 4px solid #17a2b8;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 0;
+}
+
+.timeline > li span {
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.timeline > li p {
+  margin: 0;
+  font-size: 0.9rem;
+}
