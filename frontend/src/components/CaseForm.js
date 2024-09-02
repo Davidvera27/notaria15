@@ -534,7 +534,6 @@ const DefaultColumnFilter = ({
   return (
     <input
       value={filterValue || ''}
-      onClick={(e) => e.stopPropagation()}
       onChange={e => {
         setFilter(e.target.value || undefined);
       }}
@@ -548,8 +547,7 @@ const fetchRadicados = async (caseId) => {
     const response = await axios.get(`http://127.0.0.1:5000/cases/${caseId}/radicados`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching radicados for case ${caseId}:`, error);
-    toast.error('No se pudieron cargar los radicados. Por favor, inténtelo de nuevo más tarde.');
+    console.error('Error fetching radicados:', error);
     return [];
   }
 };
