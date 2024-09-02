@@ -7,7 +7,7 @@ import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './CaseForm.css';
-import { useTable, useFilters, useGroupBy, useSortBy } from 'react-table'; // Orden corregido
+import { useTable, useFilters, useGroupBy, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
@@ -27,7 +27,7 @@ const CaseForm = () => {
     radicado: '',
     protocolista: '',
     observaciones: '',
-    fecha_documento: null // Añadido para manejar la fecha del documento
+    fecha_documento: null
   });
 
   const [errors, setErrors] = useState({});
@@ -384,7 +384,7 @@ const CaseForm = () => {
     headerGroups,
     rows,
     prepareRow,
-  } = useTable({ columns, data }, useFilters, useGroupBy, useSortBy); // Orden corregido
+  } = useTable({ columns, data }, useFilters, useGroupBy, useSortBy);
 
   const RadicadoDropdown = ({ caseId, initialRadicado }) => {
     const [radicados, setRadicados] = useState([]);
@@ -418,6 +418,24 @@ const CaseForm = () => {
       </select>
     );
   };
+
+  // Intervalo de Verificación de Casos Resaltados
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const casosResaltados = cases.filter(caseItem => isRadicadoInPdf(caseItem.radicado));
+
+      if (casosResaltados.length > 0) {
+        Swal.fire({
+          title: 'Casos Pendientes de Envío',
+          text: `Hay ${casosResaltados.length} caso(s) pendiente(s) de envío.`,
+          icon: 'warning',
+          confirmButtonText: 'Entendido'
+        });
+      }
+    }, 60000); // Cada 10 minutos (600,000 ms)
+
+    return () => clearInterval(interval);
+  }, [cases, isRadicadoInPdf]);
 
   return (
     <div>
