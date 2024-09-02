@@ -5,6 +5,7 @@ import os
 import logging
 from marshmallow import Schema, fields, ValidationError
 from flask import current_app
+from datetime import datetime
 
 cases_bp = Blueprint('cases', __name__)
 
@@ -43,7 +44,7 @@ def add_case():
             return jsonify({'error': 'Protocolista no encontrado'}), 400
 
         new_case = Case(
-            fecha=data['fecha'],
+            fecha=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # Fecha y hora actuales
             escritura=int(data['escritura']),
             radicado=data['radicado'],
             protocolista_id=protocolista.id,
