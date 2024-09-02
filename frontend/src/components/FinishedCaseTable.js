@@ -51,6 +51,25 @@ const FinishedCaseTable = () => {
         setSelectedCase(null);
     };
 
+    const renderTimeline = () => {
+        const timelineData = [
+            { date: selectedCase.fecha, event: 'Creación del caso' },
+            { date: selectedCase.fecha_documento, event: 'Fecha de Escritura' },
+            { date: selectedCase.fecha, event: `Correo enviado (${selectedCase.envios} veces)` },
+        ];
+
+        return (
+            <ul className="timeline">
+                {timelineData.map((item, index) => (
+                    <li key={index}>
+                        <span>{item.date}</span>
+                        <p>{item.event}</p>
+                    </li>
+                ))}
+            </ul>
+        );
+    };
+
     return (
         <div>
             <h2>Casos Finalizados</h2>
@@ -104,7 +123,7 @@ const FinishedCaseTable = () => {
                     <p><strong>Observaciones:</strong> {selectedCase.observaciones}</p>
                     <p><strong>Envíos:</strong> {selectedCase.envios}</p>
                     <h3>Historial de Cambios</h3>
-                    {/* Historial de cambios - Por implementar */}
+                    {renderTimeline()}
                     <h3>Comunicaciones y Envíos</h3>
                     {/* Comunicaciones y envíos - Por implementar */}
                     <h3>Archivos Adjuntos</h3>
