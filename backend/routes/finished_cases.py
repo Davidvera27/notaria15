@@ -13,7 +13,9 @@ def get_finished_cases():
             'escritura': case.escritura,
             'radicado': case.radicado,
             'protocolista': case.protocolista,
-            'observaciones': case.observaciones
+            'observaciones': case.observaciones,
+            'fecha_documento': case.fecha_documento,  # Incluir el nuevo campo
+            'envios': case.envios  # Enviar el número de envíos
         } for case in cases
     ]
     return jsonify(result)
