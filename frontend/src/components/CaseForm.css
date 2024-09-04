@@ -13,7 +13,7 @@
 .case-table th {
   background: linear-gradient(135deg, #70bd6e, #024604);
   color: rgb(0, 0, 0);
-  text-align: left;
+  text-align: center; /* Alinear las cabeceras al centro */
   padding: 10px;
   position: sticky;
   top: 0;
@@ -27,15 +27,14 @@
   max-width: 50px;    /* Ajustar el ancho de la columna de numeración */
 }
 
-
 .case-table th input {
   width: 100%;
   padding: 5px;
   border: none;
   border-radius: 5px;
   margin-top: 6px;
-  background-color: rgba(150, 248, 150, 0.486);
-  color: #000000;
+  background-color: rgb(255, 255, 255);
+  color: #000000; /* Cambiar el color del texto a blanco */
   font-size: 12px;
   box-shadow: inset 0px 1px 2px rgba(255, 255, 255, 0.1);
 }
