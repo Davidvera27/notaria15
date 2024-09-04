@@ -419,6 +419,16 @@ const CaseForm = () => {
     );
   };
 
+  const numVisibleRows = 10; // Número de filas visibles mínimo que deseas mantener
+
+  const renderEmptyRows = (numEmptyRows) => {
+    return Array.from({ length: numEmptyRows }).map((_, index) => (
+      <tr key={`empty-row-${index}`} className="empty-row">
+        <td colSpan={columns.length}></td>
+      </tr>
+    ));
+  };
+
   // Intervalo de Verificación de Casos Resaltados
   useEffect(() => {
     const interval = setInterval(() => {
@@ -477,6 +487,7 @@ const CaseForm = () => {
                 </tr>
               );
             })}
+            {renderEmptyRows(numVisibleRows - rows.length)}
           </tbody>
         </table>
       </div>
