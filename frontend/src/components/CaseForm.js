@@ -447,10 +447,16 @@ const CaseForm = () => {
     return () => clearInterval(interval);
   }, [cases, isRadicadoInPdf]);
 
+  // Añadir el contador de filas visibles
+const visibleRowsCount = rows.length;
+
   return (
     <div>
-      <h2>Casos</h2>
-      <div className="table-container">
+    <h2>Casos</h2>
+        <div>
+          <p>Número de casos: {visibleRowsCount}</p> {/* Aquí mostramos el contador */}
+        </div>
+        <div className="table-container">
         <table {...getTableProps()} className="case-table">
           <thead>
             {headerGroups.map(headerGroup => (
