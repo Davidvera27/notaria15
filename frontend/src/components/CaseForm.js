@@ -462,7 +462,7 @@ const visibleRowsCount = rows.length;
             {headerGroups.map(headerGroup => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
-                  <th key={column.id} {...column.getHeaderProps()} style={{ maxWidth: column.maxWidth }}>
+                  <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())} style={{ maxWidth: column.maxWidth }}>
                     {column.render('Header')}
                     <span>
                       {column.isSorted
