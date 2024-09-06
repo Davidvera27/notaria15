@@ -3,9 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchFinishedCases } from '../features/finishedCaseSlice';
 import { useTable, useSortBy, useFilters } from 'react-table';
 import Swal from 'sweetalert2';
-import './FinishedCaseTable.css';
 import Modal from 'react-modal';
+import { motion } from 'framer-motion';
 import axios from 'axios';
+import './FinishedCaseTable.css';
+import 'animate.css';
 
 Modal.setAppElement('#root');
 
@@ -153,7 +155,7 @@ const FinishedCaseTable = () => {
             {rows.map(row => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
+                <tr {...row.getRowProps()} onClick={() => handleEdit(row.original)}>
                   {row.cells.map(cell => {
                     return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                   })}
@@ -166,66 +168,94 @@ const FinishedCaseTable = () => {
 
       {selectedCase && (
         <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={closeModal}
-          contentLabel="Detalles del Caso"
-          className="modal"
-          overlayClassName="modal-overlay"
-        >
-          <h2>Detalles del Caso</h2>
-          <form>
-            <label>Fecha</label>
-            <input
-              name="fecha"
-              value={form.fecha}
-              onChange={handleInputChange}
-            />
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            contentLabel="Detalles del Caso"
+            className="modal animate__animated animate__fadeInDown"
+            overlayClassName="modal-overlay"
+          >
+            <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+              Detalles del Caso
+            </motion.h2>
+            <motion.form initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
+              <label>Fecha</label>
+              <input
+                name="fecha"
+                value={form.fecha}
+                onChange={handleInputChange}
+              />
 
-            <label>Escritura</label>
-            <input
-              name="escritura"
-              value={form.escritura}
-              onChange={handleInputChange}
-            />
+              <label>Escritura</label>
+              <input
+                name="escritura"
+                value={form.escritura}
+                onChange={handleInputChange}
+              />
 
-            <label>Radicado</label>
-            <input
-              name="radicado"
-              value={form.radicado}
-              onChange={handleInputChange}
-            />
+              <label>Radicado</label>
+              <input
+                name="radicado"
+                value={form.radicado}
+                onChange={handleInputChange}
+              />
 
-            <label>Protocolista</label>
-            <input
-              name="protocolista"
-              value={form.protocolista}
-              onChange={handleInputChange}
-            />
+              <label>Protocolista</label>
+              <input
+                name="protocolista"
+                value={form.protocolista}
+                onChange={handleInputChange}
+              />
 
-            <label>Fecha del Documento</label>
-            <input
-              name="fecha_documento"
-              value={form.fecha_documento}
-              onChange={handleInputChange}
-            />
+              <label>Fecha del Documento</label>
+              <input
+                name="fecha_documento"
+                value={form.fecha_documento}
+                onChange={handleInputChange}
+              />
 
-            <label>Observaciones</label>
-            <textarea
-              name="observaciones"
-              value={form.observaciones}
-              onChange={handleInputChange}
-            />
+              <label>Observaciones</label>
+              <textarea
+                name="observaciones"
+                value={form.observaciones}
+                onChange={handleInputChange}
+              />
 
-            <label>Envíos</label>
-            <input
-              name="envios"
-              value={form.envios}
-              onChange={handleInputChange}
-            />
-          </form>
-          <button onClick={handleUpdate}>Actualizar</button>
-          <button onClick={closeModal}>Cerrar</button>
-        </Modal>
+              {/* Nuevo campo para el correo al que se envió el documento */}
+              <label>Correo Enviado A</label>
+              <input
+                name="correo_enviado_a"
+                value={selectedCase.correo_enviado_a || "correo@ejemplo.com"}  // Reemplaza con el valor real
+                disabled
+              />
+
+              {/* Nuevo campo para la hora de envío */}
+              <label>Hora de Envío</label>
+              <input
+                name="hora_envio"
+                value={selectedCase.hora_envio || "12:00 PM"}  // Reemplaza con el valor real
+                disabled
+              />
+
+              {/* Nuevo campo para mostrar el nombre del usuario que envió el correo */}
+              <label>Enviado por</label>
+              <input
+                name="enviado_por"
+                value={selectedCase.enviado_por || "Usuario Activo"}  // Reemplaza con el usuario activo
+                disabled
+              />
+
+              <label>Envíos</label>
+              <input
+                name="envios"
+                value={form.envios}
+                onChange={handleInputChange}
+              />
+            </motion.form>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+              <button onClick={handleUpdate} className="btn-update">Actualizar</button>
+              <button onClick={closeModal} className="btn-close">Cerrar</button>
+            </motion.div>
+          </Modal>
       )}
     </div>
   );
