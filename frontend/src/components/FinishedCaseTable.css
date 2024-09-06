@@ -166,31 +166,41 @@
 
 .modal {
   background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 500px;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 700px;  /* Ampliar el tamaño del modal */
   margin: auto;
   position: relative;
-  z-index: 1000; /* Asegura que el modal esté encima de otros elementos */
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .modal h2 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
+  font-size: 1.8rem;  /* Hacer el título más grande */
+  margin-bottom: 25px;
 }
 
-.modal p {
+.modal input, .modal textarea {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
   font-size: 1rem;
-  margin-bottom: 10px;
+}
+
+.modal textarea {
+  resize: vertical;
 }
 
 .modal button {
   background-color: #28a745;
   color: white;
-  padding: 10px 20px;
+  padding: 10px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-right: 10px;
 }
 
 .modal button:hover {
@@ -207,8 +217,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999; /* Asegura que la superposición cubra toda la pantalla */
+  z-index: 999;
 }
+
 
 /* Estilos para la línea de tiempo */
 .timeline {
