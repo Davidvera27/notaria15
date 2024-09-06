@@ -442,7 +442,7 @@ const CaseForm = () => {
           confirmButtonText: 'Entendido'
         });
       }
-    }, 60000); // Cada 10 minutos (600,000 ms)
+    }, 600000); // Cada 10 minutos (600,000 ms)
 
     return () => clearInterval(interval);
   }, [cases, isRadicadoInPdf]);
