@@ -5,8 +5,10 @@ protocolists_bp = Blueprint('protocolists', __name__)
 
 @protocolists_bp.route('/protocolists', methods=['GET'])
 def get_protocolists():
-    protocolists = Protocolist.query.all()
+    # Ordena los protocolistas por el campo 'nombre' de forma ascendente (alfabético)
+    protocolists = Protocolist.query.order_by(Protocolist.nombre.asc()).all()
     return jsonify([protocolist.to_dict() for protocolist in protocolists])
+
 
 @protocolists_bp.route('/protocolists', methods=['POST'])
 def add_protocolist():
