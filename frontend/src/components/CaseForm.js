@@ -4,15 +4,19 @@ import { fetchCases } from '../features/caseSlice';
 import { fetchProtocolists } from '../features/protocolistSlice';
 import { fetchPdfData } from '../features/pdfDataSlice';
 import axios from 'axios';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './CaseForm.css';
 import { useTable, useFilters, useGroupBy, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
+import { es } from 'date-fns/locale'; // Importar idioma español
+
+registerLocale('es', es); // Registrar el idioma español
 
 const socket = io('http://127.0.0.1:5000');
+
 
 const CaseForm = () => {
   const dispatch = useDispatch();
@@ -498,12 +502,17 @@ const visibleRowsCount = rows.length;
         </table>
       </div>
       <form className="case-form" onSubmit={handleSubmit}>
-        <DatePicker
-          selected={form.fecha}
-          onChange={handleDateChange}
-          dateFormat="yyyy-MM-dd"
-          className="date-picker"
-        />
+      <label htmlFor="fecha">Fecha</label>
+      <DatePicker
+        selected={form.fecha}
+        onChange={handleDateChange}
+        dateFormat="yyyy-MM-dd"
+        locale="es"  // Establecer el idioma español
+        showMonthDropdown  // Permitir selección de meses
+        showYearDropdown   // Permitir selección de años
+        dropdownMode="select"  // Mostrar como lista desplegable
+        className="date-picker"
+      />
         <label htmlFor="escritura">Escritura</label>
         <input 
           type="text" 
@@ -516,12 +525,16 @@ const visibleRowsCount = rows.length;
         {errors.escritura && <span className="error-message">{errors.escritura}</span>}
 
         <label htmlFor="fecha_documento">Fecha del Documento</label>
-        <DatePicker
-          selected={form.fecha_documento}
-          onChange={handleDocumentDateChange}
-          dateFormat="yyyy-MM-dd"
-          className="date-picker"
-        />
+      <DatePicker
+        selected={form.fecha_documento}
+        onChange={handleDocumentDateChange}
+        dateFormat="yyyy-MM-dd"
+        locale="es"  // Establecer el idioma español
+        showMonthDropdown  // Permitir selección de meses
+        showYearDropdown   // Permitir selección de años
+        dropdownMode="select"  // Mostrar como lista desplegable
+        className="date-picker"
+      />
 
         <label htmlFor="radicado">Radicado</label>
         <input 
