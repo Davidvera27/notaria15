@@ -20,17 +20,20 @@ const ProtocolistTable = () => {
         axios.get('http://127.0.0.1:5000/protocolists'),
         axios.get('http://127.0.0.1:5000/cases')
       ]);
-
+  
+      // Ordena los protocolistas alfabéticamente por el nombre
       const protocolistsData = protocolistsResponse.data.map(protocolist => {
         const caseCount = casesResponse.data.filter(c => c.protocolista === protocolist.nombre).length;
         return { ...protocolist, caseCount };
-      });
+      }).sort((a, b) => a.nombre.localeCompare(b.nombre));  // Ordena por 'nombre'
+  
       setProtocolists(protocolistsData);
     } catch (error) {
       console.error('Error fetching protocolists:', error);
       toast.error('No se pudieron cargar los protocolistas. Por favor, inténtelo de nuevo más tarde.');
     }
   }, []);
+  
 
   useEffect(() => {
     fetchProtocolists();
