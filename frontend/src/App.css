@@ -421,3 +421,34 @@ body.dark .protocolist-form textarea {
 .btn-delete:hover {
   background-color: var(--btn-danger-hover-bg);
 }
+
+
+.report-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  padding: 20px;
+  margin: auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.report-form label {
+  font-weight: bold;
+}
+
+.report-form button {
+  padding: 10px;
+  background-color: #2eb135;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.report-form button:hover {
+  background-color: #239426;
+}
