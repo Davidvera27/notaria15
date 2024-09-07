@@ -13,6 +13,7 @@ from routes.extract_data import extract_data_bp
 from routes.user_data import user_data_bp
 from routes.radicados import radicados_bp
 from routes.finished_cases import finished_cases_bp
+from routes.report import report_bp
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
@@ -41,6 +42,7 @@ app.register_blueprint(user_profiles_bp)
 app.register_blueprint(extract_data_bp)
 app.register_blueprint(radicados_bp)
 app.register_blueprint(finished_cases_bp, url_prefix='/api')
+app.register_blueprint(report_bp)
 
 if __name__ == '__main__':
     with app.app_context():
