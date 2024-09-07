@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchFinishedCases } from '../features/finishedCaseSlice';
-import { useTable, useSortBy, useFilters } from 'react-table';
+import { useTable, useSortBy, useFilters } from 'react-table';  // Añadido useFilters
 import Swal from 'sweetalert2';
 import Modal from 'react-modal';
 import { motion } from 'framer-motion';
@@ -85,13 +85,13 @@ const FinishedCaseTable = () => {
   }, [dispatch]);
 
   const columns = useMemo(() => [
-    { Header: 'Fecha', accessor: 'fecha' },
-    { Header: 'Escritura', accessor: 'escritura' },
-    { Header: 'Radicado', accessor: 'radicado' },
-    { Header: 'Protocolista', accessor: 'protocolista' },
-    { Header: 'Fecha del Documento', accessor: 'fecha_documento' },
-    { Header: 'Observaciones', accessor: 'observaciones' },
-    { Header: 'Envíos', accessor: 'envios' },
+    { Header: 'Fecha', accessor: 'fecha', Filter: DefaultColumnFilter },
+    { Header: 'Escritura', accessor: 'escritura', Filter: DefaultColumnFilter },
+    { Header: 'Radicado', accessor: 'radicado', Filter: DefaultColumnFilter },
+    { Header: 'Protocolista', accessor: 'protocolista', Filter: DefaultColumnFilter },
+    { Header: 'Fecha del Documento', accessor: 'fecha_documento', Filter: DefaultColumnFilter },
+    { Header: 'Observaciones', accessor: 'observaciones', Filter: DefaultColumnFilter },
+    { Header: 'Envíos', accessor: 'envios', Filter: DefaultColumnFilter },
     {
       Header: 'Acciones',
       accessor: 'acciones',
@@ -137,15 +137,12 @@ const FinishedCaseTable = () => {
             {headerGroups.map(headerGroup => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                    {column.render('Header')}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? ' 🔽'
-                          : ' 🔼'
-                        : ''}
+                  <th {...column.getHeaderProps()}>
+                    <span {...column.getSortByToggleProps()}>
+                      {column.render('Header')}
+                      {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : '' }
                     </span>
+                    <div>{column.canFilter ? column.render('Filter') : null}</div>
                   </th>
                 ))}
               </tr>
@@ -155,7 +152,7 @@ const FinishedCaseTable = () => {
             {rows.map(row => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} onClick={() => handleEdit(row.original)}>
+                <tr {...row.getRowProps()}>
                   {row.cells.map(cell => {
                     return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                   })}
@@ -220,30 +217,6 @@ const FinishedCaseTable = () => {
                 onChange={handleInputChange}
               />
 
-              {/* Nuevo campo para el correo al que se envió el documento */}
-              <label>Correo Enviado A</label>
-              <input
-                name="correo_enviado_a"
-                value={selectedCase.correo_enviado_a || "correo@ejemplo.com"}  // Reemplaza con el valor real
-                disabled
-              />
-
-              {/* Nuevo campo para la hora de envío */}
-              <label>Hora de Envío</label>
-              <input
-                name="hora_envio"
-                value={selectedCase.hora_envio || "12:00 PM"}  // Reemplaza con el valor real
-                disabled
-              />
-
-              {/* Nuevo campo para mostrar el nombre del usuario que envió el correo */}
-              <label>Enviado por</label>
-              <input
-                name="enviado_por"
-                value={selectedCase.enviado_por || "Usuario Activo"}  // Reemplaza con el usuario activo
-                disabled
-              />
-
               <label>Envíos</label>
               <input
                 name="envios"
@@ -258,6 +231,23 @@ const FinishedCaseTable = () => {
           </Modal>
       )}
     </div>
+  );
+};
+
+// Función básica para los filtros de columna
+const DefaultColumnFilter = ({
+  column: { filterValue, preFilteredRows, setFilter },
+}) => {
+  const count = preFilteredRows.length;
+
+  return (
+    <input
+      value={filterValue || ''}
+      onChange={e => {
+        setFilter(e.target.value || undefined); // Colocar el valor en blanco elimina el filtro
+      }}
+      placeholder={`Buscar ${count} registros...`}
+    />
   );
 };
 
