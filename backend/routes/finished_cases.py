@@ -29,7 +29,6 @@ def delete_finished_case(id):
     db.session.commit()
     return jsonify({'message': 'Caso eliminado con éxito'})
 
-
 # Editar un caso finalizado
 @finished_cases_bp.route('/finished_cases/<int:id>', methods=['PUT'])
 def update_finished_case(id):
