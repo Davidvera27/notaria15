@@ -17,7 +17,6 @@ registerLocale('es', es); // Registrar el idioma español
 
 const socket = io('http://127.0.0.1:5000');
 
-
 const CaseForm = () => {
   const dispatch = useDispatch();
   const { cases, status: casesStatus } = useSelector((state) => state.cases);
@@ -456,120 +455,122 @@ const visibleRowsCount = rows.length;
 
   return (
     <div>
-    <h2>Casos</h2>
-        <div>
-          <p>Número de casos: {visibleRowsCount}</p> {/* Aquí mostramos el contador */}
-        </div>
-        <div className="table-container">
-        <table {...getTableProps()} className="case-table">
-          <thead>
-            {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
-                  <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())} style={{ maxWidth: column.maxWidth }}>
-                    {column.render('Header')}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? ' 🔽'
-                          : ' 🔼'
-                        : ''}
-                    </span>
-                    <div onClick={(e) => e.stopPropagation()}>{column.canFilter ? column.render('Filter') : null}</div>
-                    {column.id === 'acciones' && (
-                      <button onClick={handleSendAllEmails} className="btn-send-all-emails">
-                        Enviar Todos los Correos
-                      </button>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {rows.map(row => {
-              prepareRow(row);
-              return (
-                <tr key={row.id} {...row.getRowProps()} style={isRadicadoInPdf(row.original.radicado) ? { backgroundColor: 'lightgreen' } : {}}>
-                  {row.cells.map(cell => {
-                    return <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                  })}
-                </tr>
-              );
-            })}
-            {renderEmptyRows(numVisibleRows - rows.length)}
-          </tbody>
-        </table>
+      <h2>Casos</h2>
+      <div>
+        <p>Número de casos: {visibleRowsCount}</p> {/* Aquí mostramos el contador */}
       </div>
-      <form className="case-form" onSubmit={handleSubmit}>
-      <label htmlFor="fecha">Fecha</label>
-      <DatePicker
-        selected={form.fecha}
-        onChange={handleDateChange}
-        dateFormat="yyyy-MM-dd"
-        locale="es"  // Establecer el idioma español
-        showMonthDropdown  // Permitir selección de meses
-        showYearDropdown   // Permitir selección de años
-        dropdownMode="select"  // Mostrar como lista desplegable
-        className="date-picker"
-      />
-        <label htmlFor="escritura">Escritura</label>
-        <input 
-          type="text" 
-          name="escritura" 
-          value={form.escritura} 
-          onChange={handleChange} 
-          placeholder="Ej: 12345" 
-          className={errors.escritura ? 'input-error' : ''}
-        />
-        {errors.escritura && <span className="error-message">{errors.escritura}</span>}
+      <div className="table-and-form-container">
+        <div className="table-container">
+          <table {...getTableProps()} className="case-table">
+            <thead>
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(column => (
+                    <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())} style={{ maxWidth: column.maxWidth }}>
+                      {column.render('Header')}
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? ' 🔽'
+                            : ' 🔼'
+                          : ''}
+                      </span>
+                      <div onClick={(e) => e.stopPropagation()}>{column.canFilter ? column.render('Filter') : null}</div>
+                      {column.id === 'acciones' && (
+                        <button onClick={handleSendAllEmails} className="btn-send-all-emails">
+                          Enviar Todos los Correos
+                        </button>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {rows.map(row => {
+                prepareRow(row);
+                return (
+                  <tr key={row.id} {...row.getRowProps()} style={isRadicadoInPdf(row.original.radicado) ? { backgroundColor: 'lightgreen' } : {}}>
+                    {row.cells.map(cell => {
+                      return <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+                    })}
+                  </tr>
+                );
+              })}
+              {renderEmptyRows(numVisibleRows - rows.length)}
+            </tbody>
+          </table>
+        </div>
+        <form className="case-form" onSubmit={handleSubmit}>
+          <label htmlFor="fecha">Fecha</label>
+          <DatePicker
+            selected={form.fecha}
+            onChange={handleDateChange}
+            dateFormat="yyyy-MM-dd"
+            locale="es"  // Establecer el idioma español
+            showMonthDropdown  // Permitir selección de meses
+            showYearDropdown   // Permitir selección de años
+            dropdownMode="select"  // Mostrar como lista desplegable
+            className="date-picker"
+          />
+          <label htmlFor="escritura">Escritura</label>
+          <input 
+            type="text" 
+            name="escritura" 
+            value={form.escritura} 
+            onChange={handleChange} 
+            placeholder="Ej: 12345" 
+            className={errors.escritura ? 'input-error' : ''}
+          />
+          {errors.escritura && <span className="error-message">{errors.escritura}</span>}
 
-        <label htmlFor="fecha_documento">Fecha del Documento</label>
-      <DatePicker
-        selected={form.fecha_documento}
-        onChange={handleDocumentDateChange}
-        dateFormat="yyyy-MM-dd"
-        locale="es"  // Establecer el idioma español
-        showMonthDropdown  // Permitir selección de meses
-        showYearDropdown   // Permitir selección de años
-        dropdownMode="select"  // Mostrar como lista desplegable
-        className="date-picker"
-      />
+          <label htmlFor="fecha_documento">Fecha del Documento</label>
+          <DatePicker
+            selected={form.fecha_documento}
+            onChange={handleDocumentDateChange}
+            dateFormat="yyyy-MM-dd"
+            locale="es"  // Establecer el idioma español
+            showMonthDropdown  // Permitir selección de meses
+            showYearDropdown   // Permitir selección de años
+            dropdownMode="select"  // Mostrar como lista desplegable
+            className="date-picker"
+          />
 
-        <label htmlFor="radicado">Radicado</label>
-        <input 
-          type="text" 
-          name="radicado" 
-          value={form.radicado} 
-          onChange={handleChange} 
-          placeholder="Ej: 20240101234432" 
-          className={errors.radicado ? 'input-error' : ''}
-        />
-        {errors.radicado && <span className="error-message">{errors.radicado}</span>}
+          <label htmlFor="radicado">Radicado</label>
+          <input 
+            type="text" 
+            name="radicado" 
+            value={form.radicado} 
+            onChange={handleChange} 
+            placeholder="Ej: 20240101234432" 
+            className={errors.radicado ? 'input-error' : ''}
+          />
+          {errors.radicado && <span className="error-message">{errors.radicado}</span>}
 
-        <label htmlFor="protocolista">Protocolista</label>
-        <select 
-          name="protocolista" 
-          value={form.protocolista} 
-          onChange={handleChange} 
-          className={errors.protocolista ? 'input-error' : ''}
-        >
-          <option value="">Selecciona un protocolista</option>
-          {protocolists.map((protocolista) => (
-            <option key={protocolista.id} value={protocolista.nombre}>{protocolista.nombre}</option>
-          ))}
-        </select>
-        {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
+          <label htmlFor="protocolista">Protocolista</label>
+          <select 
+            name="protocolista" 
+            value={form.protocolista} 
+            onChange={handleChange} 
+            className={errors.protocolista ? 'input-error' : ''}
+          >
+            <option value="">Selecciona un protocolista</option>
+            {protocolists.map((protocolista) => (
+              <option key={protocolista.id} value={protocolista.nombre}>{protocolista.nombre}</option>
+            ))}
+          </select>
+          {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
 
-        <label htmlFor="observaciones">Observaciones</label>
-        <textarea 
-          name="observaciones" 
-          value={form.observaciones} 
-          onChange={handleChange} 
-          placeholder="Observaciones adicionales (opcional)"
-        ></textarea>
-        <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
-      </form>
+          <label htmlFor="observaciones">Observaciones</label>
+          <textarea 
+            name="observaciones" 
+            value={form.observaciones} 
+            onChange={handleChange} 
+            placeholder="Observaciones adicionales (opcional)"
+          ></textarea>
+          <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
+        </form>
+      </div>
     </div>
   );
 };
