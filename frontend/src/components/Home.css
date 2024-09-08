@@ -13,20 +13,27 @@
   position: relative;
 }
 
-.title-wrapper {
-  background-color: rgba(46, 177, 53, 0.5);
-  padding: 20px 30px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 15px rgba(0, 91, 187, 0.3);
+.home-title-wrapper {
+  background-color: rgba(46, 177, 53, 0.3); /* Verde semitransparente */
+  padding: 20px 40px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px); /* Efecto de vidrio borroso */
+  -webkit-backdrop-filter: blur(10px); /* Soporte para navegadores webkit */
   text-align: center;
-  max-width: 80%;
+  display: inline-block;
 }
 
 .home-title {
   font-size: 4.5em;
-  color: var(--link-color);
+  color: white; /* El color blanco para contraste con el fondo */
   margin: 0;
-  transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.home-logo {
+  width: 199px; /* Ajusta el tamaño según necesites */
+  margin-left: 10px; /* Para espaciar el logo del texto anterior */
+  vertical-align: middle; /* Alinea verticalmente el logo con el texto */
 }
 
 .home-buttons {
@@ -50,10 +57,6 @@
 .home-button:hover {
   background-color: #239427;
   box-shadow: 0px 4px 15px rgba(0, 91, 187, 0.5);
-}
-
-.title-wrapper:hover {
-  background-color: rgba(46, 177, 53, 0.575);
 }
 
 @media (max-width: 768px) {
