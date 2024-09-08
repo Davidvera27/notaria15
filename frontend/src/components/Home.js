@@ -11,21 +11,14 @@ const Home = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
     >
-      <motion.div
-        className="title-wrapper"
-        initial={{ scale: 0.95 }}
-        whileHover={{ scale: 1.05 }}
-        transition={{ duration: 0.3 }}
+      <motion.h1
+        className="home-title"
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 1 }}
       >
-        <motion.h1
-          className="home-title"
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          Bienvenido a Gestión de Rentas - Notaria 15
-        </motion.h1>
-      </motion.div>
+        Bienvenido a Gestión de Rentas - Notaria 15
+      </motion.h1>
       <motion.div
         className="home-buttons"
         initial={{ y: 100, opacity: 0 }}
@@ -34,7 +27,6 @@ const Home = () => {
       >
         <Link to="/cases" className="home-button">Gestión de Rentas</Link>
         <Link to="/protocolist-section" className="home-button">Protocolistas</Link>
-
       </motion.div>
     </motion.div>
   );
