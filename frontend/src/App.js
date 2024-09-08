@@ -103,12 +103,12 @@ function App() {
               <img src={logo} alt="Logo" className="logo" />
             </Link>
             <div className="nav-link" onClick={() => toggleDropdown('rentas')}>
-            Liquidación de Impuesto de Rentas
+              Liquidación de Impuesto de Rentas
               <div className={`dropdown-menu ${dropdownOpen === 'rentas' ? 'open' : ''}`}>
                 <Link to="/cases" className="dropdown-item" onClick={() => setMenuOpen(false)}>Gestión de Casos</Link>
                 <Link to="/protocolists" className="dropdown-item" onClick={() => setMenuOpen(false)}>Gestión de Protocolistas</Link>
                 <Link to="/finished-cases" className="dropdown-item" onClick={() => setMenuOpen(false)}>Casos Finalizados</Link>
-                <Link to="/generate-report" className="nav-link">Generar Informe</Link>
+                <Link to="/generate-report" className="dropdown-item" onClick={() => setMenuOpen(false)}>Generar Informe</Link>
               </div>
             </div>
             <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
