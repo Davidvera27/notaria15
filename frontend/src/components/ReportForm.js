@@ -33,19 +33,27 @@ const ReportForm = () => {
                 case_type: caseType
             }, { responseType: 'blob' });
 
-            // Obtener nombre del archivo desde el encabezado content-disposition
-            const contentDisposition = response.headers['content-disposition'];
-            let fileName = 'reporte_notarial.xlsx'; // Nombre por defecto
-
-            if (contentDisposition) {
-                const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
-                if (fileNameMatch.length === 2) fileName = fileNameMatch[1];
+            const protocolistaName = protocolists.find(p => p.id === selectedProtocolist)?.nombre.replace(' ', '_');
+            let fileName;
+            
+            switch(caseType) {
+                case 'pending':
+                    fileName = `Radicados_Pendientes_${protocolistaName}`;
+                    break;
+                case 'finished':
+                    fileName = `Radicados_Enviados_${protocolistaName}`;
+                    break;
+                case 'both':
+                    fileName = `Radicados_Completos_${protocolistaName}`;
+                    break;
+                default:
+                    fileName = 'reporte_notarial';
             }
 
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', fileName);
+            link.setAttribute('download', `${fileName}.${reportType === 'excel' ? 'xlsx' : 'pdf'}`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
