@@ -33,7 +33,6 @@ const ProtocolistTable = () => {
       toast.error('No se pudieron cargar los protocolistas. Por favor, inténtelo de nuevo más tarde.');
     }
   }, []);
-  
 
   useEffect(() => {
     fetchProtocolists();
