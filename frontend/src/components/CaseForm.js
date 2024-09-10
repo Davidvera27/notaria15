@@ -22,7 +22,9 @@ const CaseForm = () => {
   const { cases, status: casesStatus } = useSelector((state) => state.cases);
   const { protocolists, status: protocolistsStatus } = useSelector((state) => state.protocolists);
   const { pdfData, status: pdfDataStatus } = useSelector((state) => state.pdfData);
-
+  const [page, setPage] = useState(1);  // Nueva variable para la página actual
+  const [totalCases, setTotalCases] = useState(0);  // Nueva variable para el número total de casos
+  const pageSize = 40;  // Número de casos por página
   const [currentCase, setCurrentCase] = useState(null);
   const [form, setForm] = useState({
     fecha: new Date(),
@@ -127,7 +129,7 @@ const CaseForm = () => {
       toast.error('Corrija los errores antes de enviar el formulario.');
       return;
     }
-  
+
     const radicadoExistente = cases.find(c => c.radicado === form.radicado);
     if (radicadoExistente) {
       const protocolista = radicadoExistente.protocolista;
@@ -296,90 +298,125 @@ const CaseForm = () => {
     }
   }, [cases, dispatch, isRadicadoInPdf]);
 
-  const data = useMemo(() => cases, [cases]);
-  const columns = useMemo(() => [
-    {
-      Header: 'No.',
-      accessor: (row, i) => i + 1,  // Accesor para numerar las filas
-      disableFilters: true,
-      disableSortBy: true,
-      maxWidth: 50,
-    },
+    // Función para cargar los casos con paginación
+// Función para cargar los casos con paginación
+const loadCases = useCallback(async (page) => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:5000/cases?page=${page}&page_size=${pageSize}`);
+    setTotalCases(response.data.total_cases);  // Actualizar el total de casos
+    dispatch({
+      type: 'cases/setCases',
+      payload: response.data.cases // Asegúrate de que aquí estás utilizando la clave correcta del objeto recibido.
+    });
+  } catch (error) {
+    console.error('Error fetching cases with pagination:', error);
+  }
+}, [dispatch, pageSize]);
 
-    {
-      Header: 'Fecha',
-      accessor: 'fecha',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'datetime',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Escritura',
-      accessor: 'escritura',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'basic',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Fecha Del Documento', // Nueva columna para Fecha Del Documento
-      accessor: 'fecha_documento',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'datetime',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Radicado',
-      accessor: 'radicado',
-      Cell: ({ row }) => (
-        <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
-      ),
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'alphanumeric',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Protocolista',
-      accessor: 'protocolista',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'basic',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Observaciones',
-      accessor: 'observaciones',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      aggregate: 'count',
-    },
-    {
-      Header: 'Acciones',
-      accessor: 'acciones',
-      disableSortBy: true,
-      disableFilters: true,
-      Cell: ({ row }) => (
-        <div className="actions-container">
-          <button className="btn-edit" onClick={() => handleEdit(row.original)}>
-            <i className="fas fa-edit"></i> Editar
-          </button>
-          <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
-            <i className="fas fa-trash"></i> Eliminar
-          </button>
-          <button className="btn-add" onClick={() => handleAddRadicado(row.original)}>
-            <i className="fas fa-plus"></i> Añadir Radicado
-          </button>
-          <button className="btn-email" onClick={() => handleSendEmail(row.original)}>
-            <i className="fas fa-envelope"></i> Enviar Documento
-          </button>
-        </div>
-      ),
-      maxWidth: 150,
+  
+  useEffect(() => {
+    if (casesStatus === 'idle') {
+      console.log("Fetching cases...");
+      dispatch(fetchCases());
     }
-  ], [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]);
+  }, [casesStatus, dispatch]);
+
+  useEffect(() => {
+    console.log("Cases received:", cases);
+  }, [cases]);  // Added loadCases as a dependency
+  
+    // Función para manejar el cambio de página
+    const handlePageChange = (newPage) => {
+      if (newPage < 1 || newPage > Math.ceil(totalCases / pageSize)) {
+        return;  // No permitir páginas fuera de rango
+      }
+      setPage(newPage);  // Actualizar la página actual
+    };
+
+    const data = useMemo(() => Array.isArray(cases) ? cases : [], [cases]);
+    const columns = useMemo(() => [
+      {
+        Header: 'No.',
+        accessor: (row, i) => i + 1 + (page - 1) * pageSize,  // Ajustar el número de fila según la página actual
+        disableFilters: true,
+        disableSortBy: true,
+        maxWidth: 50,
+      },
+    
+      {
+        Header: 'Fecha',
+        accessor: 'fecha',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'datetime',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Escritura',
+        accessor: 'escritura',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'basic',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Fecha Del Documento', // Nueva columna para Fecha Del Documento
+        accessor: 'fecha_documento',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'datetime',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Radicado',
+        accessor: 'radicado',
+        Cell: ({ row }) => (
+          <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
+        ),
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'alphanumeric',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Protocolista',
+        accessor: 'protocolista',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'basic',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Observaciones',
+        accessor: 'observaciones',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        aggregate: 'count',
+      },
+      {
+        Header: 'Acciones',
+        accessor: 'acciones',
+        disableSortBy: true,
+        disableFilters: true,
+        Cell: ({ row }) => (
+          <div className="actions-container">
+            <button className="btn-edit" onClick={() => handleEdit(row.original)}>
+              <i className="fas fa-edit"></i> Editar
+            </button>
+            <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
+              <i className="fas fa-trash"></i> Eliminar
+            </button>
+            <button className="btn-add" onClick={() => handleAddRadicado(row.original)}>
+              <i className="fas fa-plus"></i> Añadir Radicado
+            </button>
+            <button className="btn-email" onClick={() => handleSendEmail(row.original)}>
+              <i className="fas fa-envelope"></i> Enviar Documento
+            </button>
+          </div>
+        ),
+        maxWidth: 150,
+      }
+    ], [page, pageSize, handleEdit, handleDelete, handleAddRadicado, handleSendEmail]); 
 
   const {
     getTableProps,
@@ -570,6 +607,11 @@ const visibleRowsCount = rows.length;
           ></textarea>
           <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
         </form>
+      </div>
+      <div className="pagination">
+        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Anterior</button>
+        <span>Página {page} de {Math.ceil(totalCases / pageSize)}</span>
+        <button onClick={() => handlePageChange(page + 1)} disabled={page === Math.ceil(totalCases / pageSize)}>Siguiente</button>
       </div>
     </div>
   );
