@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -76,26 +77,22 @@ class Radicado(db.Model):
 
 class UserProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    first_name1 = db.Column(db.String(50), nullable=False)
-    first_name2 = db.Column(db.String(50))
-    last_name1 = db.Column(db.String(50), nullable=False)
-    last_name2 = db.Column(db.String(50))
+    full_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     birth_date = db.Column(db.Date, nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
         return {
             'id': self.id,
-            'first_name1': self.first_name1,
-            'first_name2': self.first_name2,
-            'last_name1': self.last_name1,
-            'last_name2': self.last_name2,
+            'full_name': self.full_name,
+            'last_name': self.last_name,
             'phone_number': self.phone_number,
             'email': self.email,
             'birth_date': self.birth_date,
-            'username': self.username
+            'username': self.username,
+            'created_at': self.created_at
         }
-        
-        
