@@ -9,27 +9,33 @@ user_profiles_bp = Blueprint('user_profiles', __name__)
 def add_userprofile():
     data = request.get_json()
 
-    # Validate required fields
+    # Validar campos requeridos
     required_fields = ['full_name', 'last_name', 'phone_number', 'email', 'birth_date']
     missing_fields = [field for field in required_fields if field not in data or not data[field]]
     if missing_fields:
         return jsonify({'error': f'Missing fields: {", ".join(missing_fields)}'}), 400
 
     try:
-        # Parse birth_date and validate date format
+        # Formato y validación de la fecha de nacimiento
         birth_date = datetime.datetime.strptime(data['birth_date'], '%Y-%m-%d').date()
 
+        # Crear el nuevo perfil de usuario sin el nombre de usuario
         new_user = UserProfile(
             full_name=data['full_name'],
             last_name=data['last_name'],
             phone_number=data['phone_number'],
             email=data['email'],
             birth_date=birth_date,
-            username=f"{data['full_name'].replace(' ', '')}{data['phone_number']}"  # Username logic
+            username=''  # Temporalmente vacío, se llenará después
         )
 
+        # Añadir a la base de datos
         db.session.add(new_user)
-        db.session.commit()
+        db.session.commit()  # Aquí se genera el ID
+
+        # Generar el nombre de usuario concatenando nombre, apellido y el ID
+        new_user.username = f"{new_user.full_name}{new_user.last_name}{new_user.id}".replace(' ', '')
+        db.session.commit()  # Guardar de nuevo para actualizar el nombre de usuario
 
         return jsonify({'message': 'User created successfully'}), 201
 
