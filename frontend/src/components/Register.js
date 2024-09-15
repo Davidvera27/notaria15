@@ -4,6 +4,16 @@ import { toast } from 'react-toastify';
 import { useAuth0 } from '@auth0/auth0-react';
 import './Register.css';
 
+const roles = [
+  "Auxiliar de Rentas",
+  "Auxiliar de Protocolista",
+  "Auxiliar Notaría",
+  "Administrador",
+  "Protocolista",
+  "Contabilidad",
+  "Solo Lectura"
+];
+
 const Register = () => {
   const { user, isAuthenticated } = useAuth0();
   const [form, setForm] = useState({
@@ -13,6 +23,7 @@ const Register = () => {
     email: '',
     birth_date: '',
     username: '',
+    role: ''  // Campo de rol inicializado como cadena vacía
   });
 
   useEffect(() => {
@@ -26,27 +37,29 @@ const Register = () => {
         email: user.email || '',
         birth_date: '',
         username: '',
+        role: ''  // Inicializar vacío
       });
     }
   }, [isAuthenticated, user]);
 
   const handleChange = (e) => {
-    const value = e.target.name !== 'email' ? e.target.value.toUpperCase() : e.target.value;
-    setForm({ ...form, [e.target.name]: value });
+    const { name, value } = e.target;
+    // Actualizamos el estado del formulario con el nuevo valor
+    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        if (!form.full_name || !form.last_name || !form.phone_number || !form.email || !form.birth_date) {
-            toast.error('Todos los campos son obligatorios.');
+        if (!form.full_name || !form.last_name || !form.phone_number || !form.email || !form.birth_date || !form.role) {
+            toast.error('Todos los campos son obligatorios, incluyendo el rol.');
             return;
         }
         
         await axios.post('http://127.0.0.1:5000/userprofiles', form);
         toast.success('Usuario creado exitosamente');
         
-        // Reset form after successful submission
+        // Resetear el formulario después de la creación exitosa
         setForm({
             full_name: '',
             last_name: '',
@@ -54,13 +67,13 @@ const Register = () => {
             email: '',
             birth_date: '',
             username: '',
+            role: ''  // Limpiar rol
         });
     } catch (error) {
         console.error('Error al crear el usuario:', error);
         toast.error('Hubo un problema al crear el usuario. Por favor, inténtelo de nuevo más tarde.');
     }
-};
-
+  };
 
   return (
     <div className="register-container">
@@ -84,7 +97,16 @@ const Register = () => {
         </label>
         <label>
           Fecha de nacimiento:
-          <input type="date" name="birth_date" value={form.birth_date} onChange={handleChange} />
+          <input type="date" name="birth_date" value={form.birth_date} onChange={handleChange} required />
+        </label>
+        <label>
+          Rol del Usuario:
+          <select name="role" value={form.role} onChange={handleChange} required>
+            <option value="">Seleccionar Rol</option>
+            {roles.map((role, index) => (
+              <option key={index} value={role}>{role}</option>
+            ))}
+          </select>
         </label>
         <button type="submit">Crear Usuario</button>
       </form>
