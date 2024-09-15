@@ -36,17 +36,40 @@ const Profile = () => {
   return (
     <div className="profile-container">
       {user ? (
-        <div>
-          <h1>Perfil de Usuario</h1>
-          <p><strong>Nombre completo:</strong> {user.full_name} {user.last_name}</p>
-          <p><strong>Correo Electrónico:</strong> {user.email}</p>
-          <p><strong>Teléfono:</strong> {user.phone_number}</p>
-          <p><strong>Nombre de Usuario:</strong> {user.username}</p>
-          <p><strong>Fecha de Nacimiento:</strong> {user.birth_date}</p>
-          <p><strong>Edad:</strong> {calculateAge(user.birth_date)} años</p>
-          <p><strong>Rol:</strong> {user.role}</p>
-          <p><strong>Creado en:</strong> {new Date(user.created_at).toLocaleString()}</p>
-        </div>
+        <>
+          <div className="profile-item">
+            <strong>Nombre completo:</strong>
+            <p>{user.full_name} {user.last_name}</p>
+          </div>
+          <div className="profile-item">
+            <strong>Correo Electrónico:</strong>
+            <p>{user.email}</p>
+          </div>
+          <div className="profile-item">
+            <strong>Teléfono:</strong>
+            <p>{user.phone_number}</p>
+          </div>
+          <div className="profile-item">
+            <strong>Nombre de Usuario:</strong>
+            <p>{user.username}</p>
+          </div>
+          <div className="profile-item">
+            <strong>Fecha de Nacimiento:</strong>
+            <p>{new Date(user.birth_date).toDateString()}</p>
+          </div>
+          <div className="profile-item">
+            <strong>Edad:</strong>
+            <p>{calculateAge(user.birth_date)} años</p>
+          </div>
+          <div className="profile-item">
+            <strong>Rol:</strong>
+            <p>{user.role}</p>
+          </div>
+          <div className="profile-item">
+            <strong>Creado en:</strong>
+            <p>{new Date(user.created_at).toLocaleString()}</p>
+          </div>
+        </>
       ) : (
         <p>Cargando datos del usuario...</p>
       )}
