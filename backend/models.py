@@ -99,3 +99,44 @@ class UserProfile(db.Model):
             'role': self.role  # Devolver también el rol
         }
 
+class Contabilidad(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    protocolista = db.Column(db.String(50))
+    factura_no = db.Column(db.String(50))
+    esc = db.Column(db.String(50))
+    fact_canceladas = db.Column(db.Numeric(10, 2))
+    fact_sin_cancelar = db.Column(db.Numeric(10, 2))
+    total_fact_sin_cancelar = db.Column(db.Numeric(10, 2))
+    total_fact_canceladas = db.Column(db.Numeric(10, 2))
+    fecha = db.Column(db.Date)
+    rentas_pse = db.Column(db.Numeric(10, 2))
+    rentas_efectivo = db.Column(db.Numeric(10, 2))
+    registro_pse = db.Column(db.Numeric(10, 2))
+    registro_efectivo = db.Column(db.Numeric(10, 2))
+    total_r_yr = db.Column(db.Numeric(10, 2))
+    devolucion = db.Column(db.Numeric(10, 2))
+    excedentes = db.Column(db.Numeric(10, 2))
+    total_rentas_registro = db.Column(db.Numeric(10, 2))
+    observaciones = db.Column(db.Text)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'protocolista': self.protocolista,
+            'factura_no': self.factura_no,
+            'esc': self.esc,
+            'fact_canceladas': str(self.fact_canceladas),
+            'fact_sin_cancelar': str(self.fact_sin_cancelar),
+            'total_fact_sin_cancelar': str(self.total_fact_sin_cancelar),
+            'total_fact_canceladas': str(self.total_fact_canceladas),
+            'fecha': self.fecha.isoformat(),
+            'rentas_pse': str(self.rentas_pse),
+            'rentas_efectivo': str(self.rentas_efectivo),
+            'registro_pse': str(self.registro_pse),
+            'registro_efectivo': str(self.registro_efectivo),
+            'total_r_yr': str(self.total_r_yr),
+            'devolucion': str(self.devolucion),
+            'excedentes': str(self.excedentes),
+            'total_rentas_registro': str(self.total_rentas_registro),
+            'observaciones': self.observaciones
+        }
