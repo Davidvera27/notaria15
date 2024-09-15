@@ -20,21 +20,22 @@ app = Flask(__name__)
 mail = Mail(app)
 app.config.from_object(Config)
 
-# Generar una SECRET_KEY segura si no está definida en Config
+# Generate a secure SECRET_KEY if not defined
 if not app.config.get('SECRET_KEY'):
     import os
     app.config['SECRET_KEY'] = os.urandom(24).hex()
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+# Set CORS policy
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 db.init_app(app)
 
-# Integrando Flask-Migrate
+# Flask-Migrate integration
 migrate = Migrate(app, db)
 
-# Registro de Blueprints para las rutas
+# Registering blueprints for routes
 app.register_blueprint(cases_bp)
 app.register_blueprint(user_data_bp)
 app.register_blueprint(protocolists_bp)
@@ -48,4 +49,3 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     socketio.run(app, debug=True, port=5000)
-    
