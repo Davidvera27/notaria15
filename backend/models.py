@@ -84,6 +84,7 @@ class UserProfile(db.Model):
     birth_date = db.Column(db.Date, nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(50), nullable=False)  # Nuevo campo para el rol
 
     def to_dict(self):
         return {
@@ -94,5 +95,7 @@ class UserProfile(db.Model):
             'email': self.email,
             'birth_date': self.birth_date,
             'username': self.username,
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'role': self.role  # Devolver también el rol
         }
+
