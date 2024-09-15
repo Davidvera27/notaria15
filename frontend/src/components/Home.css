@@ -31,7 +31,7 @@
 }
 
 .home-logo {
-  width: 199px; /* Ajusta el tamaño según necesites */
+  width: 400px; /* Ajusta el tamaño según necesites */
   margin-left: 10px; /* Para espaciar el logo del texto anterior */
   vertical-align: middle; /* Alinea verticalmente el logo con el texto */
 }
