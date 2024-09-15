@@ -1,23 +1,69 @@
+/* Fuente llamativa y colores coherentes */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f0f4f8; /* Fondo suave y neutro */
+}
+
 .profile-container {
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 40px;
+  background-color: #ffffff;
   border-radius: 10px;
+  margin: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.profile-container h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
+.profile-item {
+  background-color: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
-.profile-container p {
+.profile-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.profile-item strong {
+  display: block;
+  margin-bottom: 8px;
   font-size: 18px;
-  margin: 10px 0;
+  color: #2d3748; /* Texto más oscuro */
 }
 
-.profile-container strong {
-  color: #555;
+.profile-item p {
+  font-size: 16px;
+  color: #4a5568; /* Texto menos oscuro */
+}
+
+/* Añadimos un botón de acción */
+.action-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: #2b6cb0;
+}
+
+h1 {
+  font-size: 26px;
+  color: #2d3748;
+  margin-bottom: 30px;
+  text-align: center;
 }
