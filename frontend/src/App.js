@@ -12,6 +12,7 @@ import ProtocolistSection from './components/ProtocolistSection';
 import ReportForm from './components/ReportForm';
 import FinishedCaseTable from './components/FinishedCaseTable';
 import logo from './components/assets/logo_sin_fondo.png';
+import Contabilidad from './components/Contabilidad'; // Integración del componente
 
 const ENDPOINT = "http://127.0.0.1:5000";  // Cambia esto según tu configuración
 
@@ -109,6 +110,7 @@ function App() {
                 <Link to="/protocolists" className="dropdown-item" onClick={() => setMenuOpen(false)}>Gestión de Protocolistas</Link>
                 <Link to="/finished-cases" className="dropdown-item" onClick={() => setMenuOpen(false)}>Casos Finalizados</Link>
                 <Link to="/generate-report" className="dropdown-item" onClick={() => setMenuOpen(false)}>Generar Informe</Link>
+                <Link to="/contabilidad" className="dropdown-item" onClick={() => setMenuOpen(false)}>Contabilidad</Link> {/* Nueva ruta */}
               </div>
             </div>
             <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
@@ -136,6 +138,7 @@ function App() {
               <Route path="/profile" element={<Profile user={user} />} />
               <Route path="/register" element={<Register />} />
               <Route path="/generate-report" element={<ReportForm />} />
+              <Route path="/contabilidad" element={<Contabilidad />} /> {/* Nueva ruta */}
             </Routes>
           </Suspense>
           <ToastContainer />
