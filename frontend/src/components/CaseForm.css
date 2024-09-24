@@ -1,8 +1,15 @@
 .table-container {
   flex: 2;
   max-height: 60vh;
-  overflow-y: auto;
+  overflow-x: auto; /* Agregar scroll horizontal cuando sea necesario */
   padding-right: 20px;
+  width: 70%; /* La tabla ocupa el 70% del espacio */
+}
+
+/* Ajustar la altura del dropdown de protocolistas */
+select[name="protocolista"] {
+  max-height: 200px; /* Limitar la altura */
+  overflow-y: auto; /* Agregar scroll vertical */
 }
 
 .case-table {
@@ -13,8 +20,8 @@
 
 .case-table th {
   background: linear-gradient(135deg, #70bd6e, #024604);
-  color: rgb(0, 0, 0);
-  text-align: center; /* Alinear las cabeceras al centro */
+  color: rgb(255, 255, 255);
+  text-align: center;
   padding: 10px;
   position: sticky;
   top: 0;
@@ -23,9 +30,36 @@
   box-shadow: 0px 2px 5px rgb(0, 0, 0);
 }
 
+/* Estilos uniformes para los inputs de búsqueda */
+input[type="text"],
+select {
+  height: 30px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  padding: 5px;
+  width: 90%; /* Ajustar para que el input se alinee mejor con la columna */
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+select:focus {
+  border-color: #239426; /* Color de borde en foco */
+  outline: none;
+}
+
+/* Ajustar el contenedor del input en el encabezado */
+.case-table th div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Asegura que el input llene el espacio del encabezado */
+}
+
+
 .case-table th:first-child {
   text-align: center;  /* Alinear el número al centro */
   max-width: 50px;    /* Ajustar el ancho de la columna de numeración */
+  width: 50px; /* Número de filas */
 }
 
 .case-table th input {
@@ -68,6 +102,9 @@
   border-radius: 10px;
   background-color: #f8f8f8;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 30%; /* El formulario ocupa el 30% del espacio */
+  padding: 20px; /* Aumentar el padding para mejorar la separación interna */
+  margin-left: 20px; /* Separación adicional de la tabla */
 }
 
 .case-form input, .case-form select, .case-form textarea {
@@ -160,10 +197,10 @@
 /* Ajuste de la disposición de la tabla y el formulario */
 .table-and-form-container {
   display: flex;
-  justify-content: space-between; /* Alinear la tabla y el formulario uno al lado del otro */
+  justify-content: space-between; /* Espacio entre tabla y formulario */
   align-items: flex-start;
   padding: 10px;
-  gap: 10px;
+  gap: 30px;
 }
 
 @media (max-width: 1024px) {
