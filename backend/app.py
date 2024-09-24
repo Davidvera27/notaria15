@@ -29,7 +29,7 @@ if not app.config.get('SECRET_KEY'):
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Set CORS policy
-cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+cors = CORS(app)
 
 db.init_app(app)
 
