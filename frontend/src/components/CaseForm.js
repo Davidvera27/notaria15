@@ -303,14 +303,13 @@ const CaseForm = () => {
       accessor: (row, i) => i + 1,  // Accesor para numerar las filas
       disableFilters: true,
       disableSortBy: true,
-      maxWidth: 50,
+      maxWidth: 50, // Ajuste de ancho fijo
     },
-
     {
       Header: 'Fecha',
       accessor: 'fecha',
       Filter: DefaultColumnFilter,
-      maxWidth: 150,
+      maxWidth: 100, // Ajuste de ancho para la columna Fecha
       sortType: 'datetime',
       aggregate: 'count',
     },
@@ -318,15 +317,15 @@ const CaseForm = () => {
       Header: 'Escritura',
       accessor: 'escritura',
       Filter: DefaultColumnFilter,
-      maxWidth: 150,
+      maxWidth: 100, // Ajuste de ancho para la columna Escritura
       sortType: 'basic',
       aggregate: 'count',
     },
     {
-      Header: 'Fecha Del Documento', // Nueva columna para Fecha Del Documento
+      Header: 'Fecha Del Documento', 
       accessor: 'fecha_documento',
       Filter: DefaultColumnFilter,
-      maxWidth: 150,
+      maxWidth: 100, // Ajuste de ancho para la columna Fecha del Documento
       sortType: 'datetime',
       aggregate: 'count',
     },
@@ -337,7 +336,7 @@ const CaseForm = () => {
         <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
       ),
       Filter: DefaultColumnFilter,
-      maxWidth: 150,
+      maxWidth: null, // Ajuste dinámico basado en el contenido de la fila
       sortType: 'alphanumeric',
       aggregate: 'count',
     },
@@ -345,7 +344,7 @@ const CaseForm = () => {
       Header: 'Protocolista',
       accessor: 'protocolista',
       Filter: DefaultColumnFilter,
-      maxWidth: 150,
+      maxWidth: 150, // Ajuste de ancho para la columna Protocolista
       sortType: 'basic',
       aggregate: 'count',
     },
@@ -353,7 +352,7 @@ const CaseForm = () => {
       Header: 'Observaciones',
       accessor: 'observaciones',
       Filter: DefaultColumnFilter,
-      maxWidth: 150,
+      maxWidth: 150, // Ajuste de ancho para la columna Observaciones
       aggregate: 'count',
     },
     {
@@ -377,7 +376,7 @@ const CaseForm = () => {
           </button>
         </div>
       ),
-      maxWidth: 150,
+      maxWidth: 150, // Ajuste de ancho para la columna Acciones
     }
   ], [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]);
 
