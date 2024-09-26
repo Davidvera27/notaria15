@@ -84,6 +84,27 @@ const FinishedCaseTable = () => {
     }
   }, [dispatch]);
 
+  // Nueva función para manejar el retorno del caso a la tabla de "Casos Pendientes"
+  const handleReturn = useCallback(async (id) => {
+    const result = await Swal.fire({
+      title: '¿Realmente desea retornar el caso a la tabla "CASOS PENDIENTES"?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Retornar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.post(`http://127.0.0.1:5000/api/finished_cases/return/${id}`);
+        dispatch(fetchFinishedCases());
+        Swal.fire('¡Éxito!', 'El caso ha sido retornado a la tabla de casos pendientes.', 'success');
+      } catch (error) {
+        Swal.fire('Error', error.response.data.error || 'Hubo un problema al retornar el caso.', 'error');
+      }
+    }
+  }, [dispatch]);
+
   const columns = useMemo(() => [
     { Header: 'Fecha', accessor: 'fecha', Filter: DefaultColumnFilter },
     { Header: 'Escritura', accessor: 'escritura', Filter: DefaultColumnFilter },
@@ -105,10 +126,13 @@ const FinishedCaseTable = () => {
           <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
             <i className="fas fa-trash"></i> Eliminar
           </button>
+          <button className="btn-return" onClick={() => handleReturn(row.original.id)}>
+            <i className="fas fa-undo"></i> Retornar
+          </button>
         </div>
       ),
     }
-  ], [handleEdit, handleDelete]);
+  ], [handleEdit, handleDelete, handleReturn]);
 
   const {
     getTableProps,
