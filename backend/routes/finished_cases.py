@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import CaseFinished, db
+from models import CaseFinished, Case, Protocolist, db
 
 finished_cases_bp = Blueprint('finished_cases_bp', __name__)
 
@@ -45,3 +45,34 @@ def update_finished_case(id):
 
     db.session.commit()
     return jsonify({'message': 'Caso actualizado con éxito'})
+
+# Retornar un caso a la tabla de casos pendientes
+@finished_cases_bp.route('/finished_cases/return/<int:id>', methods=['POST'])
+def return_case_to_pending(id):
+    case_finished = CaseFinished.query.get_or_404(id)
+
+    # Verificar si el caso ya existe en la tabla `case`
+    existing_case = Case.query.filter_by(radicado=case_finished.radicado).first()
+    if existing_case:
+        return jsonify({'error': 'El caso ya se encuentra en la tabla de casos pendientes.'}), 400
+
+    # Obtener el protocolista para obtener el ID
+    protocolista = Protocolist.query.filter_by(nombre=case_finished.protocolista).first()
+    if not protocolista:
+        return jsonify({'error': 'Protocolista no encontrado'}), 400
+
+    # Crear un nuevo caso en la tabla `case`
+    new_case = Case(
+        fecha=case_finished.fecha,
+        escritura=case_finished.escritura,
+        radicado=case_finished.radicado,
+        protocolista_id=protocolista.id,
+        observaciones=case_finished.observaciones,
+        fecha_documento=case_finished.fecha_documento
+    )
+
+    db.session.add(new_case)
+    db.session.delete(case_finished)  # Eliminar el caso de la tabla `case_finished`
+    db.session.commit()
+
+    return jsonify({'message': 'El caso ha sido retornado a la tabla de casos pendientes.'})
