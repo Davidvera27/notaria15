@@ -291,6 +291,7 @@ const CaseForm = () => {
             payload: caseItem.id
           });
         });
+        dispatch(fetchCases());
         dispatch(fetchFinishedCases());
       } catch (error) {
         toast.error('Hubo un problema al enviar los correos');
