@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCases } from '../features/caseSlice';
+import { fetchFinishedCases } from '../features/finishedCaseSlice';
 import { fetchProtocolists } from '../features/protocolistSlice';
 import { fetchPdfData } from '../features/pdfDataSlice';
 import axios from 'axios';
@@ -36,27 +37,29 @@ const CaseForm = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (casesStatus === 'idle') {
-      dispatch(fetchCases());
-    }
-    if (protocolistsStatus === 'idle') {
-      dispatch(fetchProtocolists());
-    }
-    if (pdfDataStatus === 'idle') {
-      dispatch(fetchPdfData());
-    }
+    if (casesStatus === 'idle') dispatch(fetchCases());
+    if (protocolistsStatus === 'idle') dispatch(fetchProtocolists());
+    if (pdfDataStatus === 'idle') dispatch(fetchPdfData());
 
-    socket.on('new_case', (newCase) => {
+    // Escuchar eventos de creación y actualización de casos
+    socket.on('new_case', () => {
       dispatch(fetchCases());
     });
 
-    socket.on('update_case', (updatedCase) => {
+    socket.on('update_case', () => {
       dispatch(fetchCases());
+    });
+
+    // Escuchar eventos de casos movidos a casos finalizados
+    socket.on('case_moved', () => {
+      dispatch(fetchCases());
+      dispatch(fetchFinishedCases()); // Actualizar la tabla de casos finalizados
     });
 
     return () => {
       socket.off('new_case');
       socket.off('update_case');
+      socket.off('case_moved');
     };
   }, [casesStatus, protocolistsStatus, pdfDataStatus, dispatch]);
 
@@ -127,7 +130,7 @@ const CaseForm = () => {
       toast.error('Corrija los errores antes de enviar el formulario.');
       return;
     }
-  
+
     const radicadoExistente = cases.find(c => c.radicado === form.radicado);
     if (radicadoExistente) {
       const protocolista = radicadoExistente.protocolista;
@@ -238,10 +241,8 @@ const CaseForm = () => {
       });
       if (response.data.message) {
         toast.success(response.data.message);
-        dispatch({
-          type: 'cases/removeCase',
-          payload: caseItem.id
-        });
+        dispatch(fetchCases());
+        dispatch(fetchFinishedCases()); // Actualizar la tabla de casos finalizados
       } else {
         toast.error(`Error: ${response.data.error}`);
       }
@@ -290,6 +291,7 @@ const CaseForm = () => {
             payload: caseItem.id
           });
         });
+        dispatch(fetchFinishedCases());
       } catch (error) {
         toast.error('Hubo un problema al enviar los correos');
       }
@@ -300,12 +302,11 @@ const CaseForm = () => {
   const columns = useMemo(() => [
     {
       Header: 'No.',
-      accessor: (row, i) => i + 1,  // Accesor para numerar las filas
+      accessor: (row, i) => i + 1,
       disableFilters: true,
       disableSortBy: true,
       maxWidth: 50,
     },
-
     {
       Header: 'Fecha',
       accessor: 'fecha',
@@ -323,7 +324,7 @@ const CaseForm = () => {
       aggregate: 'count',
     },
     {
-      Header: 'Fecha Del Documento', // Nueva columna para Fecha Del Documento
+      Header: 'Fecha Del Documento',
       accessor: 'fecha_documento',
       Filter: DefaultColumnFilter,
       maxWidth: 150,
@@ -422,7 +423,7 @@ const CaseForm = () => {
     );
   };
 
-  const numVisibleRows = 10; // Número de filas visibles mínimo que deseas mantener
+  const numVisibleRows = 10;
 
   const renderEmptyRows = (numEmptyRows) => {
     return Array.from({ length: numEmptyRows }).map((_, index) => (
@@ -432,7 +433,6 @@ const CaseForm = () => {
     ));
   };
 
-  // Intervalo de Verificación de Casos Resaltados
   useEffect(() => {
     const interval = setInterval(() => {
       const casosResaltados = cases.filter(caseItem => isRadicadoInPdf(caseItem.radicado));
@@ -445,19 +445,18 @@ const CaseForm = () => {
           confirmButtonText: 'Entendido'
         });
       }
-    }, 600000); // Cada 10 minutos (600,000 ms)
+    }, 600000);
 
     return () => clearInterval(interval);
   }, [cases, isRadicadoInPdf]);
 
-  // Añadir el contador de filas visibles
-const visibleRowsCount = rows.length;
+  const visibleRowsCount = rows.length;
 
   return (
     <div>
       <h2>Casos</h2>
       <div>
-        <p>Número de casos: {visibleRowsCount}</p> {/* Aquí mostramos el contador */}
+        <p>Número de casos: {visibleRowsCount}</p>
       </div>
       <div className="table-and-form-container">
         <div className="table-container">
@@ -507,10 +506,10 @@ const visibleRowsCount = rows.length;
             selected={form.fecha}
             onChange={handleDateChange}
             dateFormat="yyyy-MM-dd"
-            locale="es"  // Establecer el idioma español
-            showMonthDropdown  // Permitir selección de meses
-            showYearDropdown   // Permitir selección de años
-            dropdownMode="select"  // Mostrar como lista desplegable
+            locale="es"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
             className="date-picker"
           />
           <label htmlFor="escritura">Escritura</label>
@@ -529,10 +528,10 @@ const visibleRowsCount = rows.length;
             selected={form.fecha_documento}
             onChange={handleDocumentDateChange}
             dateFormat="yyyy-MM-dd"
-            locale="es"  // Establecer el idioma español
-            showMonthDropdown  // Permitir selección de meses
-            showYearDropdown   // Permitir selección de años
-            dropdownMode="select"  // Mostrar como lista desplegable
+            locale="es"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
             className="date-picker"
           />
 
