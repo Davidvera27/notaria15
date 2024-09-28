@@ -1,216 +1,244 @@
+/* Contenedor principal que agrupa la tabla y el formulario */
+.table-and-form-container {
+  display: flex;
+  gap: 20px;
+}
+
+/* Contenedor de la tabla */
 .table-container {
   flex: 2;
-  max-height: 60vh;
-  overflow-x: auto; /* Agregar scroll horizontal cuando sea necesario */
-  padding-right: 20px;
-  width: 70%; /* La tabla ocupa el 70% del espacio */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  overflow-y: auto;
+  white-space: nowrap;
+  max-height: 70vh; /* Altura máxima del contenedor */
 }
 
-/* Ajustar la altura del dropdown de protocolistas */
-select[name="protocolista"] {
-  max-height: 200px; /* Limitar la altura */
-  overflow-y: auto; /* Agregar scroll vertical */
+/* Ajustar la anchura de la columna "Radicado" */
+.case-table th:nth-child(5), /* Elige el índice de columna correcto */
+.case-table td:nth-child(5) {
+  min-width: 200px; /* Ajustar a la anchura deseada */
+  max-width: 250px; /* Máxima anchura para limitar el tamaño */
 }
 
+/* Estilo de la tabla de casos */
 .case-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
 }
 
-.case-table th {
-  background: linear-gradient(135deg, #70bd6e, #024604);
-  color: rgb(255, 255, 255);
+/* Estilo general para encabezados y celdas de la tabla */
+.case-table th,
+.case-table td {
+  border: 1px solid #ddd;
+  padding: 6px 8px;
   text-align: center;
-  padding: 10px;
+  word-break: break-word;
+}
+
+/* Estilo específico para los encabezados */
+.case-table th {
+  background: linear-gradient(135deg, #2eb135, #239426);
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
   z-index: 1;
-  font-weight: bold;
-  box-shadow: 0px 2px 5px rgb(0, 0, 0);
+  height: 50px; /* Aumentar la altura de los encabezados */
 }
 
-/* Estilos uniformes para los inputs de búsqueda */
-input[type="text"],
-select {
-  height: 30px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  padding: 5px;
-  width: 90%; /* Ajustar para que el input se alinee mejor con la columna */
-  box-sizing: border-box;
+/* Fondo diferente para filas impares */
+.case-table tr:nth-child(odd) {
+  background-color: #f5f5f5;
 }
 
-input[type="text"]:focus,
-select:focus {
-  border-color: #239426; /* Color de borde en foco */
-  outline: none;
+/* Fondo diferente para filas pares */
+.case-table tr:nth-child(even) {
+  background-color: #e6f7e6;
 }
 
-/* Ajustar el contenedor del input en el encabezado */
-.case-table th div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%; /* Asegura que el input llene el espacio del encabezado */
-}
-
-
-.case-table th:first-child {
-  text-align: center;  /* Alinear el número al centro */
-  max-width: 50px;    /* Ajustar el ancho de la columna de numeración */
-  width: 50px; /* Número de filas */
-}
-
-.case-table th input {
-  width: 100%;
-  padding: 5px;
-  border: none;
-  border-radius: 5px;
-  margin-top: 6px;
-  background-color: rgb(255, 255, 255);
-  color: #000000; /* Cambiar el color del texto a blanco */
-  font-size: 12px;
-  box-shadow: inset 0px 1px 2px rgba(255, 255, 255, 0.1);
-}
-
-.case-table th input:focus {
-  outline: none;
-  border: 1px solid #000000;
-}
-
-.case-table td {
-  border: 2px solid #020202;
-  padding: 8px;
-  font-size: 14px;
-}
-
-.case-table tbody tr:nth-child(even) {
-  background-color: #75ff4b1a;
-}
-
+/* Resalta la fila en hover */
 .case-table tr:hover {
-  background-color: #c6f8c6;
+  background-color: #b2dfdb;
 }
 
+/* Estilo del contenedor del formulario */
 .case-form {
   flex: 1;
-  max-width: 500px;
-  margin: 0 20px; /* Espacio alrededor del formulario */
+  background-color: #e9f5f0;
   padding: 20px;
-  border: 2px solid #000;
   border-radius: 10px;
-  background-color: #f8f8f8;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  width: 30%; /* El formulario ocupa el 30% del espacio */
-  padding: 20px; /* Aumentar el padding para mejorar la separación interna */
-  margin-left: 20px; /* Separación adicional de la tabla */
+  border: 1px solid #ddd;
 }
 
-.case-form input, .case-form select, .case-form textarea {
-  padding: 8px; /* Reducir el padding para ahorrar espacio */
-  border: 1px solid #000000;
+/* Estilo general para etiquetas del formulario */
+.case-form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Estilos generales para entradas de texto, select y textarea */
+.case-form input[type="text"],
+.case-form select,
+.case-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
   border-radius: 5px;
-  font-size: 12px; /* Reducir el tamaño de la fuente */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #ccc;
 }
 
-.case-form input:focus, .case-form select:focus, .case-form textarea:focus {
-  border-color: #2eb135;
-  box-shadow: 0 0 5px rgba(46, 177, 53, 0.5);
-  outline: none;
+/* Permite redimensionar verticalmente el textarea */
+.case-form textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
-.input-error {
-  border-color: #dc3545;
-  box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+/* Bordes en rojo para campos con error */
+.case-form .input-error {
+  border: 1px solid red;
 }
 
-.error-message {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  margin-bottom: 0.5rem;
+/* Mensaje de error en color rojo */
+.case-form .error-message {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 
-.case-form button {
-  padding: 8px; /* Reducir el padding del botón */
-  background-color: #46ff219f;
-  color: rgb(0, 0, 0);
+/* Estilo para el selector de fecha */
+.date-picker {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+/* Estilo para botones */
+.btn-edit, 
+.btn-delete, 
+.btn-add, 
+.btn-email, 
+.btn-send-all-emails {
+  margin: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  font-size: 12px; /* Reducir el tamaño de la fuente */
+  border-radius: 8px;
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
-.case-form button:hover {
-  background-color: #33ff3a;
-  transform: translateY(-2px);
+.btn-edit {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #388e3c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .btn-delete {
-  background-color: #dc3545;
+  background-color: #f44336;
   color: white;
 }
 
 .btn-delete:hover {
-  background-color: #c82333;
+  background-color: #d32f2f;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos para los botones de acciones */
+.btn-add {
+  background-color: #2196F3;
+  color: white;
+}
+
+.btn-add:hover {
+  background-color: #1976d2;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-email {
+  background-color: #FFC107;
+  color: white;
+}
+
+.btn-email:hover {
+  background-color: #ffb300;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-send-all-emails {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+.btn-send-all-emails:hover {
+  background-color: #218838;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Fondo para filas vacías */
+.empty-row {
+  background-color: #f9f9f9;
+}
+
+.empty-row td {
+  height: 50px;
+}
+
+/* Contenedor para botones de acción dentro de la tabla */
 .actions-container {
   display: flex;
   gap: 5px;
+  flex-wrap: nowrap;
 }
 
-.actions-container button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 10px;
-  background-color: #2eb135;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+/* Contador de casos */
+.case-counter {
+  background-color: #4CAF50;
+  color: #fff;
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: inline-block;
 }
 
-.actions-container button i {
-  margin-right: 5px;
-}
-
-.actions-container button:hover {
-  background-color: #239426;
-  transform: translateY(-2px);
-}
-
-.actions-container .btn-delete {
-  background-color: #dc3545;
-}
-
-.actions-container .btn-delete:hover {
-  background-color: #c82333;
-}
-
-/* Ajuste de la disposición de la tabla y el formulario */
-.table-and-form-container {
-  display: flex;
-  justify-content: space-between; /* Espacio entre tabla y formulario */
-  align-items: flex-start;
-  padding: 10px;
-  gap: 30px;
-}
-
-@media (max-width: 1024px) {
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
   .table-and-form-container {
     flex-direction: column;
-    gap: 15px;
+  }
+
+  .table-container, .case-form {
+    width: 100%;
+  }
+
+  .case-table th, .case-table td {
+    padding: 6px 4px;
+    font-size: 12px;
   }
 
   .case-form {
-    max-width: 100%;
-    margin: 0;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .case-form label {
+    font-size: 12px;
+  }
+
+  .case-form input, .case-form select, .case-form textarea {
+    padding: 8px;
   }
 }
