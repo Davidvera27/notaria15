@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
 import { es } from 'date-fns/locale'; // Importar idioma español
+import Select from 'react-select'; // Añadir react-select para dropdown mejorado
 
 registerLocale('es', es); // Registrar el idioma español
 
@@ -121,6 +122,11 @@ const CaseForm = () => {
 
   const handleDocumentDateChange = (date) => {
     setForm({ ...form, fecha_documento: date });
+  };
+
+  const handleProtocolistaChange = (selectedOption) => {
+    setForm({ ...form, protocolista: selectedOption ? selectedOption.value : '' });
+    validateForm('protocolista', selectedOption ? selectedOption.value : '');
   };
 
   const handleSubmit = async (e) => {
@@ -339,7 +345,7 @@ const CaseForm = () => {
         <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
       ),
       Filter: DefaultColumnFilter,
-      maxWidth: 150,
+      maxWidth: 200, // Ajuste el ancho de la columna de radicado
       sortType: 'alphanumeric',
       aggregate: 'count',
     },
@@ -379,7 +385,7 @@ const CaseForm = () => {
           </button>
         </div>
       ),
-      maxWidth: 150,
+      maxWidth: 200, // Ajuste el ancho de la columna de acciones
     }
   ], [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]);
 
@@ -415,7 +421,7 @@ const CaseForm = () => {
     };
 
     return (
-      <select defaultValue={initialRadicado} onChange={handleRadicadoChange}>
+      <select defaultValue={initialRadicado} onChange={handleRadicadoChange} style={{ width: '100%' }}>
         <option value={initialRadicado}>{initialRadicado}</option>
         {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
           <option key={r.id} value={r.radicado}>{r.radicado}</option>
@@ -424,7 +430,7 @@ const CaseForm = () => {
     );
   };
 
-  const numVisibleRows = 10;
+  const numVisibleRows = 15;
 
   const renderEmptyRows = (numEmptyRows) => {
     return Array.from({ length: numEmptyRows }).map((_, index) => (
@@ -466,7 +472,7 @@ const CaseForm = () => {
               {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map(column => (
-                    <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())} style={{ maxWidth: column.maxWidth }}>
+                    <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())} style={{ minWidth: column.minWidth, width: column.width }}>
                       {column.render('Header')}
                       <span>
                         {column.isSorted
@@ -491,14 +497,15 @@ const CaseForm = () => {
                 prepareRow(row);
                 return (
                   <tr key={row.id} {...row.getRowProps()} style={isRadicadoInPdf(row.original.radicado) ? { backgroundColor: 'lightgreen' } : {}}>
-                    {row.cells.map(cell => {
-                      return <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                    })}
+                    {row.cells.map(cell => (
+                      <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    ))}
                   </tr>
                 );
               })}
               {renderEmptyRows(numVisibleRows - rows.length)}
             </tbody>
+
           </table>
         </div>
         <form className="case-form" onSubmit={handleSubmit}>
@@ -548,17 +555,14 @@ const CaseForm = () => {
           {errors.radicado && <span className="error-message">{errors.radicado}</span>}
 
           <label htmlFor="protocolista">Protocolista</label>
-          <select 
-            name="protocolista" 
-            value={form.protocolista} 
-            onChange={handleChange} 
+          <Select 
+            options={protocolists.map(p => ({ value: p.nombre, label: p.nombre }))}
+            value={protocolists.find(p => p.nombre === form.protocolista)}
+            onChange={handleProtocolistaChange}
             className={errors.protocolista ? 'input-error' : ''}
-          >
-            <option value="">Selecciona un protocolista</option>
-            {protocolists.map((protocolista) => (
-              <option key={protocolista.id} value={protocolista.nombre}>{protocolista.nombre}</option>
-            ))}
-          </select>
+            placeholder="Selecciona un protocolista"
+            isClearable
+          />
           {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
 
           <label htmlFor="observaciones">Observaciones</label>
