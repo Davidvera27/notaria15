@@ -1,7 +1,8 @@
 .table-container {
-  max-height: 400px;
+  max-height: 70vh; /* Similar a CaseForm para mantener consistencia */
   overflow-y: auto;
-  position: relative;
+  overflow-x: auto; /* Permitir desplazamiento horizontal */
+  margin-bottom: 20px;
 }
 
 .case-table {
@@ -23,8 +24,8 @@
 }
 
 .case-table th:first-child {
-  text-align: center;  /* Alinear el número al centro */
-  max-width: 50px;    /* Ajustar el ancho de la columna de numeración */
+  text-align: center;
+  max-width: 50px;
 }
 
 .case-table th input {
@@ -61,65 +62,43 @@
 .case-form {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Reducir el espacio entre los campos */
-  padding: 10px; /* Reducir el padding para ahorrar espacio */
+  gap: 10px;
+  padding: 10px;
   border: 3px solid #000000;
   border-radius: 10px;
   background: linear-gradient(135deg, #b0ffb475, #ffffff);
   box-shadow: 0 4px 8px rgba(186, 255, 164, 0.938);
-  max-width: 400px; /* Reducir el ancho máximo del formulario */
-  margin: 10px; /* Reducir el margen para ahorrar espacio */
+  max-width: 400px;
+  margin: 10px;
 }
 
 .case-form input, .case-form select, .case-form textarea {
-  padding: 8px; /* Reducir el padding para ahorrar espacio */
+  padding: 8px;
   border: 1px solid #000000;
   border-radius: 5px;
-  font-size: 12px; /* Reducir el tamaño de la fuente */
+  font-size: 12px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .case-form input:focus, .case-form select:focus, .case-form textarea:focus {
-  border-color: #2eb135;
+  border-color: #4CAF50;
   box-shadow: 0 0 5px rgba(46, 177, 53, 0.5);
   outline: none;
 }
 
-.input-error {
-  border-color: #dc3545;
-  box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
-}
-
-.error-message {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  margin-bottom: 0.5rem;
-}
-
 .case-form button {
-  padding: 8px; /* Reducir el padding del botón */
-  background-color: #46ff219f;
-  color: rgb(0, 0, 0);
+  padding: 8px;
+  background-color: #4CAF50;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  font-size: 12px; /* Reducir el tamaño de la fuente */
 }
 
 .case-form button:hover {
-  background-color: #33ff3a;
+  background-color: #388e3c;
   transform: translateY(-2px);
-}
-
-.btn-delete {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
 }
 
 /* Estilos para los botones de acciones */
@@ -133,13 +112,12 @@
   align-items: center;
   justify-content: center;
   padding: 5px 10px;
-  background-color: #2eb135;
+  background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  font-size: 0.875rem;
 }
 
 .actions-container button i {
@@ -147,122 +125,14 @@
 }
 
 .actions-container button:hover {
-  background-color: #28a745;
+  background-color: #388e3c;
   transform: translateY(-2px);
 }
 
-.btn-send-all-emails {
-  background-color: #17a2b8;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.actions-container .btn-delete {
+  background-color: #f44336;
 }
 
-.btn-send-all-emails:hover {
-  background-color: #138496;
-}
-
-.modal {
-  background-color: white;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 700px;  /* Ampliar el tamaño del modal */
-  margin: auto;
-  position: relative;
-  z-index: 1000;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.modal h2 {
-  font-size: 1.8rem;  /* Hacer el título más grande */
-  margin-bottom: 25px;
-}
-
-.modal input, .modal textarea {
-  width: 100%;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-.modal textarea {
-  resize: vertical;
-}
-
-.modal button {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-.modal button:hover {
-  background-color: #218838;
-}
-
-.modal-overlay {
-  background-color: rgba(0, 0, 0, 0.75);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-
-/* Estilos para la línea de tiempo */
-.timeline {
-  list-style-type: none;
-  position: relative;
-  padding: 0;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: #17a2b8;
-  left: 20px;
-  margin-left: -2px;
-}
-
-.timeline > li {
-  margin: 20px 0;
-  padding-left: 40px;
-  position: relative;
-}
-
-.timeline > li::before {
-  content: '';
-  position: absolute;
-  left: 10px;
-  background: #fff;
-  border: 4px solid #17a2b8;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  top: 0;
-}
-
-.timeline > li span {
-  font-size: 0.85rem;
-  font-weight: bold;
-}
-
-.timeline > li p {
-  margin: 0;
-  font-size: 0.9rem;
+.actions-container .btn-delete:hover {
+  background-color: #d32f2f;
 }
