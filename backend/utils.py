@@ -6,26 +6,31 @@ import os
 from flask import current_app, jsonify, request
 from models import Case, Protocolist
 
-
+# Función para extraer datos del PDF, incluyendo la Fecha Límite de Registro
 def extract_pdf_data(pdf_path):
     doc = fitz.open(pdf_path)
     text = ""
     for page in doc:
         text += page.get_text()
 
+    # Extraer campos existentes
     clase = extract_field(text, "CLASE")
     radicado = extract_field(text, "RADICADO N°")
     doc_number = extract_field(text, "N° DOC")
 
-    print(f"Extracted data from {pdf_path}: CLASE={clase}, RADICADO N°={radicado}, N° DOC={doc_number}")
+    # Nueva lógica: Extraer "Fecha Límite de Registro"
+    fecha_limite_registro = extract_fecha_limite(text)
+
+    print(f"Extracted data from {pdf_path}: CLASE={clase}, RADICADO N°={radicado}, N° DOC={doc_number}, FECHA_LIMITE_REGISTRO={fecha_limite_registro}")
 
     return {
         "CLASE": clase,
         "RADICADO N°": radicado,
-        "N° DOC": doc_number
+        "N° DOC": doc_number,
+        "FECHA_LIMITE_REGISTRO": fecha_limite_registro  # Nuevo campo añadido
     }
 
-
+# Función auxiliar para extraer campos como CLASE, RADICADO, N° DOC
 def extract_field(text, field_name):
     pattern = rf"{field_name}\s*([\d\-]+)"
     match = re.search(pattern, text)
@@ -33,7 +38,15 @@ def extract_field(text, field_name):
         return match.group(1).strip()
     return "No encontrado"
 
+# Nueva función auxiliar para extraer la "Fecha Límite de Registro"
+def extract_fecha_limite(text):
+    pattern = r'FECHA L[IÍ]MITE\s+DE\s+REGISTRO\s+(\d{2}\.\d{2}\.\d{4})'
+    match = re.search(pattern, text)
+    if match:
+        return match.group(1)
+    return "No encontrado"
 
+# Función para enviar correos electrónicos utilizando Outlook
 def send_email_via_outlook(recipients, subject, body, attachments=None):
     try:
         # Inicializar COM en el hilo
@@ -67,7 +80,7 @@ def send_email_via_outlook(recipients, subject, body, attachments=None):
         # Desinicializar COM después de la operación
         pythoncom.CoUninitialize()
 
-
+# Función para enviar el correo electrónico de un caso en específico
 def send_case_email():
     data = request.json
     radicado = data.get('radicado')
