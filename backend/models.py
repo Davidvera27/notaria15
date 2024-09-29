@@ -24,7 +24,7 @@ class Case(db.Model):
             'observaciones': self.observaciones,
             'fecha_documento': self.fecha_documento  # Añadir a la salida del diccionario
         }
-        
+
 class CaseFinished(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.String(50))
@@ -46,7 +46,6 @@ class CaseFinished(db.Model):
             'fecha_documento': self.fecha_documento,
             'envios': self.envios  # Añadir a la salida del diccionario
         }
-
 
 class Protocolist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -139,4 +138,25 @@ class Contabilidad(db.Model):
             'excedentes': str(self.excedentes),
             'total_rentas_registro': str(self.total_rentas_registro),
             'observaciones': self.observaciones
+        }
+
+# Modelo actualizado para la tabla info_escritura
+class InfoEscritura(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    escritura = db.Column(db.Integer, nullable=False)
+    fecha_documento = db.Column(db.String(50), nullable=False)
+    protocolista_id = db.Column(db.Integer, db.ForeignKey('protocolist.id'), nullable=False)
+    vigencia_rentas = db.Column(db.String(50))
+    radicado = db.Column(db.String(50), nullable=False)
+    fecha_envio_rentas = db.Column(db.String(50), nullable=True)  # Nueva columna para almacenar la fecha de envío
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'escritura': self.escritura,
+            'fecha_documento': self.fecha_documento,
+            'protocolista': self.protocolista_id,
+            'vigencia_rentas': self.vigencia_rentas,
+            'radicado': self.radicado,
+            'fecha_envio_rentas': self.fecha_envio_rentas  # Incluir en el dict de salida
         }
