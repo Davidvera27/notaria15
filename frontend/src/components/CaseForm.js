@@ -266,12 +266,15 @@ const CaseForm = () => {
   }, [pdfData]);
 
   const handleSendAllEmails = useCallback(async () => {
+    // Filtrar los casos que tienen documentos PDF listos para enviar
     const emailsToSend = cases.filter(caseItem => isRadicadoInPdf(caseItem.radicado));
-
+  
+    // Si no hay correos para enviar, mostrar mensaje de información
     if (emailsToSend.length === 0) {
       return Swal.fire('No hay correos por enviar', 'No hay casos con documentos para enviar.', 'info');
     }
-
+  
+    // Confirmación antes de enviar correos
     const result = await Swal.fire({
       title: 'Confirmar Envío de Correos',
       text: `¿Realmente desea enviar ${emailsToSend.length} correos a los destinatarios de forma simultánea?`,
@@ -280,30 +283,43 @@ const CaseForm = () => {
       confirmButtonText: 'Sí, enviar',
       cancelButtonText: 'Cancelar'
     });
-
+  
+    // Si el usuario confirma el envío
     if (result.isConfirmed) {
       try {
+        // Crear una promesa para cada correo que se va a enviar
         const emailPromises = emailsToSend.map(caseItem => 
           axios.post('http://127.0.0.1:5000/send_email', { 
             radicado: caseItem.radicado,
             use_outlook: true 
           })
         );
+  
+        // Esperar a que todos los correos se envíen
         await Promise.all(emailPromises);
+  
+        // Mostrar un mensaje de éxito una vez que se hayan enviado todos los correos
         toast.success(`${emailsToSend.length} correos enviados exitosamente`);
+  
+        // Eliminar los casos que fueron enviados
         emailsToSend.forEach(caseItem => {
           dispatch({
             type: 'cases/removeCase',
             payload: caseItem.id
           });
         });
+  
+        // Refrescar las tablas de casos y casos finalizados
         dispatch(fetchCases());
         dispatch(fetchFinishedCases());
+        
       } catch (error) {
+        // Mostrar un mensaje de error si algo sale mal
         toast.error('Hubo un problema al enviar los correos');
       }
     }
   }, [cases, dispatch, isRadicadoInPdf]);
+  
 
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(() => [
