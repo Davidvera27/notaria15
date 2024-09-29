@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app as app
-from models import Case, Protocolist, db, CaseFinished
+from models import Case, Protocolist, db, CaseFinished, InfoEscritura
 from utils import send_email_via_outlook, extract_pdf_data
 import os
 import logging
@@ -17,7 +17,6 @@ class CaseSchema(Schema):
     protocolista = fields.String(required=True, error_messages={"required": "El protocolista es obligatorio"})
     observaciones = fields.String(missing='')
     fecha_documento = fields.Date(required=True, error_messages={"required": "La fecha del documento es obligatoria"})
-    
 
 
 @cases_bp.route('/cases', methods=['GET'])
@@ -29,6 +28,7 @@ def get_cases():
         result.append(case_data)
     return jsonify(result)
 
+
 @cases_bp.route('/cases', methods=['POST'])
 def add_case():
     from app import socketio  # Importar aquí para evitar la importación circular
@@ -39,10 +39,12 @@ def add_case():
         return jsonify({"errors": err.messages}), 400
 
     try:
+        # Buscar el protocolista
         protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
         if not protocolista:
             return jsonify({'error': 'Protocolista no encontrado'}), 400
 
+        # Crear el nuevo caso en la tabla "case"
         new_case = Case(
             fecha=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # Fecha y hora actuales
             escritura=int(data['escritura']),
@@ -54,6 +56,17 @@ def add_case():
         db.session.add(new_case)
         db.session.commit()
 
+        # Crear el nuevo registro en la tabla "info_escritura"
+        new_info_escritura = InfoEscritura(
+            escritura=new_case.escritura,
+            fecha_documento=new_case.fecha_documento,
+            protocolista_id=new_case.protocolista_id,
+            radicado=new_case.radicado,
+            vigencia_rentas=None  # Este campo es opcional
+        )
+        db.session.add(new_info_escritura)
+        db.session.commit()
+
         # Emitir evento a todos los clientes conectados
         socketio.emit('new_case', new_case.to_dict())
 
@@ -62,6 +75,7 @@ def add_case():
         db.session.rollback()
         print(f"Error al crear el caso: {e}")
         return jsonify({'error': 'Hubo un problema al crear el caso.'}), 500
+
 
 @cases_bp.route('/send_email', methods=['POST'])
 def send_case_email():
@@ -118,6 +132,12 @@ def send_case_email():
             )
             db.session.add(finished_case)
 
+        # Actualizar la columna fecha_envio_rentas en la tabla "info_escritura"
+        info_escritura = InfoEscritura.query.filter_by(radicado=case.radicado).first()
+        if info_escritura:
+            info_escritura.fecha_envio_rentas = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            db.session.commit()
+
         # Eliminar el caso de la tabla `case`
         db.session.delete(case)
         db.session.commit()
@@ -128,7 +148,9 @@ def send_case_email():
         current_app.logger.error(f'Error al mover el caso de `case` a `case_finished`: {str(e)}')
         return jsonify({'error': f'Hubo un problema al enviar el correo: {str(e)}'}), 500
 
+
 logging.basicConfig(level=logging.DEBUG)
+
 
 @cases_bp.route('/cases/<int:id>', methods=['PUT'])
 def update_case(id):
@@ -165,6 +187,7 @@ def update_case(id):
     except Exception as e:
         logging.error(f"Error al actualizar el caso: {e}")
         return jsonify({'error': f'Hubo un problema al actualizar el caso: {e}'}), 500
+
 
 @cases_bp.route('/cases/<int:id>', methods=['DELETE'])
 def delete_case(id):
