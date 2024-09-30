@@ -136,3 +136,94 @@
 .actions-container .btn-delete:hover {
   background-color: #d32f2f;
 }
+
+/* Estilo del fondo del modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro con transparencia */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Estilo de la ventana del modal */
+.modal {
+  background-color: #fff; /* Color de fondo del modal */
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px; /* Ancho máximo del modal */
+  width: 100%;
+  max-height: 80vh; /* Limitar la altura del modal */
+  overflow-y: auto; /* Hacer scroll si es necesario */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra para destacar el modal */
+  animation: fadeIn 0.3s ease-out; /* Animación suave al abrir */
+}
+
+/* Estilo del encabezado del modal */
+.modal h2 {
+  margin-top: 0;
+  font-size: 1.8em;
+  font-weight: bold;
+  text-align: center;
+  color: #333; /* Color del texto del título */
+}
+
+/* Estilo del contenido del modal */
+.modal p {
+  font-size: 1em;
+  margin: 15px 0;
+  color: #555; /* Color del texto */
+}
+
+/* Estilo para los botones dentro del modal */
+.modal .btn-close, .modal .btn-update {
+  padding: 10px 15px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Transición para el hover */
+}
+
+.modal .btn-close {
+  background-color: #e74c3c; /* Botón de cerrar en rojo */
+  color: white;
+}
+
+.modal .btn-update {
+  background-color: #27ae60; /* Botón de actualización en verde */
+  color: white;
+}
+
+.modal .btn-close:hover {
+  background-color: #c0392b; /* Efecto hover para el botón de cerrar */
+}
+
+.modal .btn-update:hover {
+  background-color: #2ecc71; /* Efecto hover para el botón de actualización */
+}
+
+/* Animación de entrada del modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8); /* Inicia más pequeño */
+  }
+  to {
+    opacity: 1;
+    transform: scale(1); /* Escala a tamaño completo */
+  }
+}
+
+/* Responsive: Modal centrado en pantallas pequeñas */
+@media (max-width: 600px) {
+  .modal {
+    max-width: 90%; /* Ajuste del ancho en pantallas pequeñas */
+  }
+}
