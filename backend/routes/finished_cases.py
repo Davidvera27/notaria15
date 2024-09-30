@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import CaseFinished, Case, Protocolist, db
+from models import CaseFinished, Case, InfoEscritura, Protocolist, db
 
 finished_cases_bp = Blueprint('finished_cases_bp', __name__)
 
@@ -76,3 +76,23 @@ def return_case_to_pending(id):
     db.session.commit()
 
     return jsonify({'message': 'El caso ha sido retornado a la tabla de casos pendientes.'})
+
+# Obtener información detallada del caso desde "info_escritura" y "case"
+@finished_cases_bp.route('/case_info/<string:radicado>', methods=['GET'])
+def get_case_info(radicado):
+    case_info = InfoEscritura.query.filter_by(radicado=radicado).first()
+    case_finished = CaseFinished.query.filter_by(radicado=radicado).first()
+
+    if not case_info or not case_finished:
+        return jsonify({'error': 'No se encontró la información del caso'}), 404
+
+    result = {
+        'escritura': case_info.escritura,
+        'fecha_documento': case_info.fecha_documento,
+        'radicado': case_info.radicado,
+        'fecha_envio_rentas': case_info.fecha_envio_rentas,
+        'vigencia_rentas': case_info.vigencia_rentas,
+        'fecha_radicacion': case_finished.fecha
+    }
+
+    return jsonify(result)
