@@ -16,8 +16,9 @@ const FinishedCaseTable = () => {
   const finishedCases = useSelector(state => state.finishedCases.finishedCases);
   const status = useSelector(state => state.finishedCases.status);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedCase, setSelectedCase] = useState(null);
-  const [form, setForm] = useState({
+  const [, setSelectedCase] = useState(null);
+  const [caseInfo, setCaseInfo] = useState(null); // Para almacenar la información del caso
+  const [, setForm] = useState({
     fecha: '',
     escritura: '',
     radicado: '',
@@ -33,10 +34,6 @@ const FinishedCaseTable = () => {
     }
   }, [status, dispatch]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
 
   const handleEdit = useCallback((caseItem) => {
     setSelectedCase(caseItem);
@@ -52,16 +49,6 @@ const FinishedCaseTable = () => {
     setModalIsOpen(true);
   }, []);
 
-  const handleUpdate = async () => {
-    try {
-      await axios.put(`http://127.0.0.1:5000/api/finished_cases/${selectedCase.id}`, form);
-      dispatch(fetchFinishedCases());
-      Swal.fire('Éxito', 'Caso actualizado con éxito', 'success');
-      setModalIsOpen(false);
-    } catch (error) {
-      Swal.fire('Error', 'Hubo un problema al actualizar el caso', 'error');
-    }
-  };
 
   const handleDelete = useCallback(async (id) => {
     const result = await Swal.fire({
@@ -84,7 +71,6 @@ const FinishedCaseTable = () => {
     }
   }, [dispatch]);
 
-  // Nueva función para manejar el retorno del caso a la tabla de "Casos Pendientes"
   const handleReturn = useCallback(async (id) => {
     const result = await Swal.fire({
       title: '¿Realmente desea retornar el caso a la tabla "CASOS PENDIENTES"?',
@@ -104,6 +90,17 @@ const FinishedCaseTable = () => {
       }
     }
   }, [dispatch]);
+
+  // Nueva función para mostrar el modal con la información del caso
+  const handleViewInfo = useCallback(async (caseItem) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/api/case_info/${caseItem.radicado}`);
+      setCaseInfo(response.data); // Guardar la información del caso
+      setModalIsOpen(true);
+    } catch (error) {
+      Swal.fire('Error', 'Hubo un problema al obtener la información del caso', 'error');
+    }
+  }, []);
 
   const columns = useMemo(() => [
     { Header: 'Fecha', accessor: 'fecha', Filter: DefaultColumnFilter },
@@ -129,10 +126,13 @@ const FinishedCaseTable = () => {
           <button className="btn-return" onClick={() => handleReturn(row.original.id)}>
             <i className="fas fa-undo"></i> Retornar
           </button>
+          <button className="btn-info" onClick={() => handleViewInfo(row.original)}>
+            <i className="fas fa-info-circle"></i> Información
+          </button>
         </div>
       ),
     }
-  ], [handleEdit, handleDelete, handleReturn]);
+  ], [handleEdit, handleDelete, handleReturn, handleViewInfo]);
 
   const {
     getTableProps,
@@ -145,6 +145,7 @@ const FinishedCaseTable = () => {
   const closeModal = () => {
     setModalIsOpen(false);
     setSelectedCase(null);
+    setCaseInfo(null); // Limpiar la información al cerrar el modal
   };
 
   const visibleRowsCount = rows.length;
@@ -187,69 +188,26 @@ const FinishedCaseTable = () => {
         </table>
       </div>
 
-      {selectedCase && (
+      {caseInfo && (
         <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
-            contentLabel="Detalles del Caso"
+            contentLabel="Información del Caso"
             className="modal animate__animated animate__fadeInDown"
             overlayClassName="modal-overlay"
           >
             <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-              Detalles del Caso
+              Información del Caso
             </motion.h2>
-            <motion.form initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
-              <label>Fecha</label>
-              <input
-                name="fecha"
-                value={form.fecha}
-                onChange={handleInputChange}
-              />
-
-              <label>Escritura</label>
-              <input
-                name="escritura"
-                value={form.escritura}
-                onChange={handleInputChange}
-              />
-
-              <label>Radicado</label>
-              <input
-                name="radicado"
-                value={form.radicado}
-                onChange={handleInputChange}
-              />
-
-              <label>Protocolista</label>
-              <input
-                name="protocolista"
-                value={form.protocolista}
-                onChange={handleInputChange}
-              />
-
-              <label>Fecha del Documento</label>
-              <input
-                name="fecha_documento"
-                value={form.fecha_documento}
-                onChange={handleInputChange}
-              />
-
-              <label>Observaciones</label>
-              <textarea
-                name="observaciones"
-                value={form.observaciones}
-                onChange={handleInputChange}
-              />
-
-              <label>Envíos</label>
-              <input
-                name="envios"
-                value={form.envios}
-                onChange={handleInputChange}
-              />
-            </motion.form>
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }}>
+              <p><strong>Escritura:</strong> {caseInfo.escritura}</p>
+              <p><strong>Fecha del Documento:</strong> {caseInfo.fecha_documento}</p>
+              <p><strong>Radicado:</strong> {caseInfo.radicado}</p>
+              <p><strong>Fecha de Envío de Rentas:</strong> {caseInfo.fecha_envio_rentas}</p>
+              <p><strong>Fecha de Vigencia de Rentas:</strong> {caseInfo.vigencia_rentas}</p>
+              <p><strong>Fecha de Radicación:</strong> {caseInfo.fecha_radicacion}</p>
+            </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-              <button onClick={handleUpdate} className="btn-update">Actualizar</button>
               <button onClick={closeModal} className="btn-close">Cerrar</button>
             </motion.div>
           </Modal>
