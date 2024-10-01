@@ -358,13 +358,13 @@ const CaseForm = () => {
       Header: 'Radicado',
       accessor: 'radicado',
       Cell: ({ row }) => (
-        <RadicadoDropdown caseId={row.original.id} initialRadicado={row.original.radicado} />
+        <span>{row.original.radicado}</span>
       ),
       Filter: DefaultColumnFilter,
       maxWidth: 200, // Ajuste el ancho de la columna de radicado
       sortType: 'alphanumeric',
       aggregate: 'count',
-    },
+    },    
     {
       Header: 'Protocolista',
       accessor: 'protocolista',
@@ -412,39 +412,6 @@ const CaseForm = () => {
     rows,
     prepareRow,
   } = useTable({ columns, data }, useFilters, useGroupBy, useSortBy);
-
-  const RadicadoDropdown = ({ caseId, initialRadicado }) => {
-    const [radicados, setRadicados] = useState([]);
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-      const loadRadicados = async () => {
-        const radicadoList = await fetchRadicados(caseId);
-        setRadicados(radicadoList);
-      };
-      loadRadicados();
-    }, [caseId]);
-
-    const handleRadicadoChange = async (event) => {
-      const selectedRadicado = event.target.value;
-      try {
-        await axios.put(`http://127.0.0.1:5000/cases/${caseId}`, { radicado: selectedRadicado });
-        dispatch(fetchCases());
-      } catch (error) {
-        console.error('Error updating radicado:', error);
-        toast.error('Hubo un problema al actualizar el radicado.');
-      }
-    };
-
-    return (
-      <select defaultValue={initialRadicado} onChange={handleRadicadoChange} style={{ width: '100%' }}>
-        <option value={initialRadicado}>{initialRadicado}</option>
-        {radicados.filter(r => r.radicado !== initialRadicado).map((r) => (
-          <option key={r.id} value={r.radicado}>{r.radicado}</option>
-        ))}
-      </select>
-    );
-  };
 
   const numVisibleRows = 15;
 
@@ -609,16 +576,6 @@ const DefaultColumnFilter = ({
       placeholder={`Buscar ${count} registros...`}
     />
   );
-};
-
-const fetchRadicados = async (caseId) => {
-  try {
-    const response = await axios.get(`http://127.0.0.1:5000/cases/${caseId}/radicados`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching radicados:', error);
-    return [];
-  }
 };
 
 export default CaseForm;
