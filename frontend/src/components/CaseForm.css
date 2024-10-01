@@ -234,6 +234,12 @@
     font-size: 14px;
   }
 
+  select {
+    color: #000000; /* Color del texto */
+    background-color: #ffffff; /* Color de fondo */
+}
+
+
   .case-form label {
     font-size: 12px;
   }
