@@ -5,7 +5,7 @@ import os
 import logging
 from marshmallow import Schema, fields, ValidationError
 from flask import current_app
-from datetime import datetime
+from datetime import datetime, timedelta
 
 cases_bp = Blueprint('cases', __name__)
 
@@ -18,7 +18,6 @@ class CaseSchema(Schema):
     observaciones = fields.String(missing='')
     fecha_documento = fields.Date(required=True, error_messages={"required": "La fecha del documento es obligatoria"})
 
-
 @cases_bp.route('/cases', methods=['GET'])
 def get_cases():
     cases = Case.query.all()
@@ -27,7 +26,6 @@ def get_cases():
         case_data = case.to_dict()
         result.append(case_data)
     return jsonify(result)
-
 
 @cases_bp.route('/cases', methods=['POST'])
 def add_case():
@@ -76,6 +74,23 @@ def add_case():
         print(f"Error al crear el caso: {e}")
         return jsonify({'error': 'Hubo un problema al crear el caso.'}), 500
 
+# Función para calcular el estado de vigencia
+def calcular_estado_vigencia(vigencia_rentas):
+    # Convertir la fecha de vigencia de string a objeto datetime
+    try:
+        vigencia_rentas_date = datetime.strptime(vigencia_rentas, '%d.%m.%Y').date()
+    except ValueError:
+        return "Formato de fecha incorrecto para la vigencia."
+
+    fecha_actual = datetime.now().date()
+    dias_restantes = (vigencia_rentas_date - fecha_actual).days
+
+    if dias_restantes < 0:
+        return f"El caso ha vencido hace {-dias_restantes} días."
+    elif dias_restantes <= 30:
+        return f"El caso está próximo a vencer en {dias_restantes} días."
+    else:
+        return f"El caso está vigente con {dias_restantes} días restantes."
 
 @cases_bp.route('/send_email', methods=['POST'])
 def send_case_email():
@@ -91,6 +106,29 @@ def send_case_email():
     if not protocolista:
         return jsonify({'error': 'Protocolist not found'}), 404
 
+    info_escritura = InfoEscritura.query.filter_by(radicado=case.radicado).first()
+    if not info_escritura or not info_escritura.vigencia_rentas:
+        return jsonify({'error': 'Vigencia not found for this case'}), 404
+
+    vigencia_rentas = info_escritura.vigencia_rentas
+    estado_vigencia = calcular_estado_vigencia(vigencia_rentas)
+
+    # Crear el cuerpo del correo con la fecha de vigencia
+    subject = f"BOLETA DE RENTAS {radicado}"
+    body = f"""
+    Señor(a) {protocolista.nombre},
+
+    Adjunto encontrará el documento Liquidación De Impuesto De Registro correspondiente al radicado No. {radicado} de la escritura {case.escritura}.
+    
+    La fecha de vigencia del caso es {vigencia_rentas}.
+    {estado_vigencia}
+
+    Por favor, tome las acciones necesarias si el caso está próximo a vencer.
+
+    Atentamente,
+    Auxiliar de rentas Notaría 15.
+    """
+
     # Buscar el archivo PDF
     pdf_path = None
     uploads_dir = current_app.config['UPLOAD_FOLDER']
@@ -105,8 +143,21 @@ def send_case_email():
     if not pdf_path:
         return jsonify({'error': 'PDF not found in uploads'}), 404
 
+    # Crear el cuerpo del correo con la fecha de vigencia
     subject = f"BOLETA DE RENTAS {radicado}"
-    body = f"Señor(a) {protocolista.nombre},\n\nAdjunto encontrará el documento Liquidación De Impuesto De Registro, correspondiente al radicado No. {radicado} de la escritura {case.escritura}.\n\nAtentamente,\nAuxiliar de rentas Notaría 15."
+    body = f"""
+    Señor(a) {protocolista.nombre},
+
+    Adjunto encontrará el documento Liquidación De Impuesto De Registro correspondiente al radicado No. {radicado} de la escritura {case.escritura}.
+    
+    La fecha de vigencia del caso es {vigencia_rentas}.
+    {estado_vigencia}
+
+    Por favor, tome las acciones necesarias si el caso está próximo a vencer.
+
+    Atentamente,
+    Auxiliar de rentas Notaría 15.
+    """
 
     try:
         send_email_via_outlook(recipients=[protocolista.correo_electronico], 
@@ -133,10 +184,8 @@ def send_case_email():
             db.session.add(finished_case)
 
         # Actualizar la columna fecha_envio_rentas en la tabla "info_escritura"
-        info_escritura = InfoEscritura.query.filter_by(radicado=case.radicado).first()
-        if info_escritura:
-            info_escritura.fecha_envio_rentas = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            db.session.commit()
+        info_escritura.fecha_envio_rentas = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        db.session.commit()
 
         # Eliminar el caso de la tabla `case`
         db.session.delete(case)
@@ -148,9 +197,7 @@ def send_case_email():
         current_app.logger.error(f'Error al mover el caso de `case` a `case_finished`: {str(e)}')
         return jsonify({'error': f'Hubo un problema al enviar el correo: {str(e)}'}), 500
 
-
 logging.basicConfig(level=logging.DEBUG)
-
 
 @cases_bp.route('/cases/<int:id>', methods=['PUT'])
 def update_case(id):
@@ -187,7 +234,6 @@ def update_case(id):
     except Exception as e:
         logging.error(f"Error al actualizar el caso: {e}")
         return jsonify({'error': f'Hubo un problema al actualizar el caso: {e}'}), 500
-
 
 @cases_bp.route('/cases/<int:id>', methods=['DELETE'])
 def delete_case(id):
