@@ -100,26 +100,26 @@ function App() {
       <Router>
         <Layout style={{ minHeight: '100vh' }}>
         <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-        style={{ backgroundColor: '#239426' }} // Aplicamos un verde personalizado
-      >
-        <div className="logo" />
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={['/']}
-          mode="inline"
-          items={items}
-          style={{
-            backgroundColor: '#239426', // Fondo verde para el menú
-            color: '#fff',               // Color de texto blanco
-          }}
-          onClick={({ key }) => {
-            window.location.pathname = key;
-          }}
-        />
-      </Sider>
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(value) => setCollapsed(value)}
+          style={{ backgroundColor: '#239426' }} // Aplicamos un verde personalizado
+        >
+          <div className="logo" />
+          <Menu
+            theme="dark"
+            defaultSelectedKeys={['/']}
+            mode="inline"
+            items={items}
+            style={{
+              backgroundColor: '#239426', // Fondo verde para el menú
+              color: '#fff',               // Color de texto blanco
+            }}
+            onClick={({ key }) => {
+              window.location.pathname = key;
+            }}
+          />
+        </Sider>
           <Layout className="site-layout">
             <Header style={{ padding: 0, background: colorBgContainer }}>
               {user && (
