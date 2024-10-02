@@ -149,7 +149,7 @@ function App() {
               </Suspense>
             </Content>
             <Footer style={{ textAlign: 'center' }}>
-              Notaría ©{new Date().getFullYear()} Creado por Ant Design
+              Notaría 15 ©{new Date().getFullYear()} By David Restrepo Vera
             </Footer>
           </Layout>
         </Layout>
