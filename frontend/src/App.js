@@ -1,6 +1,14 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import { Layout, Menu, theme } from 'antd';
+import {
+  DesktopOutlined,
+  FileOutlined,
+  PieChartOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NProgress from 'nprogress';
@@ -8,13 +16,11 @@ import 'nprogress/nprogress.css';
 import socketIOClient from 'socket.io-client';
 import './App.css';
 import Loader from './components/Loader';
-import ProtocolistSection from './components/ProtocolistSection';
 import ReportForm from './components/ReportForm';
 import FinishedCaseTable from './components/FinishedCaseTable';
-import logo from './components/assets/logo_sin_fondo.png';
-import Contabilidad from './components/Contabilidad'; // Integración del componente
+import Contabilidad from './components/Contabilidad';
 
-const ENDPOINT = "http://127.0.0.1:5000";  // Cambia esto según tu configuración
+const ENDPOINT = "http://127.0.0.1:5000";
 
 const CaseForm = React.lazy(() => {
   NProgress.start();
@@ -37,14 +43,33 @@ const Register = React.lazy(() => {
   return import('./components/Register').finally(NProgress.done);
 });
 
+const { Header, Content, Footer, Sider } = Layout;
+
+function getItem(label, key, icon, children) {
+  return {
+    key,
+    icon,
+    children,
+    label,
+  };
+}
+
+const items = [
+  getItem('Gestión de Casos', '/cases', <PieChartOutlined />),
+  getItem('Casos Finalizados', '/finished-cases', <DesktopOutlined />),
+  getItem('Protocolistas', '/protocolists', <UserOutlined />),
+  getItem('Informes', '/generate-report', <FileOutlined />),
+  getItem('Contabilidad', '/contabilidad', <TeamOutlined />),
+  getItem('Registrar Usuario', '/register', <UserOutlined />),
+  getItem('Perfil', '/profile', <UserOutlined />),
+];
+
 function App() {
   const { isAuthenticated, loginWithRedirect, logout, user, isLoading } = useAuth0();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [userSettings, setUserSettings] = useState(() => {
-    const savedSettings = localStorage.getItem('userSettings');
-    return savedSettings ? JSON.parse(savedSettings) : { theme: 'light' };
-  });
-  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -55,35 +80,16 @@ function App() {
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT);
 
-    socket.on('new_case', data => {
+    socket.on('new_case', (data) => {
       toast.success(`Nuevo caso creado: ${data.radicado}`);
     });
 
-    socket.on('update_case', data => {
+    socket.on('update_case', (data) => {
       toast.info(`Caso actualizado: ${data.radicado}`);
     });
 
     return () => socket.disconnect();
   }, []);
-
-  const toggleTheme = () => {
-    setUserSettings(prevSettings => {
-      const newTheme = prevSettings.theme === 'light' ? 'dark' : 'light';
-      return { ...prevSettings, theme: newTheme };
-    });
-  };
-
-  useEffect(() => {
-    localStorage.setItem('userSettings', JSON.stringify(userSettings));
-  }, [userSettings]);
-
-  useEffect(() => {
-    document.body.className = userSettings.theme;
-  }, [userSettings.theme]);
-
-  const toggleDropdown = (dropdown) => {
-    setDropdownOpen(dropdownOpen === dropdown ? null : dropdown);
-  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -92,57 +98,62 @@ function App() {
   return (
     isAuthenticated && (
       <Router>
-        <div className="app-container">
-          <div 
-            className="menu-toggle-label" 
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? 'Cerrar menú' : 'Desplegar menú'}
-          </div>
-          <nav className={`nav ${menuOpen ? 'open' : ''}`}>
-            <Link to="/" className="nav-link logo-container">
-              <img src={logo} alt="Logo" className="logo" />
-            </Link>
-            <div className="nav-link" onClick={() => toggleDropdown('rentas')}>
-              Liquidación de Impuesto de Rentas
-              <div className={`dropdown-menu ${dropdownOpen === 'rentas' ? 'open' : ''}`}>
-                <Link to="/cases" className="dropdown-item" onClick={() => setMenuOpen(false)}>Gestión de Casos</Link>
-                <Link to="/protocolists" className="dropdown-item" onClick={() => setMenuOpen(false)}>Gestión de Protocolistas</Link>
-                <Link to="/finished-cases" className="dropdown-item" onClick={() => setMenuOpen(false)}>Casos Finalizados</Link>
-                <Link to="/generate-report" className="dropdown-item" onClick={() => setMenuOpen(false)}>Generar Informe</Link>
-                <Link to="/contabilidad" className="dropdown-item" onClick={() => setMenuOpen(false)}>Contabilidad</Link> {/* Nueva ruta */}
-              </div>
-            </div>
-            <Link to="/register" className="nav-link" onClick={() => setMenuOpen(false)}>Registrar Usuario</Link>
-            <button onClick={toggleTheme} className="nav-button">
-              Cambiar a {userSettings.theme === 'light' ? 'Oscuro' : 'Claro'}
-            </button>
-            <div className="nav-user-dropdown" onClick={() => toggleDropdown('user')}>
-              {user?.name}
-              <div className={`dropdown-menu ${dropdownOpen === 'user' ? 'open' : ''}`}>
-                <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>Información de perfil</Link>
-                <button onClick={() => {
-                  setMenuOpen(false);
-                  logout({ returnTo: window.location.origin });
-                }} className="dropdown-item">Cerrar Sesión</button>
-              </div>
-            </div>
-          </nav>
-          <Suspense fallback={<Loader />}>
-            <Routes>
-              <Route path="/protocolist-section" element={<ProtocolistSection />} />
-              <Route path="/" element={<Home />} />
-              <Route path="/cases" element={<CaseForm />} />
-              <Route path="/protocolists" element={<ProtocolistTable />} />
-              <Route path="/finished-cases" element={<FinishedCaseTable />} />
-              <Route path="/profile" element={<Profile user={user} />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/generate-report" element={<ReportForm />} />
-              <Route path="/contabilidad" element={<Contabilidad />} /> {/* Nueva ruta */}
-            </Routes>
-          </Suspense>
-          <ToastContainer />
-        </div>
+        <Layout style={{ minHeight: '100vh' }}>
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(value) => setCollapsed(value)}
+          style={{ backgroundColor: '#239426' }} // Aplicamos un verde personalizado
+        >
+          <div className="logo" />
+          <Menu
+            theme="dark"
+            defaultSelectedKeys={['/']}
+            mode="inline"
+            items={items}
+            style={{
+              backgroundColor: '#239426', // Fondo verde para el menú
+              color: '#fff',               // Color de texto blanco
+            }}
+            onClick={({ key }) => {
+              window.location.pathname = key;
+            }}
+          />
+        </Sider>
+          <Layout className="site-layout">
+            <Header style={{ padding: 0, background: colorBgContainer }}>
+              {user && (
+                <div style={{ padding: '0 16px', textAlign: 'right' }}>
+                  <span>{user.name}</span>
+                  <button
+                    style={{ marginLeft: '16px' }}
+                    onClick={() => logout({ returnTo: window.location.origin })}
+                  >
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </Header>
+            <Content style={{ margin: '0 16px' }}>
+              <Suspense fallback={<Loader />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/cases" element={<CaseForm />} />
+                  <Route path="/protocolists" element={<ProtocolistTable />} />
+                  <Route path="/finished-cases" element={<FinishedCaseTable />} />
+                  <Route path="/profile" element={<Profile user={user} />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/generate-report" element={<ReportForm />} />
+                  <Route path="/contabilidad" element={<Contabilidad />} />
+                </Routes>
+              </Suspense>
+            </Content>
+            <Footer style={{ textAlign: 'center' }}>
+              Notaría ©{new Date().getFullYear()} Creado por Ant Design
+            </Footer>
+          </Layout>
+        </Layout>
+        <ToastContainer />
       </Router>
     )
   );
