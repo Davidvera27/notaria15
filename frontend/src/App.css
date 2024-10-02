@@ -3,441 +3,109 @@
 /* Variables globales */
 :root {
   --background-color: #f0fdf4;
-  --text-color: #000000;
-  --table-row-background: #e0f7fa;
-  --table-row-hover: #c8e6c9;
+  --text-color: #000;
+  --table-row-background: #e6f4ea;
+  --table-row-hover: #c2e0b6;
   --table-header-background: #2eb135;
-  --main-accent-color: #239426;
+  --nav-background-color: #2eb135;
+  --nav-hover-background-color: #239426;
   --btn-danger-bg: #dc3545;
   --btn-danger-hover-bg: #c82333;
-  --background-color-dark: #121212;
-  --text-color-dark: #e0e0e0;
-  --table-row-background-dark: #1e1e1e;
-  --main-accent-color-dark: #1f8f24;
   --highlight-background: #c8f7c5;
-  --highlight-text: #000000;
+  --highlight-text: #000;
+  --nav-link-color: white;
+  --nav-link-hover-color: #f4f4f4;
+  --main-font: "Open Sans", sans-serif;
+  --heading-font: "Merriweather", serif;
 }
 
 /* Estilos globales */
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: var(--main-font);
   background-color: var(--background-color);
   color: var(--text-color);
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Aseguramos que no haya scroll horizontal */
 }
 
-/* Definición de estilos específicos para modos claro y oscuro */
-body.light {
-  --background-color: var(--background-color);
-  --text-color: var(--text-color);
-  --table-row-background: var(--table-row-background);
-  --table-row-hover: var(--table-row-hover);
-  --table-header-background: var(--table-header-background);
-  --main-accent-color: var(--main-accent-color);
-  --btn-danger-bg: var(--btn-danger-bg);
-  --btn-danger-hover-bg: var(--btn-danger-hover-bg);
-  --highlight-background: var(--highlight-background);
-  --highlight-text: var(--highlight-text);
-}
-
-body.dark {
-  --background-color: var(--background-color-dark);
-  --text-color: var(--text-color-dark);
-  --table-row-background: var(--table-row-background-dark);
-  --table-row-hover-dark: var(--table-row-hover-dark);
-  --table-header-background-dark: var(--table-header-background-dark);
-  --main-accent-color-dark: var(--main-accent-color-dark);
-  --btn-danger-bg: var(--btn-danger-bg-dark);
-  --btn-danger-hover-bg: var(--btn-danger-hover-bg-dark);
-  --highlight-background: var(--highlight-background-dark);
-  --highlight-text: var(--highlight-text-dark);
-}
-
-/* Estilos para casos resaltados */
-.highlighted-row {
-  background-color: var(--highlight-background);
-  color: var(--highlight-text);
-}
-
-body.dark .highlighted-row {
-  background-color: var(--highlight-background-dark);
-  color: var(--highlight-text-dark);
-}
-
-button {
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-button:hover {
-  background-color: var(--main-accent-color);
-  transform: translateY(-2px);
-}
-
-.app-container {
-  min-height: 100vh;
-  padding-top: 60px;
-  max-width: 100%;
-  margin: 0 auto;
-  background-color: var(--background-color);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.title {
-  text-align: center;
+h2 {
+  font-family: var(--heading-font);
   color: var(--text-color);
-  font-size: 2em;
-  margin-bottom: 20px;
-  font-family: "Merriweather", serif;
-}
-
-/* Menú Hamburguesa */
-.hamburger-menu {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 30px;
-  height: 20px;
-  cursor: pointer;
-  position: fixed;
-  top: 15px;
-  left: 0;
-  z-index: 1001;
-}
-
-.hamburger-menu .bar {
-  height: 4px;
-  width: 100%;
-  background-color: var(--text-color);
-  border-radius: 10px;
-  transition: 0.4s;
-}
-
-/* Hover Zone */
-.hover-zone {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 30px; /* Aumentamos un poco más para asegurar que se detecte el hover */
-  z-index: 999;
-  cursor: pointer;
-}
-
-/* Etiqueta para desplegar el menú */
-.menu-toggle-label {
-  position: fixed;
-  top: 10px; /* Coloca la etiqueta en la parte superior */
-  left: 10px; /* Ajusta el desplazamiento desde el borde izquierdo */
-  transform: translateY(0);
-  background-color: #239426;
-  padding: 10px 15px;
-  color: white;
-  cursor: pointer;
-  z-index: 1000;
-  transition: background-color 0.3s, transform 0.3s;
-  border-radius: 0 5px 5px 0;
-}
-
-.menu-toggle-label:hover {
-  background-color: #1e7b38;
-  transform: translateX(5px);
+  text-align: center;
+  padding: 10px;
 }
 
 /* Barra de navegación */
 .nav {
   position: fixed;
   top: 0;
-  left: -300px; /* Mueve la barra completamente fuera de la vista */
-  height: 100%;
+  left: -300px;
   width: 250px;
-  background-color: rgba(178, 255, 178, 0.8); /* Background semitransparente */
-  backdrop-filter: blur(4px); /* Efecto de vidrio */
-  transition: left 0.3s ease; /* Hacemos la transición un poco más rápida */
-  z-index: 999; /* Asegúrate de que esté detrás de la etiqueta */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 60px 20px 20px;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3); /* Sombra para darle profundidad */
+  background-color: var(--nav-background-color);
+  height: 100%;
+  padding: 60px 20px;
+  transition: left 0.3s ease;
+  z-index: 999;
 }
 
 .nav.open {
-  left: 0; /* Mueve la barra de navegación dentro de la vista */
+  left: 0;
 }
 
-.nav-link,
-.nav-button {
+.nav-link {
+  color: var(--nav-link-color);
   text-decoration: none;
-  color: var(--text-color);
   font-weight: bold;
   margin: 10px 0;
-  font-size: 1em;
+  display: block;
   text-align: center;
-  padding: 10px 20px;
-  background-color: transparent;
+}
+
+.nav-link:hover {
+  background-color: var(--nav-hover-background-color);
+  color: var(--nav-link-hover-color);
+}
+
+button {
+  padding: 10px;
+  margin: 5px 0;
+  background-color: var(--nav-background-color);
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
 }
 
-.nav-link:hover,
-.nav-button:hover {
-  background-color: rgba(0, 0, 0, 0.1); /* Fondo semitransparente en hover */
-  color: #fff;
+button:hover {
+  background-color: var(--nav-hover-background-color);
 }
 
-/* Estilo para el logo */
-.logo {
-  height: 200px;
-  margin-bottom: 20px;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Dropdown de usuario */
-.nav-user-dropdown {
-  position: relative;
-  cursor: pointer;
-  font-weight: bold;
-  color: var(--text-color);
-  padding: 10px 20px;
-}
-
-.dropdown-menu {
-  display: none;
-  background-color: var(--background-color);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  z-index: 1000;
-  width: 100%;
-}
-
-.dropdown-menu.open {
-  display: block;
-}
-
-.dropdown-item {
-  padding: 10px 20px;
-  cursor: pointer;
-  color: var(--text-color);
-  text-align: left;
-  text-decoration: none;
-  display: block;
-  white-space: nowrap;
-}
-
-.dropdown-item:hover {
-  background-color: #f1f1f1;
-}
-
-/* Dropdown del menú de rentas */
-.nav-link {
-  position: relative;
-}
-
-.nav-link .dropdown-menu {
-  display: none;
-  background-color: rgba(255, 255, 255, 0.8); /* Semitransparente */
-  box-shadow: 0 4px 8px rgb(0, 0, 0);
-  border-radius: 5px;
-  z-index: 1000;
-  padding: 10px;
-  width: 100%;
-}
-
-.nav-link .dropdown-menu.open {
-  display: block;
-}
-
-.nav-link .dropdown-menu .dropdown-item {
-  padding: 10px 20px;
-  color: #000000; /* Cambia esto al color deseado */
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.nav-link .dropdown-menu .dropdown-item:hover {
-  background-color: rgba(169, 255, 135, 0.699);
-  color: #000000;
-}
-
-/* Efecto del menú hamburguesa al abrirse */
-.hamburger-menu.open .bar:nth-child(1) {
-  transform: rotate(-45deg) translate(-5px, 6px);
-}
-
-.hamburger-menu.open .bar:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger-menu.open .bar:nth-child(3) {
-  transform: rotate(45deg) translate(-5px, -6px);
-}
-
-/* Estilos para tablas y formularios */
+/* Tablas */
 .table-container {
-  max-height: 60vh;
-  overflow-y: auto;
-  margin-bottom: 20px;
+  margin: 20px;
 }
 
-.case-table,
-.protocolist-table,
-.finished-case-table {
+table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
 }
 
-.finished-case-table th,
-.finished-case-table td {
-  padding: 12px;
-  text-align: left;
-}
-
-.case-table th,
-.protocolist-table th {
+th {
   background-color: var(--table-header-background);
-  text-align: left;
-  color: var(--text-color);
+  color: white;
+  padding: 10px;
 }
 
-.case-table td,
-.protocolist-table td {
+td {
   border: 1px solid #ddd;
   padding: 8px;
-  color: var(--text-color);
 }
 
-body.dark .finished-case-table th,
-body.dark .finished-case-table td {
-  background-color: var(--table-row-background-dark);
-  color: var(--text-color-dark);
-}
-
-body.dark .case-table td,
-body.dark .protocolist-table td {
-  background-color: var(--table-row-background-dark);
-  color: var(--text-color-dark);
-}
-
-.case-table tbody tr:nth-child(even),
-.protocolist-table tbody tr:nth-child(even) {
+tbody tr:nth-child(even) {
   background-color: var(--table-row-background);
 }
 
-body.dark .case-table tr:nth-child(even),
-body.dark .protocolist-table tr:nth-child(even) {
-  background-color: #2a2a2a;
-}
-
-.case-table tr:hover,
-.protocolist-table tr:hover {
+tbody tr:hover {
   background-color: var(--table-row-hover);
-}
-
-.case-form,
-.protocolist-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #f0f0f0, #ffffff);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  flex-shrink: 0;
-  margin: 20px auto;
-}
-
-.case-form input,
-.protocolist-form input,
-.case-form select,
-.protocolist-form select,
-.case-form textarea,
-.protocolist-form textarea {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: var(--background-color);
-  color: var(--text-color);
-}
-
-body.dark .case-form input,
-body.dark .protocolist-form input,
-body.dark .case-form select,
-body.dark .protocolist-form select,
-body.dark .case-form textarea,
-body.dark .protocolist-form textarea {
-  background-color: #333333;
-  color: var(--text-color-dark);
-  border-color: #444444;
-}
-
-.case-form button,
-.protocolist-form button {
-  padding: 10px;
-  background-color: var(--main-accent-color);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.case-form button:hover,
-.protocolist-form button:hover {
-  background-color: var(--main-accent-color-dark);
-  transform: translateY(-2px);
-}
-
-.btn-delete {
-  background-color: var(--btn-danger-bg);
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: var(--btn-danger-hover-bg);
-}
-
-
-.report-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 400px;
-  padding: 20px;
-  margin: auto;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.report-form label {
-  font-weight: bold;
-}
-
-.report-form button {
-  padding: 10px;
-  background-color: #2eb135;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.report-form button:hover {
-  background-color: #239426;
 }
