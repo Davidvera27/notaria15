@@ -128,8 +128,6 @@ const CaseForm = () => {
     setForm({ ...form, protocolista: selectedOption ? selectedOption.value : '' });
     validateForm('protocolista', selectedOption ? selectedOption.value : '');
   };
-  
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -162,11 +160,10 @@ const CaseForm = () => {
         fecha: form.fecha.toISOString().split('T')[0],
         escritura: form.escritura,
         radicado: form.radicado,
-        protocolista: form.protocolista, // Solo el nombre, no el objeto
+        protocolista: form.protocolista,
         observaciones: form.observaciones,
         fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null
       };
-      
 
       if (currentCase) {
         await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
@@ -542,15 +539,13 @@ const CaseForm = () => {
 
           <label htmlFor="protocolista">Protocolista</label>
           <Select 
-            options={protocolists.map(p => ({ value: p.nombre, label: p.nombre }))} 
-            value={protocolists.find(p => p.value === form.protocolista)}  // Pasar el valor actual
+            options={protocolists.map(p => ({ value: p.nombre, label: p.nombre }))}
+            value={protocolists.find(p => p.nombre === form.protocolista)}
             onChange={handleProtocolistaChange}
             className={errors.protocolista ? 'input-error' : ''}
             placeholder="Selecciona un protocolista"
             isClearable
           />
-
-
           {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
 
           <label htmlFor="observaciones">Observaciones</label>
