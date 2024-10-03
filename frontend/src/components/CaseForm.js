@@ -12,10 +12,10 @@ import { useTable, useFilters, useGroupBy, useSortBy } from 'react-table';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
-import { es } from 'date-fns/locale'; // Importar idioma español
-import Select from 'react-select'; // Añadir react-select para dropdown mejorado
+import { es } from 'date-fns/locale';
+import Select from 'react-select';
 
-registerLocale('es', es); // Registrar el idioma español
+registerLocale('es', es);
 
 const socket = io('http://127.0.0.1:5000');
 
@@ -36,13 +36,13 @@ const CaseForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [componentSize, setComponentSize] = useState('default'); // Tamaño de los componentes
 
   useEffect(() => {
     if (casesStatus === 'idle') dispatch(fetchCases());
     if (protocolistsStatus === 'idle') dispatch(fetchProtocolists());
     if (pdfDataStatus === 'idle') dispatch(fetchPdfData());
 
-    // Escuchar eventos de creación y actualización de casos
     socket.on('new_case', () => {
       dispatch(fetchCases());
     });
@@ -51,10 +51,9 @@ const CaseForm = () => {
       dispatch(fetchCases());
     });
 
-    // Escuchar eventos de casos movidos a casos finalizados
     socket.on('case_moved', () => {
       dispatch(fetchCases());
-      dispatch(fetchFinishedCases()); // Actualizar la tabla de casos finalizados
+      dispatch(fetchFinishedCases());
     });
 
     return () => {
@@ -128,8 +127,10 @@ const CaseForm = () => {
     setForm({ ...form, protocolista: selectedOption ? selectedOption.value : '' });
     validateForm('protocolista', selectedOption ? selectedOption.value : '');
   };
-  
-  
+
+  const onFormLayoutChange = (e) => {
+    setComponentSize(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -138,51 +139,45 @@ const CaseForm = () => {
       toast.error('Corrija los errores antes de enviar el formulario.');
       return;
     }
-
-    const radicadoExistente = cases.find(c => c.radicado === form.radicado);
+  
+    const radicadoExistente = cases.find((c) => c.radicado === form.radicado);
     if (radicadoExistente) {
-      const protocolista = radicadoExistente.protocolista;
-      const fila = cases.indexOf(radicadoExistente) + 1;
       Swal.fire({
         title: 'Radicado Duplicado',
-        text: `El radicado ya existe en la fila ${fila}, asignado al protocolista ${protocolista}.`,
+        text: `El radicado ya existe asignado al protocolista ${radicadoExistente.protocolista}.`,
         icon: 'error',
-        confirmButtonText: 'Entendido'
+        confirmButtonText: 'Entendido',
       });
       return;
     }
-
+  
     try {
-      if (!form.fecha || !form.escritura || !form.radicado || !form.protocolista) {
-        toast.error('Todos los campos son obligatorios');
-        return;
-      }
-
       const caseData = {
         fecha: form.fecha.toISOString().split('T')[0],
         escritura: form.escritura,
         radicado: form.radicado,
-        protocolista: form.protocolista, // Solo el nombre, no el objeto
+        protocolista: form.protocolista, // Keep the protocolista value
         observaciones: form.observaciones,
-        fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null
+        fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null,
       };
-      
-
+  
       if (currentCase) {
         await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
         setCurrentCase(null);
       } else {
         await axios.post('http://127.0.0.1:5000/cases', caseData);
       }
-
+  
+      // Reset form state, including protocolista to null or empty string
       setForm({
         fecha: new Date(),
         escritura: '',
         radicado: '',
-        protocolista: '',
+        protocolista: '', // Reset protocolista
         observaciones: '',
-        fecha_documento: null
+        fecha_documento: null,
       });
+  
       dispatch(fetchCases());
       toast.success('Caso guardado exitosamente');
     } catch (error) {
@@ -190,7 +185,7 @@ const CaseForm = () => {
       toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
     }
   };
-
+  
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
   }, []);
@@ -198,11 +193,11 @@ const CaseForm = () => {
   const handleDelete = useCallback(async (id) => {
     const result = await Swal.fire({
       title: '¿Estás seguro?',
-      text: "¡No podrás revertir esto!",
+      text: '¡No podrás revertir esto!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     });
 
     if (result.isConfirmed) {
@@ -227,7 +222,7 @@ const CaseForm = () => {
       input: 'text',
       inputLabel: 'Nuevo Radicado',
       inputPlaceholder: 'Ingrese el nuevo número de radicado',
-      showCancelButton: true
+      showCancelButton: true,
     });
 
     if (radicado) {
@@ -244,14 +239,14 @@ const CaseForm = () => {
 
   const handleSendEmail = useCallback(async (caseItem) => {
     try {
-      const response = await axios.post('http://127.0.0.1:5000/send_email', { 
+      const response = await axios.post('http://127.0.0.1:5000/send_email', {
         radicado: caseItem.radicado,
-        use_outlook: true
+        use_outlook: true,
       });
       if (response.data.message) {
         toast.success(response.data.message);
         dispatch(fetchCases());
-        dispatch(fetchFinishedCases()); // Actualizar la tabla de casos finalizados
+        dispatch(fetchFinishedCases());
       } else {
         toast.error(`Error: ${response.data.error}`);
       }
@@ -260,153 +255,145 @@ const CaseForm = () => {
     }
   }, [dispatch]);
 
-  const isRadicadoInPdf = useMemo(() => (radicado) => {
-    return pdfData.some((pdf) => {
-      const pdfRadicado = pdf.data["RADICADO N°"]?.trim();
-      const caseRadicado = radicado?.trim();
-      return pdfRadicado === caseRadicado;
-    });
-  }, [pdfData]);
+  const isRadicadoInPdf = useMemo(
+    () => (radicado) => {
+      return pdfData.some((pdf) => {
+        const pdfRadicado = pdf.data['RADICADO N°']?.trim();
+        const caseRadicado = radicado?.trim();
+        return pdfRadicado === caseRadicado;
+      });
+    },
+    [pdfData]
+  );
 
   const handleSendAllEmails = useCallback(async () => {
-    // Filtrar los casos que tienen documentos PDF listos para enviar
-    const emailsToSend = cases.filter(caseItem => isRadicadoInPdf(caseItem.radicado));
-  
-    // Si no hay correos para enviar, mostrar mensaje de información
+    const emailsToSend = cases.filter((caseItem) => isRadicadoInPdf(caseItem.radicado));
+
     if (emailsToSend.length === 0) {
       return Swal.fire('No hay correos por enviar', 'No hay casos con documentos para enviar.', 'info');
     }
-  
-    // Confirmación antes de enviar correos
+
     const result = await Swal.fire({
       title: 'Confirmar Envío de Correos',
       text: `¿Realmente desea enviar ${emailsToSend.length} correos a los destinatarios de forma simultánea?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, enviar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     });
-  
-    // Si el usuario confirma el envío
+
     if (result.isConfirmed) {
       try {
-        // Crear una promesa para cada correo que se va a enviar
-        const emailPromises = emailsToSend.map(caseItem => 
-          axios.post('http://127.0.0.1:5000/send_email', { 
+        const emailPromises = emailsToSend.map((caseItem) =>
+          axios.post('http://127.0.0.1:5000/send_email', {
             radicado: caseItem.radicado,
-            use_outlook: true 
+            use_outlook: true,
           })
         );
-  
-        // Esperar a que todos los correos se envíen
+
         await Promise.all(emailPromises);
-  
-        // Mostrar un mensaje de éxito una vez que se hayan enviado todos los correos
+
         toast.success(`${emailsToSend.length} correos enviados exitosamente`);
-  
-        // Eliminar los casos que fueron enviados
-        emailsToSend.forEach(caseItem => {
+
+        emailsToSend.forEach((caseItem) => {
           dispatch({
             type: 'cases/removeCase',
-            payload: caseItem.id
+            payload: caseItem.id,
           });
         });
-  
-        // Refrescar las tablas de casos y casos finalizados
+
         dispatch(fetchCases());
         dispatch(fetchFinishedCases());
-        
       } catch (error) {
-        // Mostrar un mensaje de error si algo sale mal
         toast.error('Hubo un problema al enviar los correos');
       }
     }
   }, [cases, dispatch, isRadicadoInPdf]);
-  
 
   const data = useMemo(() => cases, [cases]);
-  const columns = useMemo(() => [
-    {
-      Header: 'No.',
-      accessor: (row, i) => i + 1,
-      disableFilters: true,
-      disableSortBy: true,
-      maxWidth: 50,
-    },
-    {
-      Header: 'Fecha',
-      accessor: 'fecha',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'datetime',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Escritura',
-      accessor: 'escritura',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'basic',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Fecha Del Documento',
-      accessor: 'fecha_documento',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'datetime',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Radicado',
-      accessor: 'radicado',
-      Cell: ({ row }) => (
-        <span>{row.original.radicado}</span>
-      ),
-      Filter: DefaultColumnFilter,
-      maxWidth: 200, // Ajuste el ancho de la columna de radicado
-      sortType: 'alphanumeric',
-      aggregate: 'count',
-    },    
-    {
-      Header: 'Protocolista',
-      accessor: 'protocolista',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      sortType: 'basic',
-      aggregate: 'count',
-    },
-    {
-      Header: 'Observaciones',
-      accessor: 'observaciones',
-      Filter: DefaultColumnFilter,
-      maxWidth: 150,
-      aggregate: 'count',
-    },
-    {
-      Header: 'Acciones',
-      accessor: 'acciones',
-      disableSortBy: true,
-      disableFilters: true,
-      Cell: ({ row }) => (
-        <div className="actions-container">
-          <button className="btn-edit" onClick={() => handleEdit(row.original)}>
-            <i className="fas fa-edit"></i> Editar
-          </button>
-          <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
-            <i className="fas fa-trash"></i> Eliminar
-          </button>
-          <button className="btn-add" onClick={() => handleAddRadicado(row.original)}>
-            <i className="fas fa-plus"></i> Añadir Radicado
-          </button>
-          <button className="btn-email" onClick={() => handleSendEmail(row.original)}>
-            <i className="fas fa-envelope"></i> Enviar Documento
-          </button>
-        </div>
-      ),
-      maxWidth: 200, // Ajuste el ancho de la columna de acciones
-    }
-  ], [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]);
+  const columns = useMemo(
+    () => [
+      {
+        Header: 'No.',
+        accessor: (row, i) => i + 1,
+        disableFilters: true,
+        disableSortBy: true,
+        maxWidth: 50,
+      },
+      {
+        Header: 'Fecha',
+        accessor: 'fecha',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'datetime',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Escritura',
+        accessor: 'escritura',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'basic',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Fecha Del Documento',
+        accessor: 'fecha_documento',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'datetime',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Radicado',
+        accessor: 'radicado',
+        Cell: ({ row }) => <span>{row.original.radicado}</span>,
+        Filter: DefaultColumnFilter,
+        maxWidth: 200,
+        sortType: 'alphanumeric',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Protocolista',
+        accessor: 'protocolista',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        sortType: 'basic',
+        aggregate: 'count',
+      },
+      {
+        Header: 'Observaciones',
+        accessor: 'observaciones',
+        Filter: DefaultColumnFilter,
+        maxWidth: 150,
+        aggregate: 'count',
+      },
+      {
+        Header: 'Acciones',
+        accessor: 'acciones',
+        disableSortBy: true,
+        disableFilters: true,
+        Cell: ({ row }) => (
+          <div className="actions-container">
+            <button className="btn-edit" onClick={() => handleEdit(row.original)}>
+              <i className="fas fa-edit"></i> Editar
+            </button>
+            <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
+              <i className="fas fa-trash"></i> Eliminar
+            </button>
+            <button className="btn-add" onClick={() => handleAddRadicado(row.original)}>
+              <i className="fas fa-plus"></i> Añadir Radicado
+            </button>
+            <button className="btn-email" onClick={() => handleSendEmail(row.original)}>
+              <i className="fas fa-envelope"></i> Enviar Documento
+            </button>
+          </div>
+        ),
+        maxWidth: 200,
+      },
+    ],
+    [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]
+  );
 
   const {
     getTableProps,
@@ -428,14 +415,14 @@ const CaseForm = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const casosResaltados = cases.filter(caseItem => isRadicadoInPdf(caseItem.radicado));
+      const casosResaltados = cases.filter((caseItem) => isRadicadoInPdf(caseItem.radicado));
 
       if (casosResaltados.length > 0) {
         Swal.fire({
           title: 'Casos Pendientes de Envío',
           text: `Hay ${casosResaltados.length} caso(s) pendiente(s) de envío.`,
           icon: 'warning',
-          confirmButtonText: 'Entendido'
+          confirmButtonText: 'Entendido',
         });
       }
     }, 600000);
@@ -451,14 +438,29 @@ const CaseForm = () => {
       <div>
         <p>Número de casos: {visibleRowsCount}</p>
       </div>
+
+      {/* Form size selection */}
+      <div>
+        <label>Tamaño del formulario:</label>
+        <div onChange={onFormLayoutChange}>
+          <input type="radio" value="small" name="size" /> Pequeño
+          <input type="radio" value="default" name="size" defaultChecked /> Mediano
+          <input type="radio" value="large" name="size" /> Grande
+        </div>
+      </div>
+
       <div className="table-and-form-container">
         <div className="table-container">
           <table {...getTableProps()} className="case-table">
             <thead>
-              {headerGroups.map(headerGroup => (
+              {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
-                    <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())} style={{ minWidth: column.minWidth, width: column.width }}>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      key={column.id}
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                      style={{ minWidth: column.minWidth, width: column.width }}
+                    >
                       {column.render('Header')}
                       <span>
                         {column.isSorted
@@ -479,22 +481,27 @@ const CaseForm = () => {
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {rows.map(row => {
+              {rows.map((row) => {
                 prepareRow(row);
                 return (
-                  <tr key={row.id} {...row.getRowProps()} style={isRadicadoInPdf(row.original.radicado) ? { backgroundColor: 'lightgreen' } : {}}>
-                    {row.cells.map(cell => (
-                      <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                  <tr
+                    key={row.id}
+                    {...row.getRowProps()}
+                    style={isRadicadoInPdf(row.original.radicado) ? { backgroundColor: 'lightgreen' } : {}}
+                  >
+                    {row.cells.map((cell) => (
+                      <td key={cell.id} {...cell.getCellProps()}>
+                        {cell.render('Cell')}
+                      </td>
                     ))}
                   </tr>
                 );
               })}
               {renderEmptyRows(numVisibleRows - rows.length)}
             </tbody>
-
           </table>
         </div>
-        <form className="case-form" onSubmit={handleSubmit}>
+        <form className={`case-form ${componentSize}`} onSubmit={handleSubmit}>
           <label htmlFor="fecha">Fecha</label>
           <DatePicker
             selected={form.fecha}
@@ -507,12 +514,12 @@ const CaseForm = () => {
             className="date-picker"
           />
           <label htmlFor="escritura">Escritura</label>
-          <input 
-            type="text" 
-            name="escritura" 
-            value={form.escritura} 
-            onChange={handleChange} 
-            placeholder="Ej: 12345" 
+          <input
+            type="text"
+            name="escritura"
+            value={form.escritura}
+            onChange={handleChange}
+            placeholder="Ej: 12345"
             className={errors.escritura ? 'input-error' : ''}
           />
           {errors.escritura && <span className="error-message">{errors.escritura}</span>}
@@ -530,34 +537,33 @@ const CaseForm = () => {
           />
 
           <label htmlFor="radicado">Radicado</label>
-          <input 
-            type="text" 
-            name="radicado" 
-            value={form.radicado} 
-            onChange={handleChange} 
-            placeholder="Ej: 20240101234432" 
+          <input
+            type="text"
+            name="radicado"
+            value={form.radicado}
+            onChange={handleChange}
+            placeholder="Ej: 20240101234432"
             className={errors.radicado ? 'input-error' : ''}
           />
           {errors.radicado && <span className="error-message">{errors.radicado}</span>}
 
           <label htmlFor="protocolista">Protocolista</label>
-          <Select 
-            options={protocolists.map(p => ({ value: p.nombre, label: p.nombre }))} 
-            value={protocolists.find(p => p.value === form.protocolista)}  // Pasar el valor actual
+          <Select
+            options={protocolists.map((p) => ({ value: p.nombre, label: p.nombre }))}
+            value={form.protocolista ? { value: form.protocolista, label: form.protocolista } : null} // Ensure proper value or null
             onChange={handleProtocolistaChange}
             className={errors.protocolista ? 'input-error' : ''}
             placeholder="Selecciona un protocolista"
             isClearable
           />
 
-
           {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
 
           <label htmlFor="observaciones">Observaciones</label>
-          <textarea 
-            name="observaciones" 
-            value={form.observaciones} 
-            onChange={handleChange} 
+          <textarea
+            name="observaciones"
+            value={form.observaciones}
+            onChange={handleChange}
             placeholder="Observaciones adicionales (opcional)"
           ></textarea>
           <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
@@ -567,15 +573,13 @@ const CaseForm = () => {
   );
 };
 
-const DefaultColumnFilter = ({
-  column: { filterValue, preFilteredRows, setFilter },
-}) => {
+const DefaultColumnFilter = ({ column: { filterValue, preFilteredRows, setFilter } }) => {
   const count = preFilteredRows.length;
 
   return (
     <input
       value={filterValue || ''}
-      onChange={e => {
+      onChange={(e) => {
         setFilter(e.target.value || undefined);
       }}
       placeholder={`Buscar ${count} registros...`}
