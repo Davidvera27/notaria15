@@ -31,12 +31,23 @@ def get_cases():
 def add_case():
     from app import socketio  # Importar aquí para evitar la importación circular
     schema = CaseSchema()
+
     try:
         data = schema.load(request.json)
     except ValidationError as err:
         return jsonify({"errors": err.messages}), 400
 
     try:
+        # Verificar si ya existe un caso con la misma escritura y fecha
+        existing_case = Case.query.filter_by(escritura=data['escritura'], fecha_documento=data['fecha_documento']).first()
+        if existing_case:
+            return jsonify({'error': 'Ya existe un caso con la misma escritura y fecha.'}), 400
+
+        # Verificar si el radicado ya existe
+        existing_radicado = Case.query.filter_by(radicado=data['radicado']).first()
+        if existing_radicado:
+            return jsonify({'error': 'Radicado duplicado.'}), 400
+
         # Buscar el protocolista
         protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
         if not protocolista:
@@ -44,7 +55,7 @@ def add_case():
 
         # Crear el nuevo caso en la tabla "case"
         new_case = Case(
-            fecha=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # Fecha y hora actuales
+            fecha=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             escritura=int(data['escritura']),
             radicado=data['radicado'],
             protocolista_id=protocolista.id,
@@ -67,12 +78,13 @@ def add_case():
 
         # Emitir evento a todos los clientes conectados
         socketio.emit('new_case', new_case.to_dict())
+        return jsonify(new_case.to_dict()), 201
 
-        return jsonify(new_case.to_dict())
     except Exception as e:
+        # Capturar cualquier otro error y devolver un mensaje detallado
         db.session.rollback()
-        print(f"Error al crear el caso: {e}")
-        return jsonify({'error': 'Hubo un problema al crear el caso.'}), 500
+        app.logger.error(f"Error al crear el caso: {str(e)}")
+        return jsonify({'error': f'Hubo un problema al crear el caso: {str(e)}'}), 500
 
 # Función para calcular el estado de vigencia
 def calcular_estado_vigencia(vigencia_rentas):
@@ -143,22 +155,6 @@ def send_case_email():
     if not pdf_path:
         return jsonify({'error': 'PDF not found in uploads'}), 404
 
-    # Crear el cuerpo del correo con la fecha de vigencia
-    subject = f"BOLETA DE RENTAS {radicado}"
-    body = f"""
-    Señor(a) {protocolista.nombre},
-
-    Adjunto encontrará el documento Liquidación De Impuesto De Registro correspondiente al radicado No. {radicado} de la escritura {case.escritura}.
-    
-    La fecha de vigencia del caso es {vigencia_rentas}.
-    {estado_vigencia}
-
-    Por favor, tome las acciones necesarias si el caso está próximo a vencer.
-
-    Atentamente,
-    Auxiliar de rentas Notaría 15.
-    """
-
     try:
         send_email_via_outlook(recipients=[protocolista.correo_electronico], 
                                subject=subject, 
@@ -210,7 +206,7 @@ def update_case(id):
         if not case:
             return jsonify({'error': 'Case not found'}), 404
 
-        # Update all fields including protocolista, escritura, fecha, observaciones
+        # Actualizar todos los campos, incluyendo protocolista, escritura, fecha, observaciones
         protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
         if not protocolista:
             return jsonify({'error': 'Protocolista no encontrado'}), 400
