@@ -140,6 +140,7 @@ const CaseForm = () => {
       return;
     }
   
+    // Validar radicado duplicado
     const radicadoExistente = cases.find((c) => c.radicado === form.radicado);
     if (radicadoExistente) {
       Swal.fire({
@@ -151,12 +152,26 @@ const CaseForm = () => {
       return;
     }
   
+    // Validar escritura y fecha de documento duplicados
+    const escrituraFechaExistente = cases.find(
+      (c) => c.escritura === form.escritura && c.fecha_documento === form.fecha_documento?.toISOString().split('T')[0]
+    );
+    if (escrituraFechaExistente) {
+      Swal.fire({
+        title: 'Escritura Duplicada',
+        text: `Ya existe un caso con la escritura ${form.escritura} y la fecha de documento ${form.fecha_documento?.toLocaleDateString()}.`,
+        icon: 'error',
+        confirmButtonText: 'Entendido',
+      });
+      return;
+    }
+  
     try {
       const caseData = {
         fecha: form.fecha.toISOString().split('T')[0],
         escritura: form.escritura,
         radicado: form.radicado,
-        protocolista: form.protocolista, // Keep the protocolista value
+        protocolista: form.protocolista,
         observaciones: form.observaciones,
         fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null,
       };
@@ -168,12 +183,11 @@ const CaseForm = () => {
         await axios.post('http://127.0.0.1:5000/cases', caseData);
       }
   
-      // Reset form state, including protocolista to null or empty string
       setForm({
         fecha: new Date(),
         escritura: '',
         radicado: '',
-        protocolista: '', // Reset protocolista
+        protocolista: '',
         observaciones: '',
         fecha_documento: null,
       });
@@ -181,10 +195,21 @@ const CaseForm = () => {
       dispatch(fetchCases());
       toast.success('Caso guardado exitosamente');
     } catch (error) {
-      console.error('Error adding/updating case:', error);
-      toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
+      // Capturar errores específicos del backend
+      if (error.response && error.response.data.error) {
+        Swal.fire({
+          title: 'Error',
+          text: error.response.data.error, // Mostrar el error específico devuelto por el backend
+          icon: 'error',
+          confirmButtonText: 'Entendido',
+        });
+      } else {
+        console.error('Error adding/updating case:', error);
+        toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
+      }
     }
   };
+  
   
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
