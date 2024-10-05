@@ -115,8 +115,16 @@ const CaseForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-    validateForm(name, value);
+    
+    // Si el campo es "radicado", permitimos solo caracteres numéricos
+    if (name === 'radicado') {
+      const numericValue = value.replace(/\D/g, ''); // Remueve todo lo que no sea un dígito
+      setForm({ ...form, [name]: numericValue });
+      validateForm(name, numericValue); // Validar el nuevo valor numérico
+    } else {
+      setForm({ ...form, [name]: value });
+      validateForm(name, value);
+    }
   };
 
   const handleDateChange = (date) => {
