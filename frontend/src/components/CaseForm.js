@@ -13,7 +13,10 @@ import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
 import { es } from 'date-fns/locale';
-import Select from 'react-select';
+import { Tooltip } from 'antd';
+import { AutoComplete } from 'antd'; // Importar AutoComplete
+
+
 
 registerLocale('es', es);
 
@@ -32,7 +35,7 @@ const CaseForm = () => {
     radicado: '',
     protocolista: '',
     observaciones: '',
-    fecha_documento: null
+    fecha_documento: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -53,7 +56,7 @@ const CaseForm = () => {
 
     socket.on('case_moved', () => {
       dispatch(fetchCases());
-      dispatch(fetchFinishedCases());
+      dispatch(fetchFinishedCases()); // Actualizar la tabla de casos finalizados
     });
 
     return () => {
@@ -68,7 +71,7 @@ const CaseForm = () => {
       setForm({
         ...currentCase,
         fecha: new Date(currentCase.fecha),
-        fecha_documento: currentCase.fecha_documento ? new Date(currentCase.fecha_documento) : null
+        fecha_documento: currentCase.fecha_documento ? new Date(currentCase.fecha_documento) : null,
       });
     } else {
       setForm({
@@ -77,7 +80,7 @@ const CaseForm = () => {
         radicado: '',
         protocolista: '',
         observaciones: '',
-        fecha_documento: null
+        fecha_documento: null,
       });
     }
   }, [currentCase]);
@@ -90,6 +93,7 @@ const CaseForm = () => {
           errorMsg = 'La escritura debe ser un número entero.';
         }
         break;
+
       case 'radicado':
         if (!value) {
           errorMsg = 'El radicado es obligatorio.';
@@ -123,9 +127,9 @@ const CaseForm = () => {
     setForm({ ...form, fecha_documento: date });
   };
 
-  const handleProtocolistaChange = (selectedOption) => {
-    setForm({ ...form, protocolista: selectedOption ? selectedOption.value : '' });
-    validateForm('protocolista', selectedOption ? selectedOption.value : '');
+  const handleProtocolistaChange = (value) => {
+    setForm({ ...form, protocolista: value });
+    validateForm('protocolista', value);
   };
 
   const onFormLayoutChange = (e) => {
@@ -139,7 +143,7 @@ const CaseForm = () => {
       toast.error('Corrija los errores antes de enviar el formulario.');
       return;
     }
-  
+
     // Validar radicado duplicado
     const radicadoExistente = cases.find((c) => c.radicado === form.radicado);
     if (radicadoExistente) {
@@ -151,7 +155,7 @@ const CaseForm = () => {
       });
       return;
     }
-  
+
     // Validar escritura y fecha de documento duplicados
     const escrituraFechaExistente = cases.find(
       (c) => c.escritura === form.escritura && c.fecha_documento === form.fecha_documento?.toISOString().split('T')[0]
@@ -165,7 +169,7 @@ const CaseForm = () => {
       });
       return;
     }
-  
+
     try {
       const caseData = {
         fecha: form.fecha.toISOString().split('T')[0],
@@ -175,14 +179,14 @@ const CaseForm = () => {
         observaciones: form.observaciones,
         fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null,
       };
-  
+
       if (currentCase) {
         await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
         setCurrentCase(null);
       } else {
         await axios.post('http://127.0.0.1:5000/cases', caseData);
       }
-  
+
       setForm({
         fecha: new Date(),
         escritura: '',
@@ -191,15 +195,14 @@ const CaseForm = () => {
         observaciones: '',
         fecha_documento: null,
       });
-  
+
       dispatch(fetchCases());
       toast.success('Caso guardado exitosamente');
     } catch (error) {
-      // Capturar errores específicos del backend
       if (error.response && error.response.data.error) {
         Swal.fire({
           title: 'Error',
-          text: error.response.data.error, // Mostrar el error específico devuelto por el backend
+          text: error.response.data.error,
           icon: 'error',
           confirmButtonText: 'Entendido',
         });
@@ -209,6 +212,7 @@ const CaseForm = () => {
       }
     }
   };
+
   
   
   const handleEdit = useCallback((caseItem) => {
@@ -527,6 +531,7 @@ const CaseForm = () => {
           </table>
         </div>
         <form className={`case-form ${componentSize}`} onSubmit={handleSubmit}>
+          {/* Fecha */}
           <label htmlFor="fecha">Fecha</label>
           <DatePicker
             selected={form.fecha}
@@ -538,18 +543,25 @@ const CaseForm = () => {
             dropdownMode="select"
             className="date-picker"
           />
-          <label htmlFor="escritura">Escritura</label>
+
+          {/* Escritura */}
+          <Tooltip title="Escribe solo el número de la escritura sin caracteres especiales.">
+            <label htmlFor="escritura">Escritura</label>
+          </Tooltip>
           <input
             type="text"
             name="escritura"
             value={form.escritura}
             onChange={handleChange}
             placeholder="Ej: 12345"
-            className={errors.escritura ? 'input-error' : ''}
+            className={errors.escritura ? 'input-error' : ''} 
           />
           {errors.escritura && <span className="error-message">{errors.escritura}</span>}
 
-          <label htmlFor="fecha_documento">Fecha del Documento</label>
+          {/* Fecha del Documento */}
+          <Tooltip title="Fecha en la que el documento fue firmado por el primer otorgante.">
+            <label htmlFor="fecha_documento">Fecha del Documento</label>
+          </Tooltip>
           <DatePicker
             selected={form.fecha_documento}
             onChange={handleDocumentDateChange}
@@ -561,7 +573,10 @@ const CaseForm = () => {
             className="date-picker"
           />
 
-          <label htmlFor="radicado">Radicado</label>
+          {/* Radicado */}
+          <Tooltip title="El radicado debe ser numérico y no debe contener texto.">
+            <label htmlFor="radicado">Radicado</label>
+          </Tooltip>
           <input
             type="text"
             name="radicado"
@@ -572,18 +587,24 @@ const CaseForm = () => {
           />
           {errors.radicado && <span className="error-message">{errors.radicado}</span>}
 
+          {/* Protocolista */}
           <label htmlFor="protocolista">Protocolista</label>
-          <Select
-            options={protocolists.map((p) => ({ value: p.nombre, label: p.nombre }))}
-            value={form.protocolista ? { value: form.protocolista, label: form.protocolista } : null} // Ensure proper value or null
+          <AutoComplete
+            style={{ width: '100%' }}
+            options={protocolists
+              .filter((p) => p.nombre.toLowerCase().startsWith(form.protocolista?.toLowerCase() || ''))
+              .map((p) => ({ value: p.nombre }))}
+            value={form.protocolista}
             onChange={handleProtocolistaChange}
-            className={errors.protocolista ? 'input-error' : ''}
             placeholder="Selecciona un protocolista"
-            isClearable
+            filterOption={(inputValue, option) =>
+              option.value.toLowerCase().includes(inputValue.toLowerCase())
+            }
           />
-
           {errors.protocolista && <span className="error-message">{errors.protocolista}</span>}
 
+
+          {/* Observaciones */}
           <label htmlFor="observaciones">Observaciones</label>
           <textarea
             name="observaciones"
@@ -591,6 +612,8 @@ const CaseForm = () => {
             onChange={handleChange}
             placeholder="Observaciones adicionales (opcional)"
           ></textarea>
+
+          {/* Botón de acción */}
           <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
         </form>
       </div>
