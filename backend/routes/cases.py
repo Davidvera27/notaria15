@@ -41,7 +41,7 @@ def add_case():
         # Verificar si ya existe un caso con la misma escritura y fecha
         existing_case = Case.query.filter_by(escritura=data['escritura'], fecha_documento=data['fecha_documento']).first()
         if existing_case:
-            return jsonify({'error': 'Ya existe un caso con la misma escritura y fecha.'}), 400
+            return jsonify({'error': 'YA EXISTE UN CASO CON LA MISMA ESCRITURA.'}), 400
 
         # Verificar si el radicado ya existe
         existing_radicado = Case.query.filter_by(radicado=data['radicado']).first()
