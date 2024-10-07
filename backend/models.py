@@ -140,7 +140,6 @@ class Contabilidad(db.Model):
             'observaciones': self.observaciones
         }
 
-# Modelo actualizado para la tabla info_escritura
 class InfoEscritura(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     escritura = db.Column(db.Integer, nullable=False)
@@ -148,15 +147,20 @@ class InfoEscritura(db.Model):
     protocolista_id = db.Column(db.Integer, db.ForeignKey('protocolist.id'), nullable=False)
     vigencia_rentas = db.Column(db.String(50))
     radicado = db.Column(db.String(50), nullable=False)
-    fecha_envio_rentas = db.Column(db.String(50), nullable=True)  # Nueva columna para almacenar la fecha de envío
+    fecha_envio_rentas = db.Column(db.String(50), nullable=True)
+    total_pagado = db.Column(db.Numeric(10, 2), nullable=True)
+
+    # Agrega esta relación explícita para acceder a los datos del protocolista desde InfoEscritura
+    protocolista = db.relationship('Protocolist', backref=db.backref('info_escrituras', lazy=True))
 
     def to_dict(self):
         return {
             'id': self.id,
             'escritura': self.escritura,
             'fecha_documento': self.fecha_documento,
-            'protocolista': self.protocolista_id,
+            'protocolista': self.protocolista.nombre,  # Acceso directo al nombre del protocolista
             'vigencia_rentas': self.vigencia_rentas,
             'radicado': self.radicado,
-            'fecha_envio_rentas': self.fecha_envio_rentas  # Incluir en el dict de salida
+            'fecha_envio_rentas': self.fecha_envio_rentas,
+            'total_pagado': str(self.total_pagado)
         }
