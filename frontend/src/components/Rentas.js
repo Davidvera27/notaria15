@@ -11,6 +11,7 @@ const Rentas = () => {
     const [totalPagado, setTotalPagado] = useState(0);
     const [selectedProtocolista, setSelectedProtocolista] = useState('');
     const [selectionType, setSelectionType] = useState('checkbox'); // Tipo de selección
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Filas seleccionadas
 
     // Obtener la lista de protocolistas desde el backend
     useEffect(() => {
@@ -32,10 +33,8 @@ const Rentas = () => {
             const response = await axios.get(`http://127.0.0.1:5000/rentas/${protocolistaId}`);
             const casosData = response.data;
             setCasos(casosData);
-
-            // Calcular el total pagado
-            const total = casosData.reduce((acc, caso) => acc + (parseFloat(caso.total_pagado) || 0), 0);
-            setTotalPagado(total);
+            setSelectedRowKeys([]); // Resetear la selección al cambiar de protocolista
+            setTotalPagado(0); // Resetear el total pagado
         } catch (error) {
             console.error('Error al obtener los casos:', error);
         }
@@ -72,10 +71,22 @@ const Rentas = () => {
     ];
 
     // Configuración de la selección de filas
+    const onSelectChange = (newSelectedRowKeys) => {
+        setSelectedRowKeys(newSelectedRowKeys);
+
+        // Filtrar los casos seleccionados
+        const casosSeleccionados = casos.filter(caso => newSelectedRowKeys.includes(caso.id));
+
+        // Calcular el total pagado solo de los casos seleccionados
+        const total = casosSeleccionados.reduce((acc, caso) => acc + (parseFloat(caso.total_pagado) || 0), 0);
+        
+        // Si no hay ningún caso seleccionado, el total debe ser 0
+        setTotalPagado(total > 0 ? total : 0);
+    };
+
     const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            console.log(`Filas seleccionadas: ${selectedRowKeys}`, 'Casos seleccionados: ', selectedRows);
-        },
+        selectedRowKeys,
+        onChange: onSelectChange, // Manejar el cambio de selección
     };
 
     return (
