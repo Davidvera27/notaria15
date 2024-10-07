@@ -1,0 +1,17 @@
+/* src/components/Rentas.css */
+.rentas-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.rentas-container h1 {
+    color: #333;
+}
+
+.rentas-container .ant-select {
+    margin-bottom: 20px;
+}
+
+.rentas-container .ant-table {
+    margin-top: 20px;
+}
