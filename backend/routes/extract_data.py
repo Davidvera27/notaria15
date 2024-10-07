@@ -28,6 +28,8 @@ def extract_data():
             info_escritura = InfoEscritura.query.filter_by(radicado=data['RADICADO N°']).first()
             if info_escritura:
                 info_escritura.vigencia_rentas = data['FECHA_LIMITE_REGISTRO']
+                if data['TOTAL_PAGADO'] is not None:  # Asegurarse de que el total pagado sea válido
+                    info_escritura.total_pagado = data['TOTAL_PAGADO']
                 db.session.commit()
 
     # Retornar los datos extraídos
@@ -49,6 +51,8 @@ def extract_data_from_file():
         info_escritura = InfoEscritura.query.filter_by(radicado=data['RADICADO N°']).first()
         if info_escritura:
             info_escritura.vigencia_rentas = data['FECHA_LIMITE_REGISTRO']
+            if data['TOTAL_PAGADO'] is not None:  # Asegurarse de que el total pagado sea válido
+                info_escritura.total_pagado = data['TOTAL_PAGADO']
             db.session.commit()
 
     # Retornar los datos extraídos
