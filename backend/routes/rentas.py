@@ -1,60 +1,23 @@
 from flask import Blueprint, jsonify, request
-from models import db, Case, Protocolist  # Asegúrate de importar el modelo Protocolist
+from models import InfoEscritura, Protocolist
+from flask_sqlalchemy import SQLAlchemy
 
-rentas = Blueprint('rentas', __name__)
+db = SQLAlchemy()
 
-# Obtener todos los casos
-@rentas.route('/cases', methods=['GET'])
-def get_cases():
-    cases = Case.query.all()
-    return jsonify([case.to_dict() for case in cases])
+# Definir el Blueprint
+rentas_bp = Blueprint('rentas', __name__)
 
-# Obtener un caso por ID
-@rentas.route('/cases/<int:id>', methods=['GET'])
-def get_case(id):
-    case = Case.query.get_or_404(id)
-    return jsonify(case.to_dict())
-
-# Añadir un nuevo caso
-@rentas.route('/cases', methods=['POST'])
-def add_case():
-    data = request.json
-    new_case = Case(
-        fecha=data['fecha'],
-        escritura=data['escritura'],
-        radicado=data['radicado'],
-        protocolista=data['protocolista']
-    )
-    db.session.add(new_case)
-    db.session.commit()
-    return jsonify(new_case.to_dict())
-
-# Actualizar un caso existente
-@rentas.route('/cases/<int:id>', methods=['PUT'])
-def update_case(id):
-    case = Case.query.get_or_404(id)
-    data = request.json
-    case.fecha = data['fecha']
-    case.escritura = data['escritura']
-    case.radicado = data['radicado']
-    case.protocolista = data['protocolista']
-    db.session.commit()
-    return jsonify(case.to_dict())
-
-# Eliminar un caso
-@rentas.route('/cases/<int:id>', methods=['DELETE'])
-def delete_case(id):
-    case = Case.query.get_or_404(id)
-    db.session.delete(case)
-    db.session.commit()
-    return jsonify({'message': 'Case deleted successfully'})
-
-# Obtener todos los protocolistas
-@rentas.route('/protocolists', methods=['GET'])
+@rentas_bp.route('/protocolists', methods=['GET'])
 def get_protocolists():
     protocolists = Protocolist.query.all()
-    return jsonify([protocolist.to_dict() for protocolist in protocolists])
+    protocolist_data = [{'id': p.id, 'nombre': p.nombre} for p in protocolists]
+    return jsonify(protocolist_data), 200
 
-# Registrar el Blueprint en la aplicación
-def register_blueprints(app):
-    app.register_blueprint(rentas)
+@rentas_bp.route('/rentas/<int:protocolista_id>', methods=['GET'])
+def get_casos_by_protocolista(protocolista_id):
+    casos = InfoEscritura.query.filter_by(protocolista_id=protocolista_id).all()
+    casos_data = [{'id': caso.id, 'num_escritura': caso.escritura, 'fecha_escritura': caso.fecha_documento,
+                   'radicado': caso.radicado, 'total_pagado': caso.total_pagado or 0, 
+                   'vigencia_rentas': caso.vigencia_rentas} for caso in casos]
+    return jsonify(casos_data), 200
+
