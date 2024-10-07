@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -8,6 +9,7 @@ import {
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
+  DollarOutlined, // Importar icono para rentas
 } from '@ant-design/icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,6 +21,7 @@ import Loader from './components/Loader';
 import ReportForm from './components/ReportForm';
 import FinishedCaseTable from './components/FinishedCaseTable';
 import Contabilidad from './components/Contabilidad';
+import Rentas from './components/Rentas'; // Importar componente de Rentas
 
 const ENDPOINT = "http://127.0.0.1:5000";
 
@@ -59,7 +62,9 @@ const items = [
   getItem('Casos Finalizados', '/finished-cases', <DesktopOutlined />),
   getItem('Protocolistas', '/protocolists', <UserOutlined />),
   getItem('Informes', '/generate-report', <FileOutlined />),
-  getItem('Contabilidad', '/contabilidad', <TeamOutlined />),
+  getItem('Contabilidad', 'sub1', <TeamOutlined />, [
+    getItem('Rentas', '/contabilidad/rentas', <DollarOutlined />),
+  ]), // Submenú con la opción de Rentas
   getItem('Registrar Usuario', '/register', <UserOutlined />),
   getItem('Perfil', '/profile', <UserOutlined />),
 ];
@@ -99,27 +104,27 @@ function App() {
     isAuthenticated && (
       <Router>
         <Layout style={{ minHeight: '100vh' }}>
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={(value) => setCollapsed(value)}
-          style={{ backgroundColor: '#239426' }} // Aplicamos un verde personalizado
-        >
-          <div className="logo" />
-          <Menu
-            theme="dark"
-            defaultSelectedKeys={['/']}
-            mode="inline"
-            items={items}
-            style={{
-              backgroundColor: '#239426', // Fondo verde para el menú
-              color: '#fff',               // Color de texto blanco
-            }}
-            onClick={({ key }) => {
-              window.location.pathname = key;
-            }}
-          />
-        </Sider>
+          <Sider
+            collapsible
+            collapsed={collapsed}
+            onCollapse={(value) => setCollapsed(value)}
+            style={{ backgroundColor: '#239426' }} // Aplicamos un verde personalizado
+          >
+            <div className="logo" />
+            <Menu
+              theme="dark"
+              defaultSelectedKeys={['/']}
+              mode="inline"
+              items={items}
+              style={{
+                backgroundColor: '#239426', // Fondo verde para el menú
+                color: '#fff',               // Color de texto blanco
+              }}
+              onClick={({ key }) => {
+                window.location.pathname = key;
+              }}
+            />
+          </Sider>
           <Layout className="site-layout">
             <Header style={{ padding: 0, background: colorBgContainer }}>
               {user && (
@@ -145,6 +150,7 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/generate-report" element={<ReportForm />} />
                   <Route path="/contabilidad" element={<Contabilidad />} />
+                  <Route path="/contabilidad/rentas" element={<Rentas />} /> {/* Nueva ruta para Rentas */}
                 </Routes>
               </Suspense>
             </Content>
