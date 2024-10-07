@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Table, Statistic, Radio, Divider } from 'antd';
+import { Select, Table, Statistic, Radio, Divider, Input, DatePicker } from 'antd';
 import axios from 'axios';
 import './Rentas.css'; // Estilo personalizado
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const Rentas = () => {
     const [protocolistas, setProtocolistas] = useState([]);
@@ -12,6 +13,17 @@ const Rentas = () => {
     const [selectedProtocolista, setSelectedProtocolista] = useState('');
     const [selectionType, setSelectionType] = useState('checkbox'); // Tipo de selección
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Filas seleccionadas
+    const [filteredCasos, setFilteredCasos] = useState([]); // Casos filtrados
+    const [selectedFilter, setSelectedFilter] = useState(''); // Filtro seleccionado
+    const [filterValue, setFilterValue] = useState(''); // Valor del filtro
+    const [dateRange, setDateRange] = useState([]); // Rango de fechas
+
+    // Opciones para el dropdown de filtros
+    const filterOptions = [
+        { value: 'num_escritura', label: 'Número de Escritura' },
+        { value: 'radicado', label: 'Radicado' },
+        { value: 'total_pagado', label: 'Total Pagado' }
+    ];
 
     // Obtener la lista de protocolistas desde el backend
     useEffect(() => {
@@ -33,11 +45,54 @@ const Rentas = () => {
             const response = await axios.get(`http://127.0.0.1:5000/rentas/${protocolistaId}`);
             const casosData = response.data;
             setCasos(casosData);
+            setFilteredCasos(casosData); // Actualizamos los casos filtrados con los originales
             setSelectedRowKeys([]); // Resetear la selección al cambiar de protocolista
             setTotalPagado(0); // Resetear el total pagado
         } catch (error) {
             console.error('Error al obtener los casos:', error);
         }
+    };
+
+    // Función para manejar el cambio en el filtro seleccionado
+    const handleFilterChange = (value) => {
+        setSelectedFilter(value);
+        setFilterValue(''); // Resetear el valor del filtro al cambiar de filtro
+    };
+
+    // Función para manejar la entrada del valor del filtro
+    const handleFilterValueChange = (e) => {
+        const value = e.target.value;
+        setFilterValue(value);
+        applyFilters(value, dateRange); // Aplicar los filtros dinámicamente
+    };
+
+    // Función para manejar el cambio de rango de fechas
+    const onDateChange = (dates) => {
+        setDateRange(dates);
+        applyFilters(filterValue, dates); // Aplicar los filtros con el nuevo rango de fechas
+    };
+
+    // Función para aplicar los filtros
+    const applyFilters = (filterValue, range) => {
+        let filteredData = casos;
+
+        // Filtrar por rango de fechas
+        if (range && range.length === 2) {
+            const [start, end] = range;
+            filteredData = filteredData.filter(caso => {
+                const fechaEscritura = new Date(caso.fecha_escritura);
+                return fechaEscritura >= start && fechaEscritura <= end;
+            });
+        }
+
+        // Filtrar por el valor del filtro seleccionado
+        if (filterValue && selectedFilter) {
+            filteredData = filteredData.filter(caso => {
+                return caso[selectedFilter]?.toString().includes(filterValue);
+            });
+        }
+
+        setFilteredCasos(filteredData); // Actualizar los casos filtrados
     };
 
     // Configuración de las columnas de la tabla
@@ -62,11 +117,6 @@ const Rentas = () => {
             dataIndex: 'total_pagado',
             key: 'total_pagado',
             render: (value) => `$${parseFloat(value).toFixed(2)}`, // Formato moneda
-        },
-        {
-            title: 'Fecha de Vigencia en Rentas',
-            dataIndex: 'vigencia_rentas',
-            key: 'vigencia_rentas',
         }
     ];
 
@@ -75,12 +125,10 @@ const Rentas = () => {
         setSelectedRowKeys(newSelectedRowKeys);
 
         // Filtrar los casos seleccionados
-        const casosSeleccionados = casos.filter(caso => newSelectedRowKeys.includes(caso.id));
+        const casosSeleccionados = filteredCasos.filter(caso => newSelectedRowKeys.includes(caso.id));
 
         // Calcular el total pagado solo de los casos seleccionados
         const total = casosSeleccionados.reduce((acc, caso) => acc + (parseFloat(caso.total_pagado) || 0), 0);
-        
-        // Si no hay ningún caso seleccionado, el total debe ser 0
         setTotalPagado(total > 0 ? total : 0);
     };
 
@@ -110,6 +158,31 @@ const Rentas = () => {
                 ))}
             </Select>
 
+            {/* Filtros avanzados */}
+            <Select
+                placeholder="Seleccione filtro"
+                onChange={handleFilterChange}
+                style={{ marginTop: 20, width: 300 }}
+                value={selectedFilter}
+            >
+                {filterOptions.map(option => (
+                    <Option key={option.value} value={option.value}>{option.label}</Option>
+                ))}
+            </Select>
+
+            {/* Input dinámico para el valor del filtro */}
+            {selectedFilter && (
+                <Input
+                    placeholder={`Ingrese ${filterOptions.find(opt => opt.value === selectedFilter)?.label}`}
+                    value={filterValue}
+                    onChange={handleFilterValueChange}
+                    style={{ marginTop: 20, width: 300 }}
+                />
+            )}
+
+            {/* Filtro de rango de fechas */}
+            <RangePicker onChange={onDateChange} style={{ marginTop: 20 }} />
+
             {/* Selección de checkbox o radio */}
             <Radio.Group
                 onChange={(e) => setSelectionType(e.target.value)}
@@ -129,7 +202,7 @@ const Rentas = () => {
                     ...rowSelection,
                 }}
                 columns={columns}
-                dataSource={casos}
+                dataSource={filteredCasos} // Usamos los casos filtrados
                 rowKey="id"
                 pagination={false}
                 style={{ marginTop: 20 }}
