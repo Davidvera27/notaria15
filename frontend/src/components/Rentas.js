@@ -13,17 +13,11 @@ const Rentas = () => {
     const [selectedProtocolista, setSelectedProtocolista] = useState('');
     const [selectionType, setSelectionType] = useState('checkbox'); // Tipo de selección
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Filas seleccionadas
+    const [selectedRowsData, setSelectedRowsData] = useState([]); // Data of selected rows
+    const [filtro, setFiltro] = useState(''); // Estado para el filtro
+    const [searchInput, setSearchInput] = useState(''); // Valor del input de búsqueda
     const [filteredCasos, setFilteredCasos] = useState([]); // Casos filtrados
-    const [selectedFilter, setSelectedFilter] = useState(''); // Filtro seleccionado
-    const [filterValue, setFilterValue] = useState(''); // Valor del filtro
-    const [dateRange, setDateRange] = useState([]); // Rango de fechas
-
-    // Opciones para el dropdown de filtros
-    const filterOptions = [
-        { value: 'num_escritura', label: 'Número de Escritura' },
-        { value: 'radicado', label: 'Radicado' },
-        { value: 'total_pagado', label: 'Total Pagado' }
-    ];
+    const [dateRange, setDateRange] = useState([]); // Filtro de rango de fechas
 
     // Obtener la lista de protocolistas desde el backend
     useEffect(() => {
@@ -45,54 +39,59 @@ const Rentas = () => {
             const response = await axios.get(`http://127.0.0.1:5000/rentas/${protocolistaId}`);
             const casosData = response.data;
             setCasos(casosData);
-            setFilteredCasos(casosData); // Actualizamos los casos filtrados con los originales
+            setFilteredCasos(casosData); // Inicializar los casos filtrados
             setSelectedRowKeys([]); // Resetear la selección al cambiar de protocolista
+            setSelectedRowsData([]); // Reset selected rows data
             setTotalPagado(0); // Resetear el total pagado
         } catch (error) {
             console.error('Error al obtener los casos:', error);
         }
     };
 
-    // Función para manejar el cambio en el filtro seleccionado
-    const handleFilterChange = (value) => {
-        setSelectedFilter(value);
-        setFilterValue(''); // Resetear el valor del filtro al cambiar de filtro
+    // Manejar el cambio del filtro (columna a buscar)
+    const handleFiltroChange = (value) => {
+        setFiltro(value);
+        setSearchInput(''); // Limpiar el input de búsqueda al cambiar de filtro
     };
 
-    // Función para manejar la entrada del valor del filtro
-    const handleFilterValueChange = (e) => {
+    // Manejar el cambio del input de búsqueda
+    const handleSearchChange = (e) => {
         const value = e.target.value;
-        setFilterValue(value);
-        applyFilters(value, dateRange); // Aplicar los filtros dinámicamente
+        setSearchInput(value);
+        aplicarFiltro(value, dateRange);
     };
 
-    // Función para manejar el cambio de rango de fechas
-    const onDateChange = (dates) => {
+    // Manejar el cambio del rango de fechas
+    const handleDateRangeChange = (dates) => {
         setDateRange(dates);
-        applyFilters(filterValue, dates); // Aplicar los filtros con el nuevo rango de fechas
+        aplicarFiltro(searchInput, dates);
     };
 
-    // Función para aplicar los filtros
-    const applyFilters = (filterValue, range) => {
-        let filteredData = casos;
+    // Aplicar los filtros
+    const aplicarFiltro = (inputValue, dateRange) => {
+        let casosFiltrados = casos;
 
-        // Filtrar por rango de fechas
-        if (range && range.length === 2) {
-            const [start, end] = range;
-            filteredData = filteredData.filter(caso => {
-                const fechaEscritura = new Date(caso.fecha_escritura);
-                return fechaEscritura >= start && fechaEscritura <= end;
+        if (inputValue) {
+            casosFiltrados = casos.filter((caso) => {
+                if (filtro === 'num_escritura') {
+                    return caso.num_escritura.toString().includes(inputValue);
+                } else if (filtro === 'radicado') {
+                    return caso.radicado.toString().includes(inputValue);
+                } else if (filtro === 'total_pagado') {
+                    return caso.total_pagado.toString().includes(inputValue);
+                }
+                return true;
             });
         }
 
-        // Filtrar por el valor del filtro seleccionado
-        if (filterValue && selectedFilter) {
-            filteredData = filteredData.filter(caso => {
-                return caso[selectedFilter]?.toString().includes(filterValue);
+        if (dateRange && dateRange.length === 2) {
+            casosFiltrados = casosFiltrados.filter((caso) => {
+                const casoFecha = new Date(caso.fecha_escritura);
+                return casoFecha >= dateRange[0]._d && casoFecha <= dateRange[1]._d;
             });
         }
 
-        setFilteredCasos(filteredData); // Actualizar los casos filtrados
+        setFilteredCasos(casosFiltrados);
     };
 
     // Configuración de las columnas de la tabla
@@ -117,19 +116,20 @@ const Rentas = () => {
             dataIndex: 'total_pagado',
             key: 'total_pagado',
             render: (value) => `$${parseFloat(value).toFixed(2)}`, // Formato moneda
-        }
+        },
     ];
 
     // Configuración de la selección de filas
-    const onSelectChange = (newSelectedRowKeys) => {
-        setSelectedRowKeys(newSelectedRowKeys);
+    const onSelectChange = (newSelectedRowKeys, selectedRows) => {
+        const updatedSelectedRows = [...selectedRowsData, ...selectedRows.filter(row => !selectedRowsData.includes(row))];
 
-        // Filtrar los casos seleccionados
-        const casosSeleccionados = filteredCasos.filter(caso => newSelectedRowKeys.includes(caso.id));
+        // Mantener la selección y las nuevas selecciones
+        setSelectedRowKeys(newSelectedRowKeys);
+        setSelectedRowsData(updatedSelectedRows);
 
         // Calcular el total pagado solo de los casos seleccionados
-        const total = casosSeleccionados.reduce((acc, caso) => acc + (parseFloat(caso.total_pagado) || 0), 0);
-        setTotalPagado(total > 0 ? total : 0);
+        const total = updatedSelectedRows.reduce((acc, caso) => acc + (parseFloat(caso.total_pagado) || 0), 0);
+        setTotalPagado(total);
     };
 
     const rowSelection = {
@@ -158,30 +158,33 @@ const Rentas = () => {
                 ))}
             </Select>
 
-            {/* Filtros avanzados */}
+            {/* Filtros de búsqueda */}
             <Select
-                placeholder="Seleccione filtro"
-                onChange={handleFilterChange}
-                style={{ marginTop: 20, width: 300 }}
-                value={selectedFilter}
+                placeholder="Seleccionar Filtro"
+                onChange={handleFiltroChange}
+                style={{ width: 200, marginLeft: 10 }}
+                value={filtro}
             >
-                {filterOptions.map(option => (
-                    <Option key={option.value} value={option.value}>{option.label}</Option>
-                ))}
+                <Option value="num_escritura">Número de Escritura</Option>
+                <Option value="radicado">Radicado</Option>
+                <Option value="total_pagado">Total Pagado</Option>
             </Select>
 
-            {/* Input dinámico para el valor del filtro */}
-            {selectedFilter && (
+            {/* Input de búsqueda */}
+            {filtro && (
                 <Input
-                    placeholder={`Ingrese ${filterOptions.find(opt => opt.value === selectedFilter)?.label}`}
-                    value={filterValue}
-                    onChange={handleFilterValueChange}
-                    style={{ marginTop: 20, width: 300 }}
+                    style={{ width: 200, marginLeft: 10 }}
+                    placeholder={`Buscar por ${filtro}`}
+                    value={searchInput}
+                    onChange={handleSearchChange}
                 />
             )}
 
             {/* Filtro de rango de fechas */}
-            <RangePicker onChange={onDateChange} style={{ marginTop: 20 }} />
+            <RangePicker
+                onChange={handleDateRangeChange}
+                style={{ marginLeft: 10 }}
+            />
 
             {/* Selección de checkbox o radio */}
             <Radio.Group
@@ -202,7 +205,7 @@ const Rentas = () => {
                     ...rowSelection,
                 }}
                 columns={columns}
-                dataSource={filteredCasos} // Usamos los casos filtrados
+                dataSource={filteredCasos}
                 rowKey="id"
                 pagination={false}
                 style={{ marginTop: 20 }}
