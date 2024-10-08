@@ -113,11 +113,21 @@ const Rentas = () => {
     ];
 
     const onSelectChange = (newSelectedRowKeys, selectedRows) => {
-        const updatedSelectedRows = [...selectedRowsData, ...selectedRows.filter(row => !selectedRowsData.includes(row))];
+        // Filtrar los casos que se han deseleccionado y ajustar el total
+        const deselectedRows = selectedRowsData.filter(row => !selectedRows.includes(row));
+        const updatedSelectedRows = selectedRows.filter(row => !selectedRowsData.includes(row));
+        
+        // Restar los valores de los casos deseleccionados
+        const totalRestado = deselectedRows.reduce((acc, caso) => acc - (parseFloat(caso.total_pagado) || 0), 0);
+
+        // Sumar los valores de los casos seleccionados
+        const totalSumado = updatedSelectedRows.reduce((acc, caso) => acc + (parseFloat(caso.total_pagado) || 0), 0);
+
+        // Actualizar el total con la suma y la resta
+        setTotalPagado(totalPagado + totalSumado + totalRestado);
+
         setSelectedRowKeys(newSelectedRowKeys);
-        setSelectedRowsData(updatedSelectedRows);
-        const total = updatedSelectedRows.reduce((acc, caso) => acc + (parseFloat(caso.total_pagado) || 0), 0);
-        setTotalPagado(total);
+        setSelectedRowsData(selectedRows);
     };
 
     const rowSelection = {
