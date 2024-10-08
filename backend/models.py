@@ -7,7 +7,7 @@ class Case(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.String(50))
     escritura = db.Column(db.Integer)
-    radicado = db.Column(db.String(50))
+    radicado = db.Column(db.String(50), unique=True)
     protocolista_id = db.Column(db.Integer, db.ForeignKey('protocolist.id'), nullable=False)
     observaciones = db.Column(db.String(255))
     fecha_documento = db.Column(db.String(50))  # Nuevo campo
