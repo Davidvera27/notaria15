@@ -206,16 +206,21 @@ def update_case(id):
         if not case:
             return jsonify({'error': 'Case not found'}), 404
 
-        # Actualizar todos los campos, incluyendo protocolista, escritura, fecha, observaciones
-        protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
-        if not protocolista:
-            return jsonify({'error': 'Protocolista no encontrado'}), 400
-
-        case.fecha = data['fecha']
-        case.escritura = int(data['escritura'])
-        case.radicado = data['radicado']
-        case.protocolista_id = protocolista.id
-        case.observaciones = data.get('observaciones', '')
+        # Solo actualizamos los campos que se hayan modificado
+        if 'fecha' in data and data['fecha']:
+            case.fecha = data['fecha']
+        if 'escritura' in data and data['escritura']:
+            case.escritura = int(data['escritura'])
+        if 'radicado' in data and data['radicado']:
+            case.radicado = data['radicado']
+        if 'protocolista' in data and data['protocolista']:
+            protocolista = Protocolist.query.filter_by(nombre=data['protocolista']).first()
+            if protocolista:
+                case.protocolista_id = protocolista.id
+            else:
+                return jsonify({'error': 'Protocolista no encontrado'}), 400
+        if 'observaciones' in data:
+            case.observaciones = data.get('observaciones', case.observaciones)  # Mantener si es None
 
         db.session.commit()
 
