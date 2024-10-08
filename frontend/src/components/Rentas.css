@@ -1,17 +1,40 @@
-/* src/components/Rentas.css */
+/* Contenedor principal que agrupa la tabla de rentas */
 .rentas-container {
     text-align: center;
     padding: 20px;
+    position: relative; /* Posicionamiento relativo para elementos internos */
 }
 
-.rentas-container h1 {
-    color: #333;
+/* Fijar el contenedor del valor total pagado en la parte superior derecha */
+.fixed-total {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
 }
 
-.rentas-container .ant-select {
-    margin-bottom: 20px;
+/* Agregar espacio adicional en la parte inferior para evitar superposición con el contenido */
+.rentas-container .ant-table-wrapper {
+    margin-bottom: 100px;
 }
 
+/* Fijar el header y filtros en la parte superior mientras se hace scroll */
+.fixed-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+/* Estilo de la tabla y los elementos de entrada para mantener el diseño limpio */
+.rentas-container .ant-select,
 .rentas-container .ant-table {
     margin-top: 20px;
 }
