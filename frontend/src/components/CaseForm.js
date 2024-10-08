@@ -14,9 +14,8 @@ import { toast } from 'react-toastify';
 import { io } from 'socket.io-client';
 import { es } from 'date-fns/locale';
 import { Tooltip } from 'antd';
-import { AutoComplete } from 'antd'; // Importar AutoComplete
-
-
+import { AutoComplete, Dropdown, Menu } from 'antd'; 
+import { MoreOutlined } from '@ant-design/icons';
 
 registerLocale('es', es);
 
@@ -424,23 +423,31 @@ const CaseForm = () => {
         accessor: 'acciones',
         disableSortBy: true,
         disableFilters: true,
-        Cell: ({ row }) => (
-          <div className="actions-container">
-            <button className="btn-edit" onClick={() => handleEdit(row.original)}>
-              <i className="fas fa-edit"></i> Editar
-            </button>
-            <button className="btn-delete" onClick={() => handleDelete(row.original.id)}>
-              <i className="fas fa-trash"></i> Eliminar
-            </button>
-            <button className="btn-add" onClick={() => handleAddRadicado(row.original)}>
-              <i className="fas fa-plus"></i> Añadir Radicado
-            </button>
-            <button className="btn-email" onClick={() => handleSendEmail(row.original)}>
-              <i className="fas fa-envelope"></i> Enviar Documento
-            </button>
-          </div>
-        ),
-        maxWidth: 200,
+        Cell: ({ row }) => {
+          const menu = (
+            <Menu>
+              <Menu.Item key="edit" onClick={() => handleEdit(row.original)}>
+                <i className="fas fa-edit"></i> Editar
+              </Menu.Item>
+              <Menu.Item key="delete" onClick={() => handleDelete(row.original.id)}>
+                <i className="fas fa-trash"></i> Eliminar
+              </Menu.Item>
+              <Menu.Item key="add-radicado" onClick={() => handleAddRadicado(row.original)}>
+                <i className="fas fa-plus"></i> Añadir Radicado
+              </Menu.Item>
+              <Menu.Item key="send-email" onClick={() => handleSendEmail(row.original)}>
+                <i className="fas fa-envelope"></i> Enviar Documento
+              </Menu.Item>
+            </Menu>
+          );
+
+          return (
+            <Dropdown overlay={menu} trigger={['click']}>
+              <MoreOutlined style={{ fontSize: '18px', cursor: 'pointer' }} />
+            </Dropdown>
+          );
+        },
+        maxWidth: 100, // Reducimos el ancho de la columna de acciones
       },
     ],
     [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]
