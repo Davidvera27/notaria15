@@ -264,7 +264,7 @@ const CaseForm = () => {
 
   const handleAddRadicado = useCallback(async (caseItem) => {
     if (!caseItem) {
-      return Swal.fire('Error', 'No hay un caso seleccionado.', 'error');
+      Swal.fire('Opción deshabilitada', 'Esta acción está deshabilitada.', 'info');
     }
 
     const { value: radicado } = await Swal.fire({
@@ -432,7 +432,7 @@ const CaseForm = () => {
               <Menu.Item key="delete" onClick={() => handleDelete(row.original.id)}>
                 <i className="fas fa-trash"></i> Eliminar
               </Menu.Item>
-              <Menu.Item key="add-radicado" onClick={() => handleAddRadicado(row.original)}>
+              <Menu.Item key="add-radicado" disabled onClick={() => handleAddRadicado(row.original)}>
                 <i className="fas fa-plus"></i> Añadir Radicado
               </Menu.Item>
               <Menu.Item key="send-email" onClick={() => handleSendEmail(row.original)}>
