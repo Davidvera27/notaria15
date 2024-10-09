@@ -39,6 +39,7 @@ const CaseForm = () => {
 
   const [errors, setErrors] = useState({});
   const [componentSize, setComponentSize] = useState('default'); // Tamaño de los componentes
+  const [isEditing, setIsEditing] = useState(false); // Track editing status for cancel button
 
   useEffect(() => {
     if (casesStatus === 'idle') dispatch(fetchCases());
@@ -72,6 +73,7 @@ const CaseForm = () => {
         fecha: new Date(currentCase.fecha),
         fecha_documento: currentCase.fecha_documento ? new Date(currentCase.fecha_documento) : null,
       });
+      setIsEditing(true); // Enter edit mode
     } else {
       setForm({
         fecha: new Date(),
@@ -81,6 +83,7 @@ const CaseForm = () => {
         observaciones: '',
         fecha_documento: null,
       });
+      setIsEditing(false); // Exit edit mode
     }
   }, [currentCase]);
 
@@ -206,6 +209,7 @@ const CaseForm = () => {
       if (currentCase) {
         await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
         setCurrentCase(null);
+        setIsEditing(false); // Exit edit mode
       } else {
         await axios.post('http://127.0.0.1:5000/cases', caseData);
       }
@@ -234,11 +238,26 @@ const CaseForm = () => {
         toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
       }
     }
-  };  
+  };   
   
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
+    setIsEditing(true); // Enable edit mode
   }, []);
+
+  // Nueva función para manejar la cancelación de la edición
+  const handleCancel = () => {
+    setCurrentCase(null);
+    setIsEditing(false); // Hide the cancel button after canceling
+    setForm({
+      fecha: new Date(),
+      escritura: '',
+      radicado: '',
+      protocolista: '',
+      observaciones: '',
+      fecha_documento: null,
+    });
+  };
 
   const handleDelete = useCallback(async (id) => {
     const result = await Swal.fire({
@@ -644,6 +663,7 @@ const CaseForm = () => {
 
           {/* Botón de acción */}
           <button type="submit">{currentCase ? 'Actualizar' : 'Agregar'}</button>
+          {isEditing && <button type="button" onClick={handleCancel} className="btn-cancel">Cancelar</button>}
         </form>
       </div>
     </div>
