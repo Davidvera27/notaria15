@@ -187,7 +187,7 @@ const CaseForm = () => {
     const caseData = {};
     
     if (form.fecha !== currentCase?.fecha) {
-      caseData.fecha = form.fecha.toISOString();  // Incluye la hora en el formato ISO
+      caseData.fecha = form.fecha.toISOString().split('T')[0];
     }
     if (form.escritura !== currentCase?.escritura) {
       caseData.escritura = form.escritura;
@@ -380,21 +380,6 @@ const CaseForm = () => {
   }, [cases, dispatch, isRadicadoInPdf]);
 
   const data = useMemo(() => cases, [cases]);
-
-  // Función para formatear la fecha al formato deseado
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).replace(',', ''); // Eliminar la coma que aparece por defecto
-  };
-
   const columns = useMemo(
     () => [
       {
@@ -406,7 +391,7 @@ const CaseForm = () => {
       },
       {
         Header: 'Fecha',
-        accessor: (row) => formatDate(row.fecha), // Formatear la fecha antes de mostrarla
+        accessor: 'fecha',
         Filter: DefaultColumnFilter,
         maxWidth: 150,
         sortType: 'datetime',
@@ -422,7 +407,7 @@ const CaseForm = () => {
       },
       {
         Header: 'Fecha Del Documento',
-        accessor: (row) => row.fecha_documento ? formatDate(row.fecha_documento) : '', // Formatear también la fecha del documento
+        accessor: 'fecha_documento',
         Filter: DefaultColumnFilter,
         maxWidth: 150,
         sortType: 'datetime',
@@ -599,10 +584,8 @@ const CaseForm = () => {
           <DatePicker
             selected={form.fecha}
             onChange={handleDateChange}
-            dateFormat="yyyy-MM-dd HH:mm:ss" // Cambiamos el formato para incluir la hora
+            dateFormat="yyyy-MM-dd"
             locale="es"
-            showTimeSelect
-            timeFormat="HH:mm"
             showMonthDropdown
             showYearDropdown
             dropdownMode="select"
