@@ -153,7 +153,7 @@ const CaseForm = () => {
       return;
     }
 
-    // Validar radicado duplicado
+    // Validar si el radicado ya existe
     const radicadoExistente = cases.find(
       (c) => c.radicado === form.radicado && (!currentCase || c.id !== currentCase.id)
     );
@@ -167,7 +167,7 @@ const CaseForm = () => {
       return;
     }
 
-    // Validar escritura y fecha de documento duplicados
+    // Validar si la escritura y fecha de documento ya existen
     const escrituraFechaExistente = cases.find(
       (c) =>
         c.escritura === form.escritura &&
@@ -184,36 +184,28 @@ const CaseForm = () => {
       return;
     }
 
-    const caseData = {};
-    
-    if (form.fecha !== currentCase?.fecha) {
-      caseData.fecha = form.fecha.toISOString().split('T')[0];
-    }
-    if (form.escritura !== currentCase?.escritura) {
-      caseData.escritura = form.escritura;
-    }
-    if (form.radicado !== currentCase?.radicado) {
-      caseData.radicado = form.radicado;
-    }
-    if (form.protocolista !== currentCase?.protocolista) {
-      caseData.protocolista = form.protocolista;
-    }
-    if (form.observaciones !== currentCase?.observaciones) {
-      caseData.observaciones = form.observaciones;
-    }
-    if (form.fecha_documento && form.fecha_documento.toISOString().split('T')[0] !== currentCase?.fecha_documento) {
-      caseData.fecha_documento = form.fecha_documento.toISOString().split('T')[0];
-    }
+    // Crear objeto de datos para envío
+    const caseData = {
+      escritura: form.escritura,
+      radicado: form.radicado,
+      protocolista: form.protocolista,
+      observaciones: form.observaciones,
+      fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null,
+    };
 
     try {
       if (currentCase) {
+        // Si estamos editando un caso existente, NO enviar la fecha de creación
         await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
         setCurrentCase(null);
-        setIsEditing(false); // Exit edit mode
+        setIsEditing(false);
       } else {
+        // Si estamos creando un nuevo caso, enviar también la fecha de creación
+        caseData.fecha = form.fecha.toISOString().split('T')[0];
         await axios.post('http://127.0.0.1:5000/cases', caseData);
       }
 
+      // Restablecer el formulario después de la operación
       setForm({
         fecha: new Date(),
         escritura: '',
@@ -223,6 +215,7 @@ const CaseForm = () => {
         fecha_documento: null,
       });
 
+      // Actualizar la lista de casos
       dispatch(fetchCases());
       toast.success('Caso guardado exitosamente');
     } catch (error) {
@@ -234,11 +227,12 @@ const CaseForm = () => {
           confirmButtonText: 'Entendido',
         });
       } else {
-        console.error('Error adding/updating case:', error);
+        console.error('Error al guardar el caso:', error);
         toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
       }
     }
-  };   
+};
+  
   
   const handleEdit = useCallback((caseItem) => {
     setCurrentCase(caseItem);
