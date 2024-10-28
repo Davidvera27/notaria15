@@ -184,12 +184,29 @@ const CaseForm = () => {
       return;
     }
 
+    // Verificar los cambios para generar las observaciones
+    let newObservations = form.observaciones || '';
+    if (currentCase) {
+      if (form.escritura !== currentCase.escritura) {
+        newObservations += `\nEscritura cambiada de ${currentCase.escritura} a ${form.escritura}.`;
+      }
+      if (form.radicado !== currentCase.radicado) {
+        newObservations += `\nRadicado cambiado de ${currentCase.radicado} a ${form.radicado}.`;
+      }
+      if (form.protocolista !== currentCase.protocolista) {
+        newObservations += `\nProtocolista cambiado de ${currentCase.protocolista} a ${form.protocolista}.`;
+      }
+      if (form.fecha_documento && form.fecha_documento.toISOString().split('T')[0] !== currentCase.fecha_documento) {
+        newObservations += `\nFecha del documento cambiada de ${currentCase.fecha_documento} a ${form.fecha_documento.toISOString().split('T')[0]}.`;
+      }
+    }
+
     // Crear objeto de datos para envío
     const caseData = {
       escritura: form.escritura,
       radicado: form.radicado,
       protocolista: form.protocolista,
-      observaciones: form.observaciones,
+      observaciones: newObservations,  // Agregamos las nuevas observaciones
       fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null,
     };
 
@@ -232,6 +249,7 @@ const CaseForm = () => {
       }
     }
 };
+
   
   
   const handleEdit = useCallback((caseItem) => {
