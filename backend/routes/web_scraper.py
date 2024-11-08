@@ -75,3 +75,4 @@ def start_scraping():
     finally:
         # Cerrar el navegador
         driver.quit()
+        
