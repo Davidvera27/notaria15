@@ -398,21 +398,24 @@ const CaseForm = () => {
 const scrapeWindowRef = useRef(null);
 
 const handleScrapeData = useCallback((caseItem) => {
-  // URL base con el placeholder para el radicado
+  // URL base con el marcador de posición para el radicado
   const baseUrl = "https://mercurio.antioquia.gov.co/mercurio/servlet/ControllerMercurio?command=anexos&tipoOperacion=abrirLista&idDocumento=RADICADO_PLACEHOLDER&tipDocumento=R&now=Date()&ventanaEmergente=S&origen=NTR";
-
-  // Reemplaza el placeholder con el radicado real del caseItem
+  
+  // Reemplaza el marcador con el radicado actual del caseItem
   const scrapingUrl = baseUrl.replace("RADICADO_PLACEHOLDER", caseItem.radicado);
 
   // Verifica si la ventana ya está abierta y si sigue activa
   if (scrapeWindowRef.current && !scrapeWindowRef.current.closed) {
-    scrapeWindowRef.current.focus(); // Enfoca la ventana existente
+    // Cambia la URL de la ventana abierta
+    scrapeWindowRef.current.location.href = scrapingUrl;
+    scrapeWindowRef.current.focus(); // Enfoca la ventana
   } else {
-    // Si no está abierta, abre una nueva ventana y guarda la referencia
+    // Si no está abierta, abre una nueva ventana con la URL personalizada y guarda la referencia
     scrapeWindowRef.current = window.open(scrapingUrl, "_blank");
     scrapeWindowRef.current.focus(); // Asegura que la ventana se muestre en primer plano
   }
 }, []);
+
 
   
 
