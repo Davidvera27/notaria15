@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCases } from '../features/caseSlice';
 import { fetchFinishedCases } from '../features/finishedCaseSlice';
@@ -16,6 +16,7 @@ import { es } from 'date-fns/locale';
 import { Tooltip } from 'antd';
 import { AutoComplete, Dropdown, Menu } from 'antd'; 
 import { MoreOutlined } from '@ant-design/icons';
+
 
 registerLocale('es', es);
 
@@ -296,6 +297,7 @@ const CaseForm = () => {
   const handleAddRadicado = useCallback(async (caseItem) => {
     if (!caseItem) {
       Swal.fire('Opción deshabilitada', 'Esta acción está deshabilitada.', 'info');
+      return;
     }
 
     const { value: radicado } = await Swal.fire({
@@ -317,6 +319,7 @@ const CaseForm = () => {
       }
     }
   }, [dispatch]);
+
 
   const handleSendEmail = useCallback(async (caseItem) => {
     try {
@@ -391,6 +394,28 @@ const CaseForm = () => {
     }
   }, [cases, dispatch, isRadicadoInPdf]);
 
+// Declaramos el hook useRef
+const scrapeWindowRef = useRef(null);
+
+const handleScrapeData = useCallback((caseItem) => {
+  // URL base con el placeholder para el radicado
+  const baseUrl = "https://mercurio.antioquia.gov.co/mercurio/servlet/ControllerMercurio?command=anexos&tipoOperacion=abrirLista&idDocumento=RADICADO_PLACEHOLDER&tipDocumento=R&now=Date()&ventanaEmergente=S&origen=NTR";
+
+  // Reemplaza el placeholder con el radicado real del caseItem
+  const scrapingUrl = baseUrl.replace("RADICADO_PLACEHOLDER", caseItem.radicado);
+
+  // Verifica si la ventana ya está abierta y si sigue activa
+  if (scrapeWindowRef.current && !scrapeWindowRef.current.closed) {
+    scrapeWindowRef.current.focus(); // Enfoca la ventana existente
+  } else {
+    // Si no está abierta, abre una nueva ventana y guarda la referencia
+    scrapeWindowRef.current = window.open(scrapingUrl, "_blank");
+    scrapeWindowRef.current.focus(); // Asegura que la ventana se muestre en primer plano
+  }
+}, []);
+
+  
+
   const data = useMemo(() => cases, [cases]);
   const columns = useMemo(
     () => [
@@ -457,19 +482,22 @@ const CaseForm = () => {
         Cell: ({ row }) => {
           const menu = (
             <Menu>
-              <Menu.Item key="edit" onClick={() => handleEdit(row.original)}>
-                <i className="fas fa-edit"></i> Editar
-              </Menu.Item>
-              <Menu.Item key="delete" onClick={() => handleDelete(row.original.id)}>
-                <i className="fas fa-trash"></i> Eliminar
-              </Menu.Item>
-              <Menu.Item key="add-radicado" disabled onClick={() => handleAddRadicado(row.original)}>
-                <i className="fas fa-plus"></i> Añadir Radicado
-              </Menu.Item>
-              <Menu.Item key="send-email" onClick={() => handleSendEmail(row.original)}>
-                <i className="fas fa-envelope"></i> Enviar Documento
-              </Menu.Item>
-            </Menu>
+            <Menu.Item key="edit" onClick={() => handleEdit(row.original)}>
+              <i className="fas fa-edit"></i> Editar
+            </Menu.Item>
+            <Menu.Item key="delete" onClick={() => handleDelete(row.original.id)}>
+              <i className="fas fa-trash"></i> Eliminar
+            </Menu.Item>
+            <Menu.Item key="add-radicado" disabled onClick={() => handleAddRadicado(row.original)}>
+              <i className="fas fa-plus"></i> Añadir Radicado
+            </Menu.Item>
+            <Menu.Item key="send-email" onClick={() => handleSendEmail(row.original)}>
+              <i className="fas fa-envelope"></i> Enviar Documento
+            </Menu.Item>
+            <Menu.Item key="scrape-data" onClick={() => handleScrapeData(row.original)}>
+              <i className="fas fa-search"></i> Extraer Datos
+            </Menu.Item>
+          </Menu>
           );
 
           return (
@@ -481,7 +509,7 @@ const CaseForm = () => {
         maxWidth: 100, // Reducimos el ancho de la columna de acciones
       },
     ],
-    [handleEdit, handleDelete, handleAddRadicado, handleSendEmail]
+    [handleEdit, handleDelete, handleAddRadicado, handleSendEmail, handleScrapeData]
   );
 
   const {
