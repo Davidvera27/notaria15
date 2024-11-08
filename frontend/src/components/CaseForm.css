@@ -294,3 +294,35 @@
 .case-form.large textarea {
   font-size: 16px;
 }
+
+/* Estilos para el contenedor de consulta de anexos */
+.anexos-container {
+  background-color: #f7f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.anexos-container h2 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+.anexos-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.anexos-container th,
+.anexos-container td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.anexos-container th {
+  background-color: #4CAF50;
+  color: white;
+}
