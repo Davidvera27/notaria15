@@ -148,108 +148,98 @@ const CaseForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validación de campos obligatorios
+    const requiredFields = ['escritura', 'radicado', 'protocolista', 'fecha', 'fecha_documento'];
+    const emptyFields = requiredFields.filter((field) => !form[field]);
+    if (emptyFields.length > 0) {
+        toast.error('Por favor complete todos los campos obligatorios.');
+        return;
+    }
+
+    // Validación de errores en los campos
     const hasErrors = Object.values(errors).some((error) => error);
     if (hasErrors) {
-      toast.error('Corrija los errores antes de enviar el formulario.');
-      return;
+        toast.error('Corrija los errores antes de enviar el formulario.');
+        return;
     }
 
     // Validar si el radicado ya existe
     const radicadoExistente = cases.find(
-      (c) => c.radicado === form.radicado && (!currentCase || c.id !== currentCase.id)
+        (c) => c.radicado === form.radicado && (!currentCase || c.id !== currentCase.id)
     );
     if (radicadoExistente) {
-      Swal.fire({
-        title: 'Radicado Duplicado',
-        text: `El radicado ya existe asignado al protocolista ${radicadoExistente.protocolista}.`,
-        icon: 'error',
-        confirmButtonText: 'Entendido',
-      });
-      return;
+        Swal.fire({
+            title: 'Radicado Duplicado',
+            text: `El radicado ya existe asignado al protocolista ${radicadoExistente.protocolista}.`,
+            icon: 'error',
+            confirmButtonText: 'Entendido',
+        });
+        return;
     }
 
     // Validar si la escritura y fecha de documento ya existen
     const escrituraFechaExistente = cases.find(
-      (c) =>
-        c.escritura === form.escritura &&
-        c.fecha_documento === form.fecha_documento?.toISOString().split('T')[0] &&
-        (!currentCase || c.id !== currentCase.id)
+        (c) =>
+            c.escritura === form.escritura &&
+            c.fecha_documento === form.fecha_documento?.toISOString().split('T')[0] &&
+            (!currentCase || c.id !== currentCase.id)
     );
     if (escrituraFechaExistente) {
-      Swal.fire({
-        title: 'Escritura Duplicada',
-        text: `Ya existe un caso con la escritura ${form.escritura} y la fecha de documento ${form.fecha_documento?.toLocaleDateString()}.`,
-        icon: 'error',
-        confirmButtonText: 'Entendido',
-      });
-      return;
-    }
-
-    // Verificar los cambios para generar las observaciones
-    let newObservations = form.observaciones || '';
-    if (currentCase) {
-      if (form.escritura !== currentCase.escritura) {
-        newObservations += `\nEscritura cambiada de ${currentCase.escritura} a ${form.escritura}.`;
-      }
-      if (form.radicado !== currentCase.radicado) {
-        newObservations += `\nRadicado cambiado de ${currentCase.radicado} a ${form.radicado}.`;
-      }
-      if (form.protocolista !== currentCase.protocolista) {
-        newObservations += `\nProtocolista cambiado de ${currentCase.protocolista} a ${form.protocolista}.`;
-      }
-      if (form.fecha_documento && form.fecha_documento.toISOString().split('T')[0] !== currentCase.fecha_documento) {
-        newObservations += `\nFecha del documento cambiada de ${currentCase.fecha_documento} a ${form.fecha_documento.toISOString().split('T')[0]}.`;
-      }
+        Swal.fire({
+            title: 'Escritura Duplicada',
+            text: `Ya existe un caso con la escritura ${form.escritura} y la fecha de documento ${form.fecha_documento?.toLocaleDateString()}.`,
+            icon: 'error',
+            confirmButtonText: 'Entendido',
+        });
+        return;
     }
 
     // Crear objeto de datos para envío
     const caseData = {
-      escritura: form.escritura,
-      radicado: form.radicado,
-      protocolista: form.protocolista,
-      observaciones: newObservations,  // Agregamos las nuevas observaciones
-      fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null,
+        escritura: form.escritura,
+        radicado: form.radicado,
+        protocolista: form.protocolista,
+        observaciones: form.observaciones || '', // Observaciones es opcional
+        fecha_documento: form.fecha_documento ? form.fecha_documento.toISOString().split('T')[0] : null,
     };
 
     try {
-      if (currentCase) {
-        // Si estamos editando un caso existente, NO enviar la fecha de creación
-        await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
-        setCurrentCase(null);
-        setIsEditing(false);
-      } else {
-        // Si estamos creando un nuevo caso, enviar también la fecha de creación
-        caseData.fecha = form.fecha.toISOString().split('T')[0];
-        await axios.post('http://127.0.0.1:5000/cases', caseData);
-      }
+        if (currentCase) {
+            await axios.put(`http://127.0.0.1:5000/cases/${currentCase.id}`, caseData);
+            setCurrentCase(null);
+            setIsEditing(false);
+        } else {
+            caseData.fecha = form.fecha.toISOString().split('T')[0];
+            await axios.post('http://127.0.0.1:5000/cases', caseData);
+        }
 
-      // Restablecer el formulario después de la operación
-      setForm({
-        fecha: new Date(),
-        escritura: '',
-        radicado: '',
-        protocolista: '',
-        observaciones: '',
-        fecha_documento: null,
-      });
-
-      // Actualizar la lista de casos
-      dispatch(fetchCases());
-      toast.success('Caso guardado exitosamente');
-    } catch (error) {
-      if (error.response && error.response.data.error) {
-        Swal.fire({
-          title: 'Error',
-          text: error.response.data.error,
-          icon: 'error',
-          confirmButtonText: 'Entendido',
+        setForm({
+            fecha: new Date(),
+            escritura: '',
+            radicado: '',
+            protocolista: '',
+            observaciones: '',
+            fecha_documento: null,
         });
-      } else {
-        console.error('Error al guardar el caso:', error);
-        toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
-      }
+
+        dispatch(fetchCases());
+        toast.success('Caso guardado exitosamente');
+    } catch (error) {
+        if (error.response && error.response.data.error) {
+            Swal.fire({
+                title: 'Error',
+                text: error.response.data.error,
+                icon: 'error',
+                confirmButtonText: 'Entendido',
+            });
+        } else {
+            console.error('Error al guardar el caso:', error);
+            toast.error('Hubo un problema al guardar el caso. Por favor, inténtelo de nuevo más tarde.');
+        }
     }
 };
+
 
   
   
