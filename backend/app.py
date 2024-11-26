@@ -17,7 +17,7 @@ from routes.report import report_bp
 from routes.rentas import rentas_bp
 from routes.contabilidad import contabilidad_bp
 from flask_socketio import SocketIO
-from routes import web_scraper
+
 
 app = Flask(__name__)
 mail = Mail(app)
@@ -49,7 +49,7 @@ app.register_blueprint(finished_cases_bp, url_prefix='/api')
 app.register_blueprint(report_bp)
 app.register_blueprint(contabilidad_bp, url_prefix='/api')
 app.register_blueprint(rentas_bp)
-app.register_blueprint(web_scraper.scraper_bp, url_prefix='/scraper')
+
 
 
 if __name__ == '__main__':
